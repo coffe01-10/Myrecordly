@@ -1,4 +1,10 @@
 {
+	"updates": {
+		"title": "更新",
+		"experimental": "实验性更新",
+		"experimentalDescription": "你已选择接收实验性更新，因此可以在 Recordly 最新更新广泛发布之前选择先行测试。",
+		"saveFailed": "无法更改更新频道。"
+	},
 	"zoom": {
 		"level": "缩放级别",
 		"selectRegion": "选择缩放区域以调整",
@@ -6,7 +12,8 @@
 		"modeAuto": "自动",
 		"modeManual": "手动",
 		"modeManualDescription": "为此缩放设置固定焦点",
-		"modeAutoDescription": "镜头会自动跟随光标"
+		"modeAutoDescription": "镜头会自动跟随光标",
+		"modeAria": "缩放模式"
 	},
 	"trim": {
 		"deleteRegion": "删除修剪区域"
@@ -38,16 +45,16 @@
 			"tahoe-inverted": "Tahoe 反相",
 			"windows11": "Windows 11",
 			"dot": "圆点",
-			"figma": "Minimal",
-			"lavender": "Lavender",
-			"parched": "Parched",
-			"chooper": "Chooper",
-			"amongus": "Among Us",
-			"turtle": "Turtle"
+			"figma": "极简",
+			"lavender": "薰衣草",
+			"parched": "干枯",
+			"chooper": "咀嚼",
+			"amongus": "我们之中",
+			"turtle": "海龟"
 		},
 		"backgroundBlur": "模糊",
 		"zoomMotionBlur": "缩放运动模糊",
-		"auto": "Auto",
+		"auto": "自动",
 		"connectZooms": "连接缩放",
 		"connectZoomsDescription": "将连续的缩放区域平滑连接为一次连续的镜头移动。",
 		"autoApplyFreshRecordingZooms": "自动为新录制应用缩放",
@@ -96,29 +103,29 @@
 		"cursorSpringMass": "光标弹簧质量",
 		"off": "关",
 		"cursorClickEffects": {
-			"title": "Click Effects",
-			"advanced": "Advanced",
-			"advancedShow": "Show advanced click effect controls",
-			"advancedHide": "Hide advanced click effect controls",
-			"color": "Effect Color",
-			"size": "Effect Size",
-			"opacity": "Effect Opacity",
-			"duration": "Effect Duration",
+			"title": "点击特效",
+			"advanced": "高级",
+			"advancedShow": "显示高级点击特效控制项",
+			"advancedHide": "隐藏高级点击特效控制项",
+			"color": "特效颜色",
+			"size": "特效大小",
+			"opacity": "特效不透明度",
+			"duration": "特效时长",
 			"none": {
-				"label": "Off",
-				"description": "No click graphic. Only the cursor motion changes when you click."
+				"label": "关闭",
+				"description": "不显示点击图形，仅在点击时改变光标动作。"
 			},
 			"ripple": {
-				"label": "Ripple",
-				"description": "Expanding rings radiate from each click so taps read clearly in motion."
+				"label": "涟漪",
+				"description": "每次点击向外扩散一圈圈波纹，让点击动作在画面中更清晰。"
 			},
 			"spotlight": {
-				"label": "Spotlight",
-				"description": "A soft halo flashes around the pointer to emphasize the clicked area."
+				"label": "聚光灯",
+				"description": "指针周围闪现一圈柔和光晕，强调被点击的区域。"
 			},
 			"echo": {
-				"label": "Echo",
-				"description": "A pair of soft rings that spread outward with a cleaner pulse."
+				"label": "回声",
+				"description": "一对柔和的圆环向外扩散，脉冲更干净利落。"
 			}
 		},
 		"cursorMotionBlur": "光标运动模糊",
@@ -151,6 +158,8 @@
 		"paddingBottom": "下",
 		"paddingLeft": "左",
 		"paddingRight": "右",
+		"linkPaddingSides": "联动内边距各边",
+		"customEffectColor": "自定义特效颜色",
 		"removeBackground": "移除背景"
 	},
 	"sections": {
@@ -176,6 +185,28 @@
 		"generateFull": "生成字幕",
 		"regenerateFull": "重新生成字幕",
 		"clearFull": "清除字幕",
+		"modelDownloadingAria": "正在下载字幕模型",
+		"whisperExecutableSelected": "已选择 Whisper 可执行文件",
+		"whisperModelSelected": "已选择 Whisper 模型",
+		"whisperModelDeleted": "已删除 Whisper 小模型",
+		"whisperModelDownloadFailed": "下载 Whisper 小模型失败",
+		"whisperModelDeleteFailed": "删除 Whisper 小模型失败",
+		"whisperModelMissing": "请先选择 Whisper 模型或下载小模型",
+		"noSourceVideo": "未加载源视频",
+		"recordingChanged": "录制已更改；生成的字幕未应用。",
+		"generateFailed": "生成字幕失败",
+		"generatedCount": "已生成 {{count}} 条字幕",
+		"editSaved": "字幕已更新",
+		"languageAutoDetect": "自动检测",
+		"languageEnglish": "英语",
+		"languageSpanish": "西班牙语",
+		"languageFrench": "法语",
+		"languageGerman": "德语",
+		"languageItalian": "意大利语",
+		"languagePortuguese": "葡萄牙语",
+		"languageChineseSimplified": "简体中文",
+		"languageJapanese": "日语",
+		"languageKorean": "韩语",
 		"fontSettings": "字体设置",
 		"defaultFont": "默认",
 		"fontFamily": "字体",
@@ -192,12 +223,12 @@
 		"backgroundOpacity": "背景透明度",
 		"textColor": "文字颜色",
 		"editor": {
-			"text": "Text",
-			"start": "Start",
-			"end": "End",
-			"split": "Split",
-			"merge": "Merge",
-			"delete": "Delete"
+			"text": "文字",
+			"start": "开始",
+			"end": "结束",
+			"split": "拆分",
+			"merge": "合并",
+			"delete": "删除"
 		}
 	},
 	"crop": {
@@ -218,7 +249,12 @@
 		"uploadCustom": "上传自定义",
 		"uploadSuccess": "自定义图片上传成功！",
 		"uploadError": "请上传 JPG 或 JPEG 图片文件。",
-		"uploadErrorDescription": "仅支持 JPG 和 JPEG 图片。"
+		"uploadErrorDescription": "仅支持 JPG 和 JPEG 图片。",
+		"customColor": "自定义颜色",
+		"videoUnsupportedFormat": "不支持的格式",
+		"videoUnsupportedFormatDescription": "请选择视频文件（mp4、webm、mov 等）",
+		"videoAdded": "已添加视频背景",
+		"videoImportFailed": "导入视频背景失败"
 	},
 	"export": {
 		"title": "导出",
@@ -253,10 +289,36 @@
 		"mixedLabel": "来源",
 		"deleteRegion": "删除音频"
 	},
-	"updates": {
-		"experimentalDescription": "你已选择接收实验性更新，因此可以在 Recordly 最新更新广泛发布之前选择先行测试。",
-		"title": "更新",
-		"experimental": "实验性更新",
-		"saveFailed": "无法更改更新频道。"
+	"settingsSections": {
+		"aria": "设置分区",
+		"regionAria": "{{section}}设置",
+		"general": "常规",
+		"motion": "运动",
+		"recording": "录制",
+		"files": "文件",
+		"advanced": "高级"
+	},
+	"onboarding": {
+		"title": "新手引导",
+		"show": "显示新手引导"
+	},
+	"dashboard": {
+		"title": "设置",
+		"settingsAria": "仪表盘设置",
+		"openVideoOrProject": "打开视频或项目",
+		"openFile": "打开文件",
+		"recordingsFolder": "录制文件夹",
+		"changeRecordingsFolderFailed": "无法更改录制文件夹",
+		"changeFolder": "更改文件夹",
+		"hideHud": "在录制中隐藏 HUD",
+		"hideHudDescription": "仅在录制时隐藏。空闲状态的 HUD 仍会显示在录制中。",
+		"updateCaptureProtectionFailed": "无法更新录制保护设置",
+		"previewUpdateUi": "预览更新界面",
+		"preview": "预览",
+		"projectsFolder": "项目文件夹",
+		"projectsFolderDescription": "命名项目会自动保存。",
+		"openProjectsFolderFailed": "无法打开项目文件夹",
+		"showFolder": "显示文件夹",
+		"projectsNote": "命名项目会自动保存。返回“项目”时预览会刷新。"
 	}
 }

@@ -4,10 +4,12 @@ import { DashboardFilters } from "./DashboardFilters";
 import { DashboardGrid } from "./DashboardGrid";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardToolbar } from "./DashboardToolbar";
+import { useScopedT } from "@/contexts/I18nContext";
 import type { DashboardProps } from "./types";
 import { useDashboardModel } from "./useDashboardModel";
 export function Dashboard(props: DashboardProps) {
 	const model = useDashboardModel(props);
+	const t = useScopedT("common");
 	const view = { ...props, ...model };
 	return (
 		<>
@@ -15,7 +17,7 @@ export function Dashboard(props: DashboardProps) {
 				<Modal.Backdrop>
 					<Modal.Container size="full">
 						<Modal.Dialog
-							aria-label="Projects dashboard"
+							aria-label={t("dashboard.dialogLabel", "Projects dashboard")}
 							className="dashboard-surface dashboard-shell flex h-full flex-row gap-0 rounded-none bg-background p-0 text-foreground"
 						>
 							<DashboardSidebar {...view} />

@@ -2,6 +2,8 @@
 	"zoom": {
 		"cannotPlace": "Нельзя добавить зум здесь",
 		"existsOrNoSpace": "Зум уже есть или недостаточно места для его добавления.",
+		"notEnoughRoom": "Zoom already exists here or there is not enough room before the next zoom or clip end.",
+		"suggestUnavailableLoop": "Suggested zooms are unavailable while cursor looping is enabled.",
 		"suggestHandlerUnavailable": "Подсказки недоступны",
 		"noTelemetry": "Нет данных о курсоре",
 		"recordFirst": "Запишите видео для генерации подсказок на основе курсора.",
@@ -33,7 +35,45 @@
 		"addAnnotation": "Добавить аннотацию (A)"
 	},
 	"audio": {
-		"label": "Аудио"
+		"label": "Аудио",
+		"readFailed": "Could not read audio file",
+		"readFailedDesc": "The selected file may be corrupted or in an unsupported format.",
+		"cannotPlace": "Cannot place audio here",
+		"noSpace": "There is no remaining space at the current playhead position.",
+		"occupied": "Audio region already exists at this location or not enough space available."
+	},
+	"caption": {
+		"cannotPlace": "Cannot place caption here",
+		"occupied": "A caption already exists at this position."
+	},
+	"item": {
+		"loading": "Loading...",
+		"clip": "Clip",
+		"trim": "Trim",
+		"manual": "Manual",
+		"auto": "Auto"
+	},
+	"timeline": {
+		"noVideoLoaded": "No Video Loaded",
+		"dragToStart": "Drag and drop a video to start editing"
+	},
+	"hintClip": "Press C to split clip",
+	"hintAnnotation": "Press A to add annotation",
+	"hintAudio": "Click music icon to add audio",
+	"playhead": {
+		"aria": "Playhead {{time}}"
+	},
+	"keyframe": {
+		"title": "Keyframe @ {{time}}ms (drag to move, Delete/Backspace to remove)"
+	},
+	"model": {
+		"emptyText": "Empty text",
+		"image": "Image",
+		"annotation": "Annotation",
+		"audio": "Audio",
+		"caption": "Caption",
+		"zoom": "Zoom {{index}}",
+		"clip": "Clip {{index}}"
 	},
 	"addSpeed": "Скорость (S)",
 	"resizeLeft": "Изменить размер слева",

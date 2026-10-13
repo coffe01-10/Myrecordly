@@ -8,6 +8,7 @@
 		"copyFailed": "Link konnte nicht kopiert werden. Wähle ihn aus und kopiere ihn manuell.",
 		"copied": "Kopiert",
 		"copy": "Kopieren",
+		"copyLink": "Copy link",
 		"preparing": "Aktueller Schnitt wird vorbereitet…",
 		"createLink": "Link erstellen",
 		"heading": "In der Cloud teilen",
@@ -15,10 +16,22 @@
 		"openPage": "Freigabeseite öffnen",
 		"notes": "Notizen",
 		"publish": "Veröffentlichen und Link erstellen",
+		"publishButton": "Publish",
+		"publishDestination": "Publish destination",
+		"link": "Link",
+		"local": "Local",
 		"createLinkTitle": "Einen Freigabelink erstellen",
 		"notesPlaceholder": "Füge Kontext, Anweisungen oder eine kurze Zusammenfassung für Zuschauer hinzu…",
 		"description": "Veröffentliche den aktuellen Schnitt auf einer Recordly-Seite zum Ansehen und Kommentieren. Ein Download ist nicht nötig. Videos werden mit bis zu 1080p vorbereitet.",
 		"uploading": "Wird hochgeladen… {progress}%",
+		"uploadingProgress": "Uploading · {{progress}}%",
+		"share": "Share",
+		"signInToShare": "Sign in to share",
+		"linkExpiry": "Free-plan links expire after 14 days.",
+		"linkSaveFailed": "Share created, but its link could not be saved locally",
+		"sharingUnavailable": "Cloud sharing is not available in this build yet.",
+		"capacityCheckFailed": "Could not check cloud storage. Try again.",
+		"recordingLimit": "You have 5 cloud recordings. Delete one from Shared before sharing another.",
 		"googleUnavailable": "Die Google-Anmeldung ist noch nicht aktiviert. Nutze E-Mail oder bitte deinen Recordly-Administrator, Google zu verbinden.",
 		"xUnavailable": "Die X-Anmeldung ist noch nicht aktiviert. Nutze E-Mail oder bitte deinen Recordly-Administrator, X zu verbinden.",
 		"providerUnavailable": "Diese Anmeldemethode ist noch nicht aktiviert. Nutze vorerst E-Mail.",
@@ -42,6 +55,62 @@
 		"addingVideo": "Video wird hinzugefügt…",
 		"preparingFootage": "Video und Audio werden für die Zeitleiste vorbereitet."
 	},
+	"signIn": {
+		"welcome": "Welcome to Recordly",
+		"yourAccount": "Your account",
+		"tagline": "Beautiful, shareable screen recordings",
+		"signInToStart": "Sign in to get started",
+		"continue": "Continue",
+		"continueWithout": "Continue without signing in",
+		"continueWith": "Continue with {{provider}}",
+		"orContinueWithEmail": "or continue with email",
+		"emailPlaceholder": "you@example.com",
+		"sendingLink": "Sending sign-in link…",
+		"emailMagicLink": "Email me a magic link",
+		"microsoftUnavailable": "Microsoft sign-in is not available yet.",
+		"githubUnavailable": "GitHub sign-in is not available yet.",
+		"emailUnavailable": "Email sign-in is not available yet.",
+		"checkInbox": "Check your inbox to verify your email and continue to Recordly. Open the link on this computer with Recordly running."
+	},
+	"clips": {
+		"title": "Clips",
+		"library": "Clips library",
+		"actions": "Clip library actions",
+		"moveAllToTrash": "Move all to Trash",
+		"close": "Close Clips",
+		"search": "Search videos",
+		"searchPlaceholder": "Search videos",
+		"selectAll": "Select all videos",
+		"selected": "{{count}} selected",
+		"recordingsOne": "{{count}} recording",
+		"recordingsMany": "{{count}} recordings",
+		"moveSelectedToTrash": "Move selected videos to Trash",
+		"moveSelectedToTrashTitle": "Move selected to Trash",
+		"loading": "Loading videos…",
+		"retry": "Retry",
+		"emptySearch": "No matching videos",
+		"emptySearchHint": "Try another search.",
+		"emptyNone": "Your recordings appear here",
+		"emptyNoneHint": "Record a video to get started.",
+		"select": "Select {{name}}",
+		"addToTimeline": "Add {{name}} to timeline",
+		"addToTimelineTitle": "Add to timeline",
+		"movedToTrash": "Moved to Trash",
+		"dragHint": "Drag to the timeline or click + to add.",
+		"undo": "Undo",
+		"undoTitle": "Undo (⌘Z / Ctrl+Z)",
+		"removeFailed": "Could not remove videos: {{error}}",
+		"restoreFailed": "Could not restore videos: {{error}}",
+		"importCancelFailed": "Could not stop import processing: {{error}}",
+		"addedOne": "Video added to timeline",
+		"addedMany": "{{count}} videos added to timeline",
+		"addFailed": "Could not add video: {{error}}",
+		"projectChanged": "The project changed while importing. Add the recordings again.",
+		"finalizeFailed": "Could not finalize imported media",
+		"thumbnailPreview": "Preview of {{name}}",
+		"thumbnailUnavailable": "Preview unavailable",
+		"thumbnailLoading": "Loading preview image"
+	},
 	"library": {
 		"videos": "Videos"
 	},
@@ -51,7 +120,13 @@
 		"skipBack": "Zurück springen",
 		"skipForward": "Vorwärts springen",
 		"muteUnmute": "Stummschalten/Stummschaltung aufheben",
-		"volume": "Vorschaulautstärke"
+		"volume": "Vorschaulautstärke",
+		"editCaption": "Edit current caption",
+		"videoLoadFailed": "Failed to load video ({{detail}})",
+		"videoErrorFormat": "format not supported",
+		"videoErrorNetwork": "network error",
+		"videoErrorDecode": "decode error",
+		"videoErrorCode": "code {{code}}"
 	},
 	"annotations": {
 		"settings": "Einstellungen für Anmerkungen",
@@ -89,7 +164,12 @@
 		"imageUploadError": "Bitte lade eine JPG-, PNG-, GIF- oder WebP-Bilddatei hoch.",
 		"blurStrength": "Unschärfestärke: {{strength}}",
 		"solidColor": "Einfarbig (Zensur)",
-		"borderRadius": "Randradius"
+		"borderRadius": "Randradius",
+		"imageAlt": "Annotation",
+		"noImage": "No image",
+		"noArrowData": "No arrow data",
+		"typeLabel": "Annotation type",
+		"uploadedAlt": "Uploaded annotation"
 	},
 	"fontStyles": {
 		"classic": "Klassisch",
@@ -158,17 +238,76 @@
 	},
 	"project": {
 		"untitled": "Unbenannt",
+		"untitledProject": "Untitled Project",
 		"unsavedChangesTitle": "Ungespeicherte Änderungen",
 		"unsavedChangesDescription": "Möchtest du dein aktuelles Projekt speichern, bevor du {{action}}?",
+		"actionOpenProject": "open another project",
+		"actionImportFile": "import a file",
 		"discardChanges": "Änderungen verwerfen",
-		"saveProject": "Projekt speichern"
+		"saveProject": "Projekt speichern",
+		"home": "Home",
+		"renameTitle": "Rename project",
+		"renameInput": "Project name",
+		"noVideoLoaded": "No video loaded",
+		"saveCanceled": "Project save canceled",
+		"saveFailed": "Failed to save project",
+		"saveError": "Could not save project: {{error}}",
+		"nameRequired": "Project name is required",
+		"renamePreferencesFailed": "Project renamed, but library preferences could not be updated",
+		"loadFailed": "Failed to load project",
+		"invalidFormat": "Could not load project: invalid project file format",
+		"loadError": "Could not load project: {{error}}",
+		"importFailed": "Failed to import file",
+		"loadedFrom": "Project loaded from {{path}}",
+		"loaded": "Project loaded",
+		"noMediaSelected": "No media file selected",
+		"mediaLoadFailed": "Could not load media",
+		"mediaImported": "Media imported",
+		"fileLoadError": "Could not load file: {{error}}",
+		"mediaError": "Could not load project media",
+		"renameFailed": "Could not rename project",
+		"libraryLoadFailed": "Failed to load project library"
 	},
 	"exportTips": {
 		"autoZooms": "Tipp: Automatisch angewendete Zooms können in den Einstellungen deaktiviert werden",
 		"experimentalBuilds": "Tipp: Aktiviere den Zugriff auf experimentelle Builds in den Einstellungen",
 		"cursorAppearance": "Tipp: Du kannst das Aussehen deines Cursors anpassen"
 	},
-	"account": { "title": "Konto", "comingSoon": "Konto demnächst verfügbar" },
+	"account": {
+		"title": "Konto",
+		"comingSoon": "Konto demnächst verfügbar"
+	},
+	"sidebar": {
+		"recordlyAccount": "Recordly account",
+		"advanced": "Advanced",
+		"advancedSettings": "Advanced settings"
+	},
+	"extensions": {
+		"title": "Extensions are no longer available",
+		"description": "Extension installation and marketplace access have been disabled. This area is kept as a placeholder for existing projects and navigation."
+	},
+	"loading": {
+		"editor": "Loading editor",
+		"editorEllipsis": "Loading editor…"
+	},
+	"preview": {
+		"loadingPreview": "Loading preview"
+	},
+	"presets": {
+		"open": "Open presets",
+		"label": "Presets",
+		"popoverLabel": "Presets",
+		"saveCurrentAs": "Save current preset as",
+		"namePlaceholder": "Preset name",
+		"savedList": "Saved presets",
+		"empty": "No presets yet.",
+		"deleteAriaLabel": "Delete preset {{name}}"
+	},
+	"audio": {
+		"sourceLoadFailed": "Could not load companion audio source: {{error}}",
+		"sourcesLoadFailed": "Could not load companion audio sources: {{error}}",
+		"sourcesLoadFailedHint": "Could not load companion audio sources. Playback and export may miss microphone audio."
+	},
 	"nativeCaptureUnavailable": {
 		"title": "Es ist nichts kaputt, aber wir können kein animiertes Cursor-Overlay rendern.",
 		"description": "Ihr Gerät unterstützt keine native Erfassung. Dies kann verschiedene Gründe haben, die wir noch nicht ermittelt haben. Recordly funktioniert weiterhin, aber eine Cursor-Glättung ist nicht möglich.",
@@ -181,10 +320,39 @@
 		"completePercent": "{{percent}} % abgeschlossen",
 		"issue": "Problem beim Export",
 		"complete": "Export abgeschlossen",
-		"savedSuccessfully": "Deine Datei wurde erfolgreich gespeichert."
+		"savedSuccessfully": "Deine Datei wurde erfolgreich gespeichert.",
+		"exportTooSlow": "Export too slow? Cancel and try Lightning export!",
+		"runtimePath": "Path: {{path}}",
+		"errorCopied": "Error copied",
+		"errorCopyFailed": "Couldn't copy. Select the error text and copy it manually.",
+		"copyError": "Copy error"
 	},
 	"export": {
-		"processingAudioEdits": "Audio mit Geschwindigkeits-/Overlay-Bearbeitungen wird verarbeitet"
+		"processingAudioEdits": "Audio mit Geschwindigkeits-/Overlay-Bearbeitungen wird verarbeitet",
+		"noVideoLoaded": "No video loaded",
+		"videoNotReady": "Video not ready",
+		"metadataLoading": "Video metadata is still loading",
+		"prepareGifFailed": "Could not prepare the GIF for sharing.",
+		"prepareVideoFailed": "Could not prepare the video for sharing.",
+		"saveCanceled": "Save dialog canceled. Click Save Again to save without re-rendering.",
+		"saveCanceledToast": "Save canceled. You can save again without re-exporting.",
+		"saveGifFailed": "Failed to save GIF",
+		"gifExportFailed": "GIF export failed",
+		"exportProducedNoOutput": "Export produced no output",
+		"saveVideoFailed": "Failed to save video",
+		"exportFailed": "Export failed",
+		"exportFailedWithError": "Export failed: {{error}}",
+		"unknownError": "Unknown error"
+	},
+	"exportDialog": {
+		"exportCanceled": "Export canceled",
+		"noPendingSave": "No pending export to save",
+		"saveCanceledTryAgain": "Save canceled. You can try again."
+	},
+	"exportRunner": {
+		"exportedTo": "Exported successfully to {{path}}",
+		"revealFailed": "Failed to reveal item in folder.",
+		"revealError": "Error revealing in folder: {{error}}"
 	},
 	"toolbar": {
 		"addLayer": "Ebene hinzufügen",

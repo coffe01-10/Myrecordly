@@ -1,5 +1,4 @@
 import { Button, Description, Modal, Surface } from "@heroui/react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
 	ArrowLeft,
 	ArrowRight,
@@ -10,40 +9,22 @@ import {
 	Record,
 	SlidersHorizontal,
 } from "@phosphor-icons/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useScopedT } from "@/contexts/I18nContext";
 
-const features = [
-	{
-		name: "Record",
-		title: "Start with a moment.",
-		description: "Choose your screen or a window. Add your voice and camera, then hit record.",
-	},
-	{
-		name: "Preview",
-		title: "Make it yours.",
-		description: "Trim the take, frame your video, and bring the important details into focus.",
-	},
-	{
-		name: "Share",
-		title: "Ready when you are.",
-		description:
-			"Publish a link for anyone to watch, or save the finished video to your device.",
-	},
-];
+const FEATURE_KEYS = ["record", "preview", "share"] as const;
 
 // Decorative product illustrations stay crisp as the image frame changes size.
 function FeatureIllustration({ step }: { step: number }) {
 	return (
-		<div
-			aria-hidden="true"
-			className="flex h-full items-center justify-center p-6 sm:p-10"
-		>
+		<div aria-hidden="true" className="flex h-full items-center justify-center p-6 sm:p-10">
 			<div className="relative w-full max-w-[580px] overflow-hidden rounded-2xl border border-white/50 bg-white/85 text-zinc-900 shadow-2xl backdrop-blur-xl">
 				<div className="flex items-center gap-1.5 border-b border-black/5 px-4 py-3">
 					{[0, 1, 2].map((i) => (
 						<span key={i} className="size-2 rounded-full bg-zinc-300" />
 					))}
 					<span className="ml-3 text-xs font-medium">
-						{features[step].name === "Share" ? "Your recording" : "Recordly"}
+						{step === 2 ? "Your recording" : "Recordly"}
 					</span>
 				</div>
 				<div className="relative mx-5 mb-5 mt-4 flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-200 via-sky-100 to-rose-200">
@@ -95,7 +76,8 @@ export function OnboardingFeature({
 	onFinish: () => void;
 }) {
 	const reduceMotion = useReducedMotion();
-	const feature = features[step];
+	const t = useScopedT("launch");
+	const featureKey = FEATURE_KEYS[step];
 	return (
 		<div className="absolute inset-0 flex flex-col">
 			<div className="relative min-h-0 flex-1 overflow-hidden">
@@ -116,16 +98,20 @@ export function OnboardingFeature({
 				<div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
 					<Modal.Header aria-live="polite" className="min-w-0 flex-1 gap-2">
 						<Modal.Heading className="text-2xl font-semibold tracking-tight sm:text-3xl">
-							{feature.title}
+							{t(`onboarding.${featureKey}.title`)}
 						</Modal.Heading>
 						<Description className="text-sm leading-relaxed">
-							{feature.description}
+							{t(`onboarding.${featureKey}.description`)}
 						</Description>
 					</Modal.Header>
 					<Modal.Footer className="shrink-0 gap-2">
 						<Button
 							isIconOnly
-							aria-label={step === 0 ? "Back to sign in" : "Previous feature"}
+							aria-label={
+								step === 0
+									? t("onboarding.backToSignIn")
+									: t("onboarding.previousFeature")
+							}
 							variant="secondary"
 							onPress={() => onStep(step - 1)}
 						>
@@ -133,7 +119,9 @@ export function OnboardingFeature({
 						</Button>
 						<Button
 							isIconOnly
-							aria-label={step === 2 ? "Get started" : "Next"}
+							aria-label={
+								step === 2 ? t("onboarding.getStarted") : t("onboarding.next")
+							}
 							variant="secondary"
 							onPress={() => (step === 2 ? onFinish() : onStep(step + 1))}
 						>

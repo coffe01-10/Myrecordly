@@ -36,6 +36,7 @@ import {
 	sendNativeVideoExportWriteFrameResult,
 	settleNativeVideoExportWriteFrameRequest,
 } from "../export/native-video";
+import { t } from "../../i18n";
 import { getFfmpegBinaryPath } from "../ffmpeg/binary";
 import {
 	buildNativeH264StreamExportArgs,
@@ -864,11 +865,13 @@ export function registerExportHandlers() {
 				// Determine file type from extension
 				const isGif = fileName.toLowerCase().endsWith(".gif");
 				const filters = isGif
-					? [{ name: "GIF Image", extensions: ["gif"] }]
-					: [{ name: "MP4 Video", extensions: ["mp4"] }];
+					? [{ name: t("filter.gifImage", "GIF Image"), extensions: ["gif"] }]
+					: [{ name: t("filter.mp4Video", "MP4 Video"), extensions: ["mp4"] }];
 				const parentWindow = BrowserWindow.fromWebContents(event.sender);
 				const saveDialogOptions: SaveDialogOptions = {
-					title: isGif ? "Save Exported GIF" : "Save Exported Video",
+					title: isGif
+						? t("dialog.saveGifTitle", "Save Exported GIF")
+						: t("dialog.saveVideoTitle", "Save Exported Video"),
 					defaultPath: path.join(app.getPath("downloads"), fileName),
 					filters,
 					properties: ["createDirectory", "showOverwriteConfirmation"],
@@ -882,7 +885,7 @@ export function registerExportHandlers() {
 					return {
 						success: false,
 						canceled: true,
-						message: "Export canceled",
+						message: t("error.exportCanceled", "Export canceled"),
 					};
 				}
 
@@ -897,7 +900,7 @@ export function registerExportHandlers() {
 					success: true,
 					path: result.filePath,
 					message: withCaptionSidecarMessage(
-						"Video exported successfully",
+						t("error.videoExportedSuccessfully", "Video exported successfully"),
 						captionSidecarResult,
 					),
 				};
@@ -905,7 +908,7 @@ export function registerExportHandlers() {
 				console.error("Failed to save exported video:", error);
 				return {
 					success: false,
-					message: "Failed to save exported video",
+					message: t("error.failedToSaveExportedVideo", "Failed to save exported video"),
 					error: String(error),
 				};
 			}
@@ -945,7 +948,7 @@ export function registerExportHandlers() {
 					success: true,
 					path: resolvedPath,
 					message: withCaptionSidecarMessage(
-						"Video exported successfully",
+						t("error.videoExportedSuccessfully", "Video exported successfully"),
 						captionSidecarResult,
 					),
 					canceled: false,
@@ -954,7 +957,7 @@ export function registerExportHandlers() {
 				console.error("Failed to write exported video to path:", error);
 				return {
 					success: false,
-					message: "Failed to write exported video",
+					message: t("error.failedToWriteExportedVideo", "Failed to write exported video"),
 					canceled: false,
 					error: String(error),
 				};
@@ -1011,7 +1014,7 @@ export function registerExportHandlers() {
 						path: resolvedPath,
 						canceled: false,
 						message: withCaptionSidecarMessage(
-							"Video exported successfully",
+							t("error.videoExportedSuccessfully", "Video exported successfully"),
 							captionSidecarResult,
 						),
 					};
@@ -1019,11 +1022,13 @@ export function registerExportHandlers() {
 
 				const isGif = fileName.toLowerCase().endsWith(".gif");
 				const filters = isGif
-					? [{ name: "GIF Image", extensions: ["gif"] }]
-					: [{ name: "MP4 Video", extensions: ["mp4"] }];
+					? [{ name: t("filter.gifImage", "GIF Image"), extensions: ["gif"] }]
+					: [{ name: t("filter.mp4Video", "MP4 Video"), extensions: ["mp4"] }];
 				const parentWindow = BrowserWindow.fromWebContents(event.sender);
 				const saveDialogOptions: SaveDialogOptions = {
-					title: isGif ? "Save Exported GIF" : "Save Exported Video",
+					title: isGif
+						? t("dialog.saveGifTitle", "Save Exported GIF")
+						: t("dialog.saveVideoTitle", "Save Exported Video"),
 					defaultPath: path.join(app.getPath("downloads"), fileName),
 					filters,
 					properties: ["createDirectory", "showOverwriteConfirmation"],
@@ -1039,7 +1044,7 @@ export function registerExportHandlers() {
 					return {
 						success: false,
 						canceled: true,
-						message: "Export canceled",
+						message: t("error.exportCanceled", "Export canceled"),
 					};
 				}
 
@@ -1056,7 +1061,7 @@ export function registerExportHandlers() {
 					path: result.filePath,
 					canceled: false,
 					message: withCaptionSidecarMessage(
-						"Video exported successfully",
+						t("error.videoExportedSuccessfully", "Video exported successfully"),
 						captionSidecarResult,
 					),
 				};
@@ -1065,7 +1070,7 @@ export function registerExportHandlers() {
 				return {
 					success: false,
 					canceled: false,
-					message: "Failed to save exported video",
+					message: t("error.failedToSaveExportedVideo", "Failed to save exported video"),
 					error: String(error),
 				};
 			}

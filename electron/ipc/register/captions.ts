@@ -8,6 +8,7 @@ import {
 	sendWhisperModelDownloadProgress,
 } from "../captions/whisper";
 import { LEGACY_PROJECT_FILE_EXTENSIONS, PROJECT_FILE_EXTENSION } from "../constants";
+import { t } from "../../i18n";
 import { hasProjectFileExtension, loadProjectFromPath } from "../project/manager";
 import { setCurrentProjectPath } from "../state";
 import { approveUserPath, getRecordingsDir } from "../utils";
@@ -25,13 +26,15 @@ export function registerCaptionHandlers() {
 			const includeProjects = Boolean(options?.includeProjects);
 			const recordingsDir = await getRecordingsDir();
 			const result = await dialog.showOpenDialog({
-				title: includeProjects ? "Import Media or Recordly Project" : "Select Video File",
+				title: includeProjects
+					? t("dialog.importMediaOrProjectTitle", "Import Media or Recordly Project")
+					: t("dialog.selectVideoTitle", "Select Video File"),
 				defaultPath: recordingsDir,
 				filters: [
 					...(includeProjects
 						? [
 								{
-									name: "Media or Recordly Projects",
+									name: t("filter.mediaOrProjects", "Media or Recordly Projects"),
 									extensions: [
 										...VIDEO_FILE_EXTENSIONS,
 										...PROJECT_FILE_EXTENSIONS,
@@ -39,11 +42,16 @@ export function registerCaptionHandlers() {
 								},
 							]
 						: []),
-					{ name: "Video Files", extensions: VIDEO_FILE_EXTENSIONS },
+					{ name: t("filter.videoFiles", "Video Files"), extensions: VIDEO_FILE_EXTENSIONS },
 					...(includeProjects
-						? [{ name: "Recordly Projects", extensions: PROJECT_FILE_EXTENSIONS }]
+						? [
+							{
+								name: t("filter.recordlyProjects", "Recordly Projects"),
+								extensions: PROJECT_FILE_EXTENSIONS,
+							},
+						]
 						: []),
-					{ name: "All Files", extensions: ["*"] },
+					{ name: t("filter.allFiles", "All Files"), extensions: ["*"] },
 				],
 				properties: ["openFile"],
 			});
@@ -73,7 +81,7 @@ export function registerCaptionHandlers() {
 			console.error("Failed to open file picker:", error);
 			return {
 				success: false,
-				message: "Failed to open file picker",
+				message: t("error.failedToOpenFilePicker", "Failed to open file picker"),
 				error: String(error),
 			};
 		}
@@ -82,13 +90,13 @@ export function registerCaptionHandlers() {
 	ipcMain.handle("open-audio-file-picker", async () => {
 		try {
 			const result = await dialog.showOpenDialog({
-				title: "Select Audio File",
+				title: t("dialog.selectAudioTitle", "Select Audio File"),
 				filters: [
 					{
-						name: "Audio Files",
+						name: t("filter.audioFiles", "Audio Files"),
 						extensions: ["mp3", "wav", "aac", "m4a", "flac", "ogg"],
 					},
-					{ name: "All Files", extensions: ["*"] },
+					{ name: t("filter.allFiles", "All Files"), extensions: ["*"] },
 				],
 				properties: ["openFile"],
 			});
@@ -106,7 +114,7 @@ export function registerCaptionHandlers() {
 			console.error("Failed to open audio file picker:", error);
 			return {
 				success: false,
-				message: "Failed to open audio file picker",
+				message: t("error.failedToOpenAudioFilePicker", "Failed to open audio file picker"),
 				error: String(error),
 			};
 		}
@@ -115,13 +123,13 @@ export function registerCaptionHandlers() {
 	ipcMain.handle("open-whisper-executable-picker", async () => {
 		try {
 			const result = await dialog.showOpenDialog({
-				title: "Select Whisper Executable",
+				title: t("dialog.selectWhisperExecutableTitle", "Select Whisper Executable"),
 				filters: [
 					{
-						name: "Executables",
+						name: t("filter.executables", "Executables"),
 						extensions: process.platform === "win32" ? ["exe", "cmd", "bat"] : ["*"],
 					},
-					{ name: "All Files", extensions: ["*"] },
+					{ name: t("filter.allFiles", "All Files"), extensions: ["*"] },
 				],
 				properties: ["openFile"],
 			});
@@ -141,10 +149,10 @@ export function registerCaptionHandlers() {
 	ipcMain.handle("open-whisper-model-picker", async () => {
 		try {
 			const result = await dialog.showOpenDialog({
-				title: "Select Whisper Model",
+				title: t("dialog.selectWhisperModelTitle", "Select Whisper Model"),
 				filters: [
-					{ name: "Whisper Models", extensions: ["bin"] },
-					{ name: "All Files", extensions: ["*"] },
+					{ name: t("filter.whisperModels", "Whisper Models"), extensions: ["bin"] },
+					{ name: t("filter.allFiles", "All Files"), extensions: ["*"] },
 				],
 				properties: ["openFile"],
 			});

@@ -13,6 +13,7 @@ import { BrowserWindow, dialog, ipcMain, shell } from "electron";
 import { RECORDINGS_DIR } from "../../appPaths";
 import { buildMediaUrl, getMediaServerBaseUrl } from "../../mediaServer";
 import { LEGACY_PROJECT_FILE_EXTENSIONS, PROJECT_FILE_EXTENSION } from "../constants";
+import { t } from "../../i18n";
 import { getProjectBackupPath, writeProjectFileAtomically } from "../project/atomicSave";
 import {
 	getProjectsDir,
@@ -378,7 +379,7 @@ export function registerProjectHandlers() {
 				return {
 					success: false,
 					error: openPathResult,
-					message: "Failed to open recordings folder.",
+					message: t("error.failedToOpenRecordingsFolder", "Failed to open recordings folder."),
 				};
 			}
 
@@ -388,7 +389,7 @@ export function registerProjectHandlers() {
 			return {
 				success: false,
 				error: String(error),
-				message: "Failed to open recordings folder.",
+				message: t("error.failedToOpenRecordingsFolder", "Failed to open recordings folder."),
 			};
 		}
 	});
@@ -415,7 +416,7 @@ export function registerProjectHandlers() {
 		try {
 			const current = await getRecordingsDir();
 			const result = await dialog.showOpenDialog({
-				title: "Choose recordings folder",
+				title: t("dialog.chooseRecordingsFolder", "Choose recordings folder"),
 				defaultPath: current,
 				properties: ["openDirectory", "createDirectory", "promptToCreate"],
 			});
@@ -438,7 +439,7 @@ export function registerProjectHandlers() {
 			return {
 				success: false,
 				error: String(error),
-				message: "Failed to set recordings folder",
+				message: t("error.failedToSetRecordingsFolder", "Failed to set recordings folder"),
 			};
 		}
 	});
@@ -476,7 +477,7 @@ export function registerProjectHandlers() {
 						success: true,
 						path: trustedExistingProjectPath,
 						projectId: preparedProject.projectId,
-						message: "Project saved successfully",
+						message: t("error.projectSavedSuccessfully", "Project saved successfully"),
 					};
 				}
 
@@ -492,11 +493,14 @@ export function registerProjectHandlers() {
 				const defaultName = `${safeName}.${PROJECT_FILE_EXTENSION}`;
 
 				const result = await dialog.showSaveDialog({
-					title: "Save Recordly Project",
+					title: t("dialog.saveProjectTitle", "Save Recordly Project"),
 					defaultPath: path.join(projectsDir, defaultName),
 					filters: [
-						{ name: "Recordly Project", extensions: [PROJECT_FILE_EXTENSION] },
-						{ name: "JSON", extensions: ["json"] },
+						{
+							name: t("filter.recordlyProject", "Recordly Project"),
+							extensions: [PROJECT_FILE_EXTENSION],
+						},
+						{ name: t("filter.json", "JSON"), extensions: ["json"] },
 					],
 					properties: ["createDirectory", "showOverwriteConfirmation"],
 				});
@@ -505,7 +509,7 @@ export function registerProjectHandlers() {
 					return {
 						success: false,
 						canceled: true,
-						message: "Save project canceled",
+						message: t("error.saveProjectCanceled", "Save project canceled"),
 					};
 				}
 
@@ -521,13 +525,13 @@ export function registerProjectHandlers() {
 					success: true,
 					path: result.filePath,
 					projectId: preparedProject.projectId,
-					message: "Project saved successfully",
+					message: t("error.projectSavedSuccessfully", "Project saved successfully"),
 				};
 			} catch (error) {
 				console.error("Failed to save project file:", error);
 				return {
 					success: false,
-					message: "Failed to save project file",
+					message: t("error.failedToSaveProjectFile", "Failed to save project file"),
 					error: String(error),
 				};
 			}
@@ -548,7 +552,7 @@ export function registerProjectHandlers() {
 				if (!normalizedProjectName) {
 					return {
 						success: false,
-						message: "Project name is required",
+						message: t("error.projectNameRequired", "Project name is required"),
 					};
 				}
 
@@ -628,13 +632,13 @@ export function registerProjectHandlers() {
 					success: true,
 					path: targetProjectPath,
 					projectId: preparedProject.projectId,
-					message: "Project saved successfully",
+					message: t("error.projectSavedSuccessfully", "Project saved successfully"),
 				};
 			} catch (error) {
 				console.error("Failed to save named project file:", error);
 				return {
 					success: false,
-					message: "Failed to save project file",
+					message: t("error.failedToSaveProjectFile", "Failed to save project file"),
 					error: String(error),
 				};
 			}
@@ -645,21 +649,25 @@ export function registerProjectHandlers() {
 		try {
 			const projectsDir = await getProjectsDir();
 			const result = await dialog.showOpenDialog({
-				title: "Open Recordly Project",
+				title: t("dialog.openProjectTitle", "Open Recordly Project"),
 				defaultPath: projectsDir,
 				filters: [
 					{
 						name: "Recordly Project",
 						extensions: [PROJECT_FILE_EXTENSION, ...LEGACY_PROJECT_FILE_EXTENSIONS],
 					},
-					{ name: "JSON", extensions: ["json"] },
+					{ name: t("filter.json", "JSON"), extensions: ["json"] },
 					{ name: "All Files", extensions: ["*"] },
 				],
 				properties: ["openFile"],
 			});
 
 			if (result.canceled || result.filePaths.length === 0) {
-				return { success: false, canceled: true, message: "Open project canceled" };
+				return {
+					success: false,
+					canceled: true,
+					message: t("error.openProjectCanceled", "Open project canceled"),
+				};
 			}
 
 			return await loadProjectFromPath(result.filePaths[0]);
@@ -667,7 +675,7 @@ export function registerProjectHandlers() {
 			console.error("Failed to load project file:", error);
 			return {
 				success: false,
-				message: "Failed to load project file",
+				message: t("error.failedToLoadProjectFile", "Failed to load project file"),
 				error: String(error),
 			};
 		}
@@ -676,7 +684,10 @@ export function registerProjectHandlers() {
 	ipcMain.handle("load-current-project-file", async () => {
 		try {
 			if (!currentProjectPath) {
-				return { success: false, message: "No active project" };
+				return {
+					success: false,
+					message: t("error.noActiveProject", "No active project"),
+				};
 			}
 
 			return await loadProjectFromPath(currentProjectPath);
@@ -684,7 +695,7 @@ export function registerProjectHandlers() {
 			console.error("Failed to load current project file:", error);
 			return {
 				success: false,
-				message: "Failed to load current project file",
+				message: t("error.failedToLoadCurrentProjectFile", "Failed to load current project file"),
 				error: String(error),
 			};
 		}
@@ -776,7 +787,7 @@ export function registerProjectHandlers() {
 			console.error("Failed to open project file at path:", error);
 			return {
 				success: false,
-				message: "Failed to open project file",
+				message: t("error.failedToOpenProjectFile", "Failed to open project file"),
 				error: String(error),
 			};
 		}
@@ -790,7 +801,7 @@ export function registerProjectHandlers() {
 				return {
 					success: false,
 					error: openPathResult,
-					message: "Failed to open projects folder.",
+					message: t("error.failedToOpenProjectsFolder", "Failed to open projects folder."),
 				};
 			}
 
@@ -800,7 +811,7 @@ export function registerProjectHandlers() {
 			return {
 				success: false,
 				error: String(error),
-				message: "Failed to open projects folder.",
+				message: t("error.failedToOpenProjectsFolder", "Failed to open projects folder."),
 			};
 		}
 	});

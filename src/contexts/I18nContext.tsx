@@ -14,6 +14,7 @@ import {
 	type I18nNamespace,
 	SUPPORTED_LOCALES,
 } from "@/i18n/config";
+import { loadAppSetting, saveAppSetting } from "@/lib/appSettings";
 import enCommon from "@/i18n/locales/en/common.json";
 import enDialogs from "@/i18n/locales/en/dialogs.json";
 import enEditor from "@/i18n/locales/en/editor.json";
@@ -251,12 +252,29 @@ function getInitialLocale(): AppLocale {
 		return DEFAULT_LOCALE;
 	}
 
+	// Shared preference (main process) takes priority so the native surfaces
+	// (application menu, tray) start in the same language as the renderer.
+	const sharedLocale = loadAppSetting<unknown>(LOCALE_STORAGE_KEY);
+	if (typeof sharedLocale === "string" && sharedLocale.length > 0) {
+		return normalizeLocale(sharedLocale);
+	}
+
 	const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
 	if (storedLocale) {
 		return normalizeLocale(storedLocale);
 	}
 
 	return getSystemLocale();
+}
+
+function notifyMainProcessLocale(locale: AppLocale) {
+	const api = (globalThis as typeof globalThis & { electronAPI?: Window["electronAPI"] })
+		.electronAPI;
+	try {
+		void api?.setLocale?.(locale);
+	} catch {
+		// Ignore: native surfaces will simply keep their current language.
+	}
 }
 
 function getMessageValue(source: unknown, key: string): string | undefined {
@@ -315,10 +333,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 		if (typeof window !== "undefined") {
 			window.localStorage.setItem(LOCALE_STORAGE_KEY, nextLocale);
 		}
+		// Persist to the shared store so the main process reads the same value.
+		saveAppSetting(LOCALE_STORAGE_KEY, nextLocale);
 	}, []);
 
 	useEffect(() => {
 		document.documentElement.lang = locale;
+	}, [locale]);
+
+	// Push the initial locale to the main process so the application menu and
+	// tray start localized even when the user never opens the language selector.
+	useEffect(() => {
+		notifyMainProcessLocale(locale);
 	}, [locale]);
 
 	const t = useCallback(

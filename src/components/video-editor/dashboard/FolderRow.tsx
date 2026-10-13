@@ -2,6 +2,7 @@ import { Dropdown, Input } from "@heroui/react";
 import { DotsThree } from "@/components/ui/icons";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useScopedT } from "@/contexts/I18nContext";
 import { FolderColors } from "./FolderColors";
 import type { ProjectFolder } from "./useProjectFolders";
 
@@ -22,6 +23,7 @@ export function FolderRow({
 	colors: string[];
 	onColors: (colors: string[]) => void;
 }) {
+	const t = useScopedT("common");
 	const [editing, setEditing] = useState(false);
 	const [draft, setDraft] = useState(folder.name);
 	const finish = () => {
@@ -54,7 +56,7 @@ export function FolderRow({
 					<Input
 						autoFocus
 						onFocus={(event) => event.currentTarget.select()}
-						aria-label="Folder name"
+						aria-label={t("dashboard.folderRow.nameLabel", "Folder name")}
 						className="h-8 w-full min-w-0 border-0 bg-transparent px-0 text-[13px] shadow-none"
 						value={draft}
 						maxLength={80}
@@ -83,18 +85,20 @@ export function FolderRow({
 				<Button
 					variant="ghost"
 					size="icon"
-					aria-label={`Options for ${folder.name}`}
+					aria-label={t("dashboard.folderRow.optionsFor", "Options for {{name}}", {
+						name: folder.name,
+					})}
 					className="size-6 min-w-6 text-muted-foreground opacity-0 group-hover:opacity-100 focus:opacity-100"
 				>
 					<DotsThree className="size-4" />
 				</Button>
 				<Dropdown.Popover>
-					<Dropdown.Menu aria-label="Folder options">
+					<Dropdown.Menu aria-label={t("dashboard.folderRow.options", "Folder options")}>
 						<Dropdown.Item id="rename" onAction={edit}>
-							Rename
+							{t("actions.rename", "Rename")}
 						</Dropdown.Item>
 						<Dropdown.Item id="remove" onAction={onRemove}>
-							Remove folder
+							{t("dashboard.folderRow.removeFolder", "Remove folder")}
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown.Popover>

@@ -10,6 +10,7 @@ import {
 	Popover,
 } from "@heroui/react";
 import { Button } from "./button";
+import { useScopedT } from "@/contexts/I18nContext";
 
 type PaletteProps = {
 	color?: string;
@@ -18,10 +19,11 @@ type PaletteProps = {
 	style?: React.CSSProperties;
 };
 export function ColorPalette({ color = "#000000", colors, onChange }: PaletteProps) {
+	const t = useScopedT("common");
 	return (
 		<div className="flex flex-col gap-3">
 			<ColorSwatchPicker
-				aria-label="Colors"
+				aria-label={t("colorPicker.colors", "Colors")}
 				value={color}
 				onChange={(value) => onChange({ hex: value.toString("hex") })}
 			>
@@ -50,6 +52,7 @@ export function ColorControl({
 	compact?: boolean;
 	onClear?: () => void;
 }) {
+	const t = useScopedT("common");
 	return (
 		<ColorPicker
 			value={value === "transparent" ? "#00000000" : value}
@@ -62,7 +65,11 @@ export function ColorControl({
 			>
 				<ColorSwatch size="sm" />
 				<span className="truncate">
-					{compact ? (value === "transparent" ? "None" : value.toUpperCase()) : label}
+					{compact
+						? value === "transparent"
+							? t("colorPicker.none", "None")
+							: value.toUpperCase()
+						: label}
 				</span>
 			</Button>
 			<ColorPicker.Popover>
@@ -76,7 +83,9 @@ export function ColorControl({
 						</ColorSlider.Track>
 					</ColorSlider>
 					{colors && (
-						<ColorSwatchPicker aria-label="Preset colors">
+						<ColorSwatchPicker
+							aria-label={t("colorPicker.presetColors", "Preset colors")}
+						>
 							{colors.map((color) => (
 								<ColorSwatchPicker.Item key={color} color={color}>
 									<ColorSwatchPicker.Swatch />
@@ -86,12 +95,12 @@ export function ColorControl({
 						</ColorSwatchPicker>
 					)}
 					<ColorField>
-						<Label>Hex color</Label>
+						<Label>{t("colorPicker.hexColor", "Hex color")}</Label>
 						<Input />
 					</ColorField>
 					{onClear && (
 						<Button variant="ghost" onClick={onClear}>
-							Clear background
+							{t("colorPicker.clearBackground", "Clear background")}
 						</Button>
 					)}
 				</Popover.Dialog>

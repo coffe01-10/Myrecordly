@@ -2,6 +2,7 @@ import { removeProjectShareLinks } from "../cloud/projectShareLinks";
 import { useRawLibrary } from "./useRawLibrary";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/components/ui/toast";
+import { useScopedT } from "@/contexts/I18nContext";
 import type { ProjectLibraryEntry } from "../ProjectBrowserDialog";
 import type { DashboardProps } from "./types";
 import { useDashboardMetadata } from "./useDashboardMetadata";
@@ -14,6 +15,7 @@ export function useDashboardModel({
 	onDeleteProjects,
 	open,
 }: DashboardProps) {
+	const t = useScopedT("common");
 	const { metadata, update } = useDashboardMetadata();
 	const [selecting, setSelecting] = useState(false);
 	const [selected, setSelected] = useState<string[]>([]);
@@ -93,7 +95,11 @@ export function useDashboardModel({
 		try {
 			await action();
 		} catch (e) {
-			toast.error(e instanceof Error ? e.message : "Could not complete action");
+			toast.error(
+				e instanceof Error
+					? e.message
+					: t("dashboard.errors.actionFailed", "Could not complete action"),
+			);
 		} finally {
 			setBusy(false);
 		}

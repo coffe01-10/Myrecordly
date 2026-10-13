@@ -174,6 +174,7 @@ const TimelineEditor = forwardRef<TimelineEditorHandle, TimelineEditorProps>(
 		ref,
 	) {
 		const t = useScopedT("settings");
+		const tTimeline = useScopedT("timeline");
 		const totalMs = useMemo(
 			() => Math.max(0, Math.round(videoDuration * 1000)),
 			[videoDuration],
@@ -410,9 +411,11 @@ const TimelineEditor = forwardRef<TimelineEditorHandle, TimelineEditorProps>(
 						<Plus className="w-6 h-6 text-muted-foreground" />
 					</div>
 					<div className="text-center">
-						<p className="text-sm font-medium text-muted-foreground">No Video Loaded</p>
+						<p className="text-sm font-medium text-muted-foreground">
+							{tTimeline("timeline.noVideoLoaded")}
+						</p>
 						<p className="text-xs text-muted-foreground/70 mt-1">
-							Drag and drop a video to start editing
+							{tTimeline("timeline.dragToStart")}
 						</p>
 					</div>
 				</div>

@@ -4,6 +4,23 @@ import type {
 	ExportErrorReport,
 } from "../../../services/supabase/functions/_shared/exportErrorReport";
 
+export type ExportReportErrorCode = "UNAVAILABLE" | "BUSY" | "SEND_FAILED";
+
+const EXPORT_REPORT_ERROR_MESSAGES: Record<ExportReportErrorCode, string> = {
+	UNAVAILABLE: "Error reporting is unavailable until support services are configured.",
+	BUSY: "Reporting is busy. Please try again later.",
+	SEND_FAILED: "Could not send the report. Please try again.",
+};
+
+export class ExportReportError extends Error {
+	readonly code: ExportReportErrorCode;
+
+	constructor(code: ExportReportErrorCode) {
+		super(EXPORT_REPORT_ERROR_MESSAGES[code]);
+		this.code = code;
+	}
+}
+
 const FAILURE_CODES = new Set([
 	"VIDEO_DECODE_ENCODING_ERROR",
 	"VIDEO_DECODER_RESOURCE_EXHAUSTED",
@@ -87,8 +104,7 @@ export function buildExportErrorReport(
 export async function submitExportErrorReport(report: ExportErrorReport): Promise<void> {
 	const url = import.meta.env.VITE_SUPABASE_URL?.trim();
 	const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
-	if (!url || !key)
-		throw new Error("Error reporting is unavailable until support services are configured.");
+	if (!url || !key) throw new ExportReportError("UNAVAILABLE");
 	const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/submit-export-error`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json", apikey: key },
@@ -97,7 +113,7 @@ export async function submitExportErrorReport(report: ExportErrorReport): Promis
 		body: JSON.stringify(report),
 		signal: AbortSignal.timeout(10_000),
 	});
-	if (response.status === 429) throw new Error("Reporting is busy. Please try again later.");
+	if (response.status === 429) throw new ExportReportError("BUSY");
 	const body = response.ok ? await response.json().catch(() => null) : null;
-	if (body?.success !== true) throw new Error("Could not send the report. Please try again.");
+	if (body?.success !== true) throw new ExportReportError("SEND_FAILED");
 }

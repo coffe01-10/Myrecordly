@@ -30,7 +30,7 @@ import type { VideoPlaybackRef } from "../VideoPlayback";
 import { cloneStructured } from "../videoEditorUtils";
 
 type Input = {
-	t: (key: string) => string;
+	t: (key: string, fallback?: string, vars?: Record<string, string | number>) => string;
 	project: ReturnType<typeof useProjectState>;
 	appearance: ReturnType<typeof useAppearanceState>;
 	timeline: ReturnType<typeof useTimelineState>;
@@ -113,14 +113,20 @@ export function useProjectLifecycle(input: Input) {
 				},
 				{ preserveProjectPath: Boolean(path) },
 			);
-			if (result && !result.success) throw new Error("Could not load project media");
+			if (result && !result.success)
+				throw new Error(
+					current.t("editor.project.mediaError", "Could not load project media"),
+				);
 			const session = await window.electronAPI.getCurrentRecordingSession?.();
 			current.applySessionPresentation(session?.success ? session.session : null);
 		} else {
 			const result = await window.electronAPI.setCurrentVideoPath(sourcePath, {
 				preserveProjectPath: Boolean(path),
 			});
-			if (!result.success) throw new Error("Could not load project media");
+			if (!result.success)
+				throw new Error(
+					current.t("editor.project.mediaError", "Could not load project media"),
+				);
 			current.applySessionPresentation(null);
 		}
 		const videoUrl = await resolveVideoUrl(sourcePath);

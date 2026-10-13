@@ -44,6 +44,29 @@
 		"stop": "停止",
 		"cancel": "取消",
 		"more": "更多",
+		"controlsLabel": "錄製控制項",
+		"microphoneOn": "麥克風已開",
+		"microphoneOff": "麥克風已關",
+		"fallbackMicFailed": "儲存備用麥克風音軌失敗",
+		"savedWithoutFallbackMicTrack": "{{error}}。錄影已儲存，但不含備用麥克風音軌。",
+		"nativeWindowsUnavailable": "原生 Windows 擷取無法使用。將改用瀏覽器擷取。",
+		"nativeWindowsCheckFailed": "無法檢查原生 Windows 擷取。將改用瀏覽器擷取。",
+		"nativeWindowsStartFailed": "原生 Windows 擷取啟動失敗。將改用瀏覽器擷取。",
+		"finalizeMacFailed": "無法完成 macOS 錄影，因此未開啟編輯器。",
+		"finalizeFailed": "無法完成錄影，因此未開啟編輯器。",
+		"storeFailed": "儲存錄影失敗。",
+		"saveFailed": "無法儲存錄影。",
+		"finalizeFailedWithReason": "完成錄影失敗。{{error}}",
+		"nativeStartFailed": "啟動原生螢幕錄影失敗",
+		"nativePauseFailed": "倒數前暫停原生擷取失敗",
+		"nativeResumeFailed": "倒數後繼續原生擷取失敗",
+		"displayUnavailable": "此系統上的瀏覽器擷取無法使用所選顯示器。",
+		"videoTrackUnavailable": "視訊軌不可用。",
+		"mediaStreamUnavailable": "媒體串流不可用。",
+		"micPermissionDenied": "麥克風權限遭拒。將在沒有麥克風音訊的情況下繼續錄製。",
+		"continueWithoutMic": "{{error}}。將在沒有麥克風音訊的情況下繼續錄製。",
+		"savedFile": "已儲存檔案：{{path}}",
+		"unexpectedError": "發生未預期的錯誤",
 		"update": {
 			"update": "更新",
 			"updated": "已更新",
@@ -91,6 +114,26 @@
 		"notNow": "暫不",
 		"updateNow": "立即更新",
 		"restartToUpdate": "重新啟動以更新",
-		"tryAgain": "重試"
+		"tryAgain": "重試",
+		"windowLabel": "Recordly 更新",
+		"downloadingProgressLabel": "正在下載更新"
+	},
+	"onboarding": {
+		"record": {
+			"title": "從一個瞬間開始。",
+			"description": "選擇螢幕或視窗。加入你的聲音和網路攝影機，然後開始錄製。"
+		},
+		"preview": {
+			"title": "讓它成為你的作品。",
+			"description": "裁剪片段、調整畫面構圖，讓重要細節脫穎而出。"
+		},
+		"share": {
+			"title": "隨時準備就緒。",
+			"description": "發布連結供任何人觀看，或將完成的影片儲存到你的裝置。"
+		},
+		"backToSignIn": "返回登入",
+		"previousFeature": "上一個功能",
+		"getStarted": "開始使用",
+		"next": "下一步"
 	}
 }

@@ -1,3 +1,4 @@
+import { Button, Separator, Tooltip } from "@heroui/react";
 import {
 	House,
 	MicrophoneIcon,
@@ -8,7 +9,6 @@ import {
 	XIcon,
 } from "@/components/ui/icons";
 import { useScopedT } from "@/contexts/I18nContext";
-import { Button, Separator, Tooltip } from "@heroui/react";
 import styles from "./LaunchWindow.module.css";
 
 interface RecordingControlsProps {
@@ -36,7 +36,11 @@ export function RecordingControls({
 	const t = useScopedT("launch");
 	const actionClass = `size-9 min-w-9 rounded-full ${styles.electronNoDrag}`;
 	return (
-		<div role="group" aria-label="Recording controls" className="flex items-center gap-2">
+		<div
+			role="group"
+			aria-label={t("recording.controlsLabel")}
+			className="flex items-center gap-2"
+		>
 			<Button
 				isIconOnly
 				variant="ghost"
@@ -67,7 +71,11 @@ export function RecordingControls({
 					variant="ghost"
 					isDisabled
 					className={actionClass}
-					aria-label={microphoneEnabled ? "Microphone on" : "Microphone off"}
+					aria-label={
+						microphoneEnabled
+							? t("recording.microphoneOn")
+							: t("recording.microphoneOff")
+					}
 				>
 					{microphoneEnabled ? (
 						<MicrophoneIcon weight="fill" className="size-4" />

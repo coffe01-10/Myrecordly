@@ -44,6 +44,29 @@
 		"stop": "Stop",
 		"cancel": "Cancel",
 		"more": "More",
+		"controlsLabel": "Recording controls",
+		"microphoneOn": "Microphone on",
+		"microphoneOff": "Microphone off",
+		"fallbackMicFailed": "Failed to save the fallback microphone audio track",
+		"savedWithoutFallbackMicTrack": "{{error}}. Recording was saved without the fallback microphone track.",
+		"nativeWindowsUnavailable": "Native Windows capture is unavailable. Falling back to browser capture.",
+		"nativeWindowsCheckFailed": "Unable to check native Windows capture. Falling back to browser capture.",
+		"nativeWindowsStartFailed": "Native Windows capture failed to start. Falling back to browser capture.",
+		"finalizeMacFailed": "Failed to finish the macOS recording, so the editor was not opened.",
+		"finalizeFailed": "Failed to finish the recording, so the editor was not opened.",
+		"storeFailed": "Failed to store the recording.",
+		"saveFailed": "Failed to save the recording.",
+		"finalizeFailedWithReason": "Failed to finalize the recording. {{error}}",
+		"nativeStartFailed": "Failed to start native screen recording",
+		"nativePauseFailed": "Failed to pause native capture before countdown",
+		"nativeResumeFailed": "Failed to resume native capture after countdown",
+		"displayUnavailable": "Selected display is not available for browser capture on this system.",
+		"videoTrackUnavailable": "Video track is not available.",
+		"mediaStreamUnavailable": "Media stream is not available.",
+		"micPermissionDenied": "Microphone permission denied. Recording will continue without microphone audio.",
+		"continueWithoutMic": "{{error}}. Recording will continue without microphone audio.",
+		"savedFile": "Saved file: {{path}}",
+		"unexpectedError": "An unexpected error occurred",
 		"update": {
 			"update": "Update",
 			"updated": "Updated",
@@ -91,6 +114,26 @@
 		"notNow": "Not now",
 		"updateNow": "Update now",
 		"restartToUpdate": "Restart to update",
-		"tryAgain": "Try again"
+		"tryAgain": "Try again",
+		"windowLabel": "Recordly update",
+		"downloadingProgressLabel": "Downloading update"
+	},
+	"onboarding": {
+		"record": {
+			"title": "Start with a moment.",
+			"description": "Choose your screen or a window. Add your voice and camera, then hit record."
+		},
+		"preview": {
+			"title": "Make it yours.",
+			"description": "Trim the take, frame your video, and bring the important details into focus."
+		},
+		"share": {
+			"title": "Ready when you are.",
+			"description": "Publish a link for anyone to watch, or save the finished video to your device."
+		},
+		"backToSignIn": "Back to sign in",
+		"previousFeature": "Previous feature",
+		"getStarted": "Get started",
+		"next": "Next"
 	}
 }

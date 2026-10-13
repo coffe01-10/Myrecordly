@@ -1,13 +1,13 @@
-import { FeedbackDialog } from "@/components/feedback/FeedbackDialog";
 import { Separator } from "@heroui/react";
+import type { CSSProperties, FormEvent, RefObject } from "react";
+import { FeedbackDialog } from "@/components/feedback/FeedbackDialog";
+import { Button } from "@/components/ui/button";
 import {
-	House,
 	FilmStrip,
+	House,
 	ArrowClockwise as Redo2,
 	ArrowCounterClockwise as Undo2,
 } from "@/components/ui/icons";
-import type { CSSProperties, FormEvent, RefObject } from "react";
-import { Button } from "@/components/ui/button";
 import type { useI18n } from "@/contexts/I18nContext";
 import type { useExportDimensions } from "../export/useExportDimensions";
 import type { useExportSession } from "../export/useExportSession";
@@ -117,11 +117,11 @@ export function EditorHeader(props: Props) {
 					size="sm"
 					onClick={handleOpenProjectBrowser}
 					className="h-9 shrink-0 gap-2 px-3"
-					title="Home"
-					aria-label="Home"
+					title={t("editor.project.home", "Home")}
+					aria-label={t("editor.project.home", "Home")}
 				>
 					<House weight="fill" className="h-4 w-4" />
-					<span>Home</span>
+					<span>{t("editor.project.home", "Home")}</span>
 				</Button>
 				<span
 					aria-hidden="true"
@@ -188,7 +188,7 @@ export function EditorHeader(props: Props) {
 					onClick={props.onToggleClips}
 				>
 					<FilmStrip weight={props.clipsOpen ? "fill" : "regular"} className="size-4" />
-					Clips
+					{t("editor.clips.title", "Clips")}
 				</Button>
 			</div>
 

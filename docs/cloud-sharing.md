@@ -1,3 +1,5 @@
+Language: EN | [简中](cloud-sharing.zh-CN.md)
+
 # Recordly cloud sharing
 
 Recordly's **Export** menu offers downloading the current edit or **Create share link**. The Account button at the bottom of the left toolbar opens sign-in. Sharing renders an MP4 to a temporary file, uploads it to Recordly Share, finalizes its metadata, and removes the temporary file when the dialog closes.

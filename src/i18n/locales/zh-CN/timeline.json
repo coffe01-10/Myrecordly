@@ -2,6 +2,8 @@
 	"zoom": {
 		"cannotPlace": "无法在此处放置缩放",
 		"existsOrNoSpace": "此位置已存在缩放或空间不足。",
+		"notEnoughRoom": "此位置已存在缩放，或下一个缩放或片段结尾前空间不足。",
+		"suggestUnavailableLoop": "启用光标循环时无法使用缩放建议。",
 		"suggestHandlerUnavailable": "缩放建议处理不可用",
 		"noTelemetry": "无光标遥测数据",
 		"recordFirst": "请先录制屏幕以生成基于光标的建议。",
@@ -33,7 +35,45 @@
 		"addAnnotation": "添加注释 (A)"
 	},
 	"audio": {
-		"label": "音频"
+		"label": "音频",
+		"readFailed": "无法读取音频文件",
+		"readFailedDesc": "所选文件可能已损坏或格式不受支持。",
+		"cannotPlace": "无法在此处放置音频",
+		"noSpace": "当前播放头位置没有剩余空间。",
+		"occupied": "此位置已存在音频区域或空间不足。"
+	},
+	"caption": {
+		"cannotPlace": "无法在此处放置字幕",
+		"occupied": "此位置已存在字幕。"
+	},
+	"item": {
+		"loading": "加载中...",
+		"clip": "片段",
+		"trim": "修剪",
+		"manual": "手动",
+		"auto": "自动"
+	},
+	"timeline": {
+		"noVideoLoaded": "未加载视频",
+		"dragToStart": "拖放视频以开始编辑"
+	},
+	"hintClip": "按 C 分割片段",
+	"hintAnnotation": "按 A 添加注释",
+	"hintAudio": "点击音乐图标添加音频",
+	"playhead": {
+		"aria": "播放头 {{time}}"
+	},
+	"keyframe": {
+		"title": "关键帧 @ {{time}}ms（拖动移动，Delete/Backspace 删除）"
+	},
+	"model": {
+		"emptyText": "空文本",
+		"image": "图片",
+		"annotation": "注释",
+		"audio": "音频",
+		"caption": "字幕",
+		"zoom": "缩放 {{index}}",
+		"clip": "片段 {{index}}"
 	},
 	"addSpeed": "添加变速 (S)",
 	"resizeLeft": "向左调整",

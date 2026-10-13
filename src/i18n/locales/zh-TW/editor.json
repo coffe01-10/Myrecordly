@@ -8,6 +8,7 @@
 		"copyFailed": "無法複製連結，請選取後手動複製。",
 		"copied": "已複製",
 		"copy": "複製",
+		"copyLink": "複製連結",
 		"preparing": "正在準備目前的剪輯…",
 		"createLink": "建立連結",
 		"heading": "分享到雲端",
@@ -15,10 +16,22 @@
 		"openPage": "開啟分享頁面",
 		"notes": "備註",
 		"publish": "發布並建立連結",
+		"publishButton": "發布",
+		"publishDestination": "發布目標",
+		"link": "連結",
+		"local": "本機",
 		"createLinkTitle": "建立可分享的連結",
 		"notesPlaceholder": "為觀眾新增背景資訊、說明或簡短摘要…",
 		"description": "將目前的剪輯發布到 Recordly 觀看及回饋頁面，無需下載。分享的影片最高為 1080p。",
 		"uploading": "正在上傳… {progress}%",
+		"uploadingProgress": "正在上傳 · {{progress}}%",
+		"share": "分享",
+		"signInToShare": "登入後分享",
+		"linkExpiry": "免費方案的連結將在 14 天後過期。",
+		"linkSaveFailed": "分享已建立，但無法在本機儲存連結",
+		"sharingUnavailable": "此版本尚不支援雲端分享。",
+		"capacityCheckFailed": "無法檢查雲端儲存空間，請重試。",
+		"recordingLimit": "你已有 5 個雲端錄影。請先在「已分享」中刪除一個再分享。",
 		"googleUnavailable": "尚未啟用 Google 登入。請使用電子郵件，或請 Recordly 管理員連結 Google。",
 		"xUnavailable": "尚未啟用 X 登入。請使用電子郵件，或請 Recordly 管理員連結 X。",
 		"providerUnavailable": "尚未啟用此登入方式，請先使用電子郵件。",
@@ -42,6 +55,62 @@
 		"addingVideo": "正在新增影片…",
 		"preparingFootage": "正在為時間軸準備影片與音訊。"
 	},
+	"signIn": {
+		"welcome": "歡迎使用 Recordly",
+		"yourAccount": "你的帳戶",
+		"tagline": "精美、可分享的螢幕錄影",
+		"signInToStart": "登入以開始使用",
+		"continue": "繼續",
+		"continueWithout": "不登入直接繼續",
+		"continueWith": "使用 {{provider}} 繼續",
+		"orContinueWithEmail": "或使用電子郵件繼續",
+		"emailPlaceholder": "you@example.com",
+		"sendingLink": "正在傳送登入連結…",
+		"emailMagicLink": "透過郵件傳送登入連結",
+		"microsoftUnavailable": "暫不支援 Microsoft 登入。",
+		"githubUnavailable": "暫不支援 GitHub 登入。",
+		"emailUnavailable": "暫不支援電子郵件登入。",
+		"checkInbox": "請查收郵件以驗證電子郵件並繼續使用 Recordly。請在此電腦上開啟連結，並保持 Recordly 執行。"
+	},
+	"clips": {
+		"title": "片段",
+		"library": "片段庫",
+		"actions": "片段庫操作",
+		"moveAllToTrash": "全部移到垃圾桶",
+		"close": "關閉片段",
+		"search": "搜尋影片",
+		"searchPlaceholder": "搜尋影片",
+		"selectAll": "全選影片",
+		"selected": "已選擇 {{count}} 個",
+		"recordingsOne": "{{count}} 個錄影",
+		"recordingsMany": "{{count}} 個錄影",
+		"moveSelectedToTrash": "將所選影片移到垃圾桶",
+		"moveSelectedToTrashTitle": "將所選移到垃圾桶",
+		"loading": "正在載入影片…",
+		"retry": "重試",
+		"emptySearch": "沒有符合的影片",
+		"emptySearchHint": "請嘗試其他搜尋字詞。",
+		"emptyNone": "你的錄影將顯示在這裡",
+		"emptyNoneHint": "錄製一段影片即可開始。",
+		"select": "選擇 {{name}}",
+		"addToTimeline": "將 {{name}} 加入時間軸",
+		"addToTimelineTitle": "加入時間軸",
+		"movedToTrash": "已移到垃圾桶",
+		"dragHint": "拖到時間軸，或點擊 + 新增。",
+		"undo": "復原",
+		"undoTitle": "復原 (⌘Z / Ctrl+Z)",
+		"removeFailed": "無法移除影片：{{error}}",
+		"restoreFailed": "無法還原影片：{{error}}",
+		"importCancelFailed": "無法停止匯入處理：{{error}}",
+		"addedOne": "影片已加入時間軸",
+		"addedMany": "已將 {{count}} 段影片加入時間軸",
+		"addFailed": "無法新增影片：{{error}}",
+		"projectChanged": "匯入過程中專案已變更，請重新新增錄影。",
+		"finalizeFailed": "無法完成匯入的媒體",
+		"thumbnailPreview": "{{name}} 的預覽",
+		"thumbnailUnavailable": "預覽無法使用",
+		"thumbnailLoading": "正在載入預覽圖"
+	},
 	"library": {
 		"videos": "影片"
 	},
@@ -51,7 +120,13 @@
 		"skipBack": "後退",
 		"skipForward": "前進",
 		"muteUnmute": "靜音/取消靜音",
-		"volume": "預覽音量"
+		"volume": "預覽音量",
+		"editCaption": "編輯目前字幕",
+		"videoLoadFailed": "無法載入影片（{{detail}}）",
+		"videoErrorFormat": "格式不受支援",
+		"videoErrorNetwork": "網路錯誤",
+		"videoErrorDecode": "解碼錯誤",
+		"videoErrorCode": "錯誤碼 {{code}}"
 	},
 	"annotations": {
 		"settings": "註釋設定",
@@ -89,9 +164,13 @@
 		"imageUploadError": "請上傳 JPG、PNG、GIF 或 WebP 圖片檔案。",
 		"blurStrength": "模糊強度: {{strength}}",
 		"solidColor": "純色 (審查)",
-		"borderRadius": "邊框半徑"
+		"borderRadius": "邊框半徑",
+		"imageAlt": "註釋",
+		"noImage": "無圖片",
+		"noArrowData": "無箭頭資料",
+		"typeLabel": "註解類型",
+		"uploadedAlt": "已上傳的註解"
 	},
-
 	"fontStyles": {
 		"classic": "經典",
 		"editor": "編輯器",
@@ -159,17 +238,76 @@
 	},
 	"project": {
 		"untitled": "未命名",
+		"untitledProject": "未命名專案",
 		"unsavedChangesTitle": "未儲存的變更",
 		"unsavedChangesDescription": "要在{{action}}之前儲存目前的專案嗎？",
+		"actionOpenProject": "開啟另一個專案",
+		"actionImportFile": "匯入檔案",
 		"discardChanges": "捨棄變更",
-		"saveProject": "儲存專案"
+		"saveProject": "儲存專案",
+		"home": "首頁",
+		"renameTitle": "重新命名專案",
+		"renameInput": "專案名稱",
+		"noVideoLoaded": "未載入影片",
+		"saveCanceled": "專案儲存已取消",
+		"saveFailed": "儲存專案失敗",
+		"saveError": "無法儲存專案：{{error}}",
+		"nameRequired": "專案名稱為必填",
+		"renamePreferencesFailed": "專案已重新命名，但無法更新媒體庫偏好設定",
+		"loadFailed": "載入專案失敗",
+		"invalidFormat": "無法載入專案：專案檔案格式無效",
+		"loadError": "無法載入專案：{{error}}",
+		"importFailed": "匯入檔案失敗",
+		"loadedFrom": "專案已從 {{path}} 載入",
+		"loaded": "專案已載入",
+		"noMediaSelected": "未選擇媒體檔案",
+		"mediaLoadFailed": "無法載入媒體",
+		"mediaImported": "媒體已匯入",
+		"fileLoadError": "無法載入檔案：{{error}}",
+		"mediaError": "無法載入專案媒體",
+		"renameFailed": "無法重新命名專案",
+		"libraryLoadFailed": "無法載入專案庫"
 	},
 	"exportTips": {
 		"autoZooms": "提示：可在設定中關閉自動套用的縮放",
 		"experimentalBuilds": "提示：可在設定中開啟實驗版本存取權",
 		"cursorAppearance": "提示：你可以自訂游標外觀"
 	},
-	"account": { "title": "帳號", "comingSoon": "帳號功能即將推出" },
+	"account": {
+		"title": "帳號",
+		"comingSoon": "帳號功能即將推出"
+	},
+	"sidebar": {
+		"recordlyAccount": "Recordly 帳號",
+		"advanced": "進階",
+		"advancedSettings": "進階設定"
+	},
+	"extensions": {
+		"title": "擴充功能已不再提供",
+		"description": "擴充功能安裝與應用程式商店存取已停用。此區域僅作為現有專案與導覽的預留位置。"
+	},
+	"loading": {
+		"editor": "正在載入編輯器",
+		"editorEllipsis": "正在載入編輯器…"
+	},
+	"preview": {
+		"loadingPreview": "正在載入預覽"
+	},
+	"presets": {
+		"open": "開啟預設集",
+		"label": "預設集",
+		"popoverLabel": "預設集",
+		"saveCurrentAs": "將目前的預設集另存為",
+		"namePlaceholder": "預設集名稱",
+		"savedList": "已儲存的預設集",
+		"empty": "尚無預設集。",
+		"deleteAriaLabel": "刪除預設集 {{name}}"
+	},
+	"audio": {
+		"sourceLoadFailed": "無法載入伴隨音訊來源：{{error}}",
+		"sourcesLoadFailed": "無法載入伴隨音訊來源：{{error}}",
+		"sourcesLoadFailedHint": "無法載入伴隨音訊來源。播放與匯出可能會缺少麥克風音訊。"
+	},
 	"nativeCaptureUnavailable": {
 		"title": "沒有出錯，但我們無法轉譯動畫游標覆蓋層。",
 		"description": "你的裝置不支援原生擷取。這可能是由我們尚未釐清的多種原因造成的。Recordly 仍可繼續運作，但無法進行游標平滑處理。",
@@ -182,10 +320,39 @@
 		"completePercent": "已完成 {{percent}}%",
 		"issue": "匯出問題",
 		"complete": "匯出完成",
-		"savedSuccessfully": "檔案已成功保存。"
+		"savedSuccessfully": "檔案已成功保存。",
+		"exportTooSlow": "匯出太慢？取消並試試閃電匯出！",
+		"runtimePath": "路徑：{{path}}",
+		"errorCopied": "錯誤已複製",
+		"errorCopyFailed": "無法複製。請選取錯誤文字後手動複製。",
+		"copyError": "複製錯誤"
 	},
 	"export": {
-		"processingAudioEdits": "正在處理帶有速度/疊加編輯的音訊"
+		"processingAudioEdits": "正在處理帶有速度/疊加編輯的音訊",
+		"noVideoLoaded": "未載入影片",
+		"videoNotReady": "影片未就緒",
+		"metadataLoading": "影片中繼資料仍在載入",
+		"prepareGifFailed": "無法準備用於分享的 GIF。",
+		"prepareVideoFailed": "無法準備用於分享的影片。",
+		"saveCanceled": "儲存對話方塊已取消。點擊「再次保存」即可無需重新渲染直接儲存。",
+		"saveCanceledToast": "儲存已取消。你可以無需重新匯出再次儲存。",
+		"saveGifFailed": "儲存 GIF 失敗",
+		"gifExportFailed": "GIF 匯出失敗",
+		"exportProducedNoOutput": "匯出未產生輸出",
+		"saveVideoFailed": "儲存影片失敗",
+		"exportFailed": "匯出失敗",
+		"exportFailedWithError": "匯出失敗：{{error}}",
+		"unknownError": "未知錯誤"
+	},
+	"exportDialog": {
+		"exportCanceled": "匯出已取消",
+		"noPendingSave": "沒有待儲存的匯出",
+		"saveCanceledTryAgain": "儲存已取消。你可以重試。"
+	},
+	"exportRunner": {
+		"exportedTo": "已成功匯出至 {{path}}",
+		"revealFailed": "無法在資料夾中顯示項目。",
+		"revealError": "在資料夾中顯示時發生錯誤：{{error}}"
 	},
 	"toolbar": {
 		"addLayer": "新增圖層",

@@ -1,4 +1,10 @@
 {
+	"updates": {
+		"title": "更新",
+		"experimental": "實驗性更新",
+		"experimentalDescription": "你已選擇接收實驗性更新，因此可以在 Recordly 最新更新廣泛推出之前選擇先行測試。",
+		"saveFailed": "無法變更更新頻道。"
+	},
 	"zoom": {
 		"level": "縮放倍率",
 		"selectRegion": "選取要調整的縮放區域",
@@ -6,7 +12,8 @@
 		"modeAuto": "自動",
 		"modeManual": "手動",
 		"modeManualDescription": "為此縮放設定固定的對焦點",
-		"modeAutoDescription": "相機會自動跟隨游標"
+		"modeAutoDescription": "相機會自動跟隨游標",
+		"modeAria": "縮放模式"
 	},
 	"trim": {
 		"deleteRegion": "刪除修剪區域"
@@ -39,15 +46,15 @@
 			"windows11": "Windows 11",
 			"dot": "圓點",
 			"figma": "極簡",
-			"lavender": "Lavender",
-			"parched": "Parched",
-			"chooper": "Chooper",
-			"amongus": "Among Us",
-			"turtle": "Turtle"
+			"lavender": "薰衣草",
+			"parched": "乾枯",
+			"chooper": "咀嚼",
+			"amongus": "我們之中",
+			"turtle": "海龜"
 		},
 		"backgroundBlur": "模糊",
 		"zoomMotionBlur": "縮放動態模糊",
-		"auto": "Auto",
+		"auto": "自動",
 		"connectZooms": "連接縮放",
 		"connectZoomsDescription": "將連續的縮放區域平滑串接成一段連續的鏡頭移動。",
 		"autoApplyFreshRecordingZooms": "自動套用新錄影的縮放",
@@ -60,18 +67,18 @@
 		"zoomOutDescription": "控制相機如何離開縮放區域。",
 		"connectedZoomTitle": "縮放之間",
 		"connectedZoomDescription": "啟用連接後，調整連續縮放區域之間的滑行效果。",
-		"motionPresetsTitle": "Motion Presets",
-		"motionPresetsZoomHint": "Zoom motion presets are available in Settings.",
-		"animationPresets": "Animation Presets",
-		"cursorMotionPresets": "Cursor Motion Presets",
+		"motionPresetsTitle": "運動預設",
+		"motionPresetsZoomHint": "縮放運動預設已移至「設定」中。",
+		"animationPresets": "動畫預設",
+		"cursorMotionPresets": "游標運動預設",
 		"motionPresets": {
 			"focused": {
-				"label": "Focused",
-				"description": "Snappier motion for demos, walkthroughs, and everyday recordings."
+				"label": "專注",
+				"description": "更俐落的動作，適合示範、教學與日常錄影。"
 			},
 			"smooth": {
-				"label": "Smooth",
-				"description": "Gentler motion for presentations, keynote-style videos, and polished reveals."
+				"label": "平滑",
+				"description": "更柔和的動作，適合簡報、發表會風格影片與從容的呈現。"
 			}
 		},
 		"zoomInDuration": "拉近時間",
@@ -91,34 +98,34 @@
 		},
 		"cursorSize": "游標大小",
 		"cursorSmoothing": "游標平滑",
-		"cursorSpringStiffness": "Cursor Spring Stiffness",
-		"cursorSpringDamping": "Cursor Spring Damping",
-		"cursorSpringMass": "Cursor Spring Mass",
+		"cursorSpringStiffness": "游標彈簧剛度",
+		"cursorSpringDamping": "游標彈簧阻尼",
+		"cursorSpringMass": "游標彈簧質量",
 		"off": "關閉",
 		"cursorClickEffects": {
-			"title": "Click Effects",
-			"advanced": "Advanced",
-			"advancedShow": "Show advanced click effect controls",
-			"advancedHide": "Hide advanced click effect controls",
-			"color": "Effect Color",
-			"size": "Effect Size",
-			"opacity": "Effect Opacity",
-			"duration": "Effect Duration",
+			"title": "點擊特效",
+			"advanced": "進階",
+			"advancedShow": "顯示進階點擊特效控制項",
+			"advancedHide": "隱藏進階點擊特效控制項",
+			"color": "特效顏色",
+			"size": "特效大小",
+			"opacity": "特效不透明度",
+			"duration": "特效時長",
 			"none": {
-				"label": "Off",
-				"description": "No click graphic. Only the cursor motion changes when you click."
+				"label": "關閉",
+				"description": "不顯示點擊圖形，僅在點擊時改變游標動作。"
 			},
 			"ripple": {
-				"label": "Ripple",
-				"description": "Expanding rings radiate from each click so taps read clearly in motion."
+				"label": "漣漪",
+				"description": "每次點擊向外擴散一圈圈波紋，讓點擊動作在畫面中更清晰。"
 			},
 			"spotlight": {
-				"label": "Spotlight",
-				"description": "A soft halo flashes around the pointer to emphasize the clicked area."
+				"label": "聚光燈",
+				"description": "指標周圍閃現一圈柔和光暈，強調被點擊的區域。"
 			},
 			"echo": {
-				"label": "Echo",
-				"description": "A pair of soft rings that spread outward with a cleaner pulse."
+				"label": "回聲",
+				"description": "一對柔和的圓環向外擴散，脈衝更乾淨俐落。"
 			}
 		},
 		"cursorMotionBlur": "游標動態模糊",
@@ -151,6 +158,8 @@
 		"paddingBottom": "下",
 		"paddingLeft": "左",
 		"paddingRight": "右",
+		"linkPaddingSides": "連動內距各邊",
+		"customEffectColor": "自訂特效顏色",
 		"removeBackground": "移除背景"
 	},
 	"sections": {
@@ -176,6 +185,28 @@
 		"generateFull": "產生字幕",
 		"regenerateFull": "重新產生字幕",
 		"clearFull": "清除字幕",
+		"modelDownloadingAria": "正在下載字幕模型",
+		"whisperExecutableSelected": "已選擇 Whisper 執行檔",
+		"whisperModelSelected": "已選擇 Whisper 模型",
+		"whisperModelDeleted": "已刪除 Whisper 小模型",
+		"whisperModelDownloadFailed": "下載 Whisper 小模型失敗",
+		"whisperModelDeleteFailed": "刪除 Whisper 小模型失敗",
+		"whisperModelMissing": "請先選擇 Whisper 模型或下載小模型",
+		"noSourceVideo": "未載入來源影片",
+		"recordingChanged": "錄影已變更；產生的字幕未套用。",
+		"generateFailed": "產生字幕失敗",
+		"generatedCount": "已產生 {{count}} 條字幕",
+		"editSaved": "字幕已更新",
+		"languageAutoDetect": "自動偵測",
+		"languageEnglish": "英文",
+		"languageSpanish": "西班牙文",
+		"languageFrench": "法文",
+		"languageGerman": "德文",
+		"languageItalian": "義大利文",
+		"languagePortuguese": "葡萄牙文",
+		"languageChineseSimplified": "簡體中文",
+		"languageJapanese": "日文",
+		"languageKorean": "韓文",
 		"fontSettings": "字型設定",
 		"defaultFont": "預設",
 		"fontFamily": "字型",
@@ -192,12 +223,12 @@
 		"backgroundOpacity": "背景不透明度",
 		"textColor": "文字顏色",
 		"editor": {
-			"text": "Text",
-			"start": "Start",
-			"end": "End",
-			"split": "Split",
-			"merge": "Merge",
-			"delete": "Delete"
+			"text": "文字",
+			"start": "開始",
+			"end": "結束",
+			"split": "分割",
+			"merge": "合併",
+			"delete": "刪除"
 		}
 	},
 	"crop": {
@@ -218,7 +249,12 @@
 		"uploadCustom": "上傳自訂圖片",
 		"uploadSuccess": "自訂圖片已成功上傳！",
 		"uploadError": "請上傳 JPG 或 JPEG 圖片檔。",
-		"uploadErrorDescription": "僅支援 JPG 與 JPEG 圖片。"
+		"uploadErrorDescription": "僅支援 JPG 與 JPEG 圖片。",
+		"customColor": "自訂顏色",
+		"videoUnsupportedFormat": "不支援的格式",
+		"videoUnsupportedFormatDescription": "請選擇影片檔案（mp4、webm、mov 等）",
+		"videoAdded": "已新增影片背景",
+		"videoImportFailed": "匯入影片背景失敗"
 	},
 	"export": {
 		"title": "匯出",
@@ -230,7 +266,7 @@
 			"high": "高",
 			"original": "原始"
 		},
-		"fpsTitle": "FPS",
+		"fpsTitle": "影格率",
 		"loop": "循環",
 		"outputDimensions": "輸出：{{dimensions}}px",
 		"sizePresetOriginalShort": "原",
@@ -253,10 +289,36 @@
 		"mixedLabel": "源",
 		"deleteRegion": "刪除音訊"
 	},
-	"updates": {
-		"experimentalDescription": "你已選擇接收實驗性更新，因此可以在 Recordly 最新更新廣泛推出之前選擇先行測試。",
-		"title": "更新",
-		"experimental": "實驗性更新",
-		"saveFailed": "無法變更更新頻道。"
+	"settingsSections": {
+		"aria": "設定分區",
+		"regionAria": "{{section}}設定",
+		"general": "一般",
+		"motion": "動作",
+		"recording": "錄影",
+		"files": "檔案",
+		"advanced": "進階"
+	},
+	"onboarding": {
+		"title": "新手導引",
+		"show": "顯示新手導引"
+	},
+	"dashboard": {
+		"title": "設定",
+		"settingsAria": "儀表板設定",
+		"openVideoOrProject": "開啟影片或專案",
+		"openFile": "開啟檔案",
+		"recordingsFolder": "錄影資料夾",
+		"changeRecordingsFolderFailed": "無法變更錄影資料夾",
+		"changeFolder": "變更資料夾",
+		"hideHud": "在錄影中隱藏 HUD",
+		"hideHudDescription": "僅在錄影時隱藏。閒置狀態的 HUD 仍會顯示於錄影中。",
+		"updateCaptureProtectionFailed": "無法更新錄影保護設定",
+		"previewUpdateUi": "預覽更新介面",
+		"preview": "預覽",
+		"projectsFolder": "專案資料夾",
+		"projectsFolderDescription": "具名專案會自動儲存。",
+		"openProjectsFolderFailed": "無法開啟專案資料夾",
+		"showFolder": "顯示資料夾",
+		"projectsNote": "具名專案會自動儲存。返回「專案」時預覽會重新整理。"
 	}
 }

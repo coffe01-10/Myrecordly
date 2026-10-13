@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { t } from "../../i18n";
 
 export async function renameLibraryProject(
 	source: string,
@@ -7,7 +8,8 @@ export async function renameLibraryProject(
 	allowedPaths: string[],
 	sidecars: (path: string) => string[],
 ) {
-	if (!allowedPaths.includes(source)) throw new Error("Project is not in the library");
+	if (!allowedPaths.includes(source))
+		throw new Error(t("error.projectNotInLibrary", "Project is not in the library"));
 	const clean = name.trim();
 	if (
 		!clean ||
@@ -17,7 +19,7 @@ export async function renameLibraryProject(
 		[...clean].some((char) => char.charCodeAt(0) < 32) ||
 		/[. ]$/.test(clean)
 	)
-		throw new Error("Choose a valid project name");
+		throw new Error(t("error.chooseValidProjectName", "Choose a valid project name"));
 	const target = path.join(path.dirname(source), `${clean}${path.extname(source)}`);
 	if (target === source) return target;
 	// An exclusive link prevents a rename from overwriting another project.

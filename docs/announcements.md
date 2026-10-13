@@ -1,3 +1,5 @@
+Language: EN | [简中](announcements.zh-CN.md)
+
 # In-app announcements
 
 Recordly can show dismissible announcements in the editor as a popup, carousel slide, lightweight live notification, or header banner. Popups can contain images or video; notifications and banners are text-only with optional buttons.

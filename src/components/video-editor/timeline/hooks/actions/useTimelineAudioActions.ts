@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { useScopedT } from "@/contexts/I18nContext";
 import { resolveMediaElementSource } from "@/lib/exporter/localMediaSource";
 import type { TimelineAudioRegion } from "../../core/timelineTypes";
 import { resolveAudioPlacement } from "../utils/timelineAudioPlacement";
@@ -84,6 +85,7 @@ export function useTimelineAudioActions({
 }: UseTimelineAudioActionsParams) {
 	const { videoDuration, totalMs, currentTimeMs } = timeline;
 	const { audio: audioRegions } = regions;
+	const t = useScopedT("timeline");
 	const deps = useMemo(() => buildTimelineAudioActionsDeps(depsOverrides), [depsOverrides]);
 
 	const handleAddAudio = useCallback(
@@ -100,19 +102,13 @@ export function useTimelineAudioActions({
 			const audioPath = result.path;
 			const audioDurationMs = await deps.probeAudioDurationMs(audioPath);
 			if (audioDurationMs <= 0) {
-				deps.reportError(
-					"Could not read audio file",
-					"The selected file may be corrupted or in an unsupported format.",
-				);
+				deps.reportError(t("audio.readFailed"), t("audio.readFailedDesc"));
 				return;
 			}
 
 			const startPos = Math.max(0, Math.min(currentTimeMs, totalMs));
 			if (totalMs - startPos <= 0) {
-				deps.reportError(
-					"Cannot place audio here",
-					"There is no remaining space at the current playhead position.",
-				);
+				deps.reportError(t("audio.cannotPlace"), t("audio.noSpace"));
 				return;
 			}
 
@@ -124,10 +120,7 @@ export function useTimelineAudioActions({
 				preferredTrackIndex,
 			});
 			if (!placement) {
-				deps.reportError(
-					"Cannot place audio here",
-					"Audio region already exists at this location or not enough space available.",
-				);
+				deps.reportError(t("audio.cannotPlace"), t("audio.occupied"));
 				return;
 			}
 
@@ -137,7 +130,7 @@ export function useTimelineAudioActions({
 				placement.trackIndex,
 			);
 		},
-		[videoDuration, totalMs, onAudioAdded, deps, currentTimeMs, audioRegions],
+		[videoDuration, totalMs, onAudioAdded, deps, currentTimeMs, audioRegions, t],
 	);
 
 	return { handleAddAudio };

@@ -44,6 +44,29 @@
 		"stop": "停止",
 		"cancel": "取消",
 		"more": "更多",
+		"controlsLabel": "录制控件",
+		"microphoneOn": "麦克风已开",
+		"microphoneOff": "麦克风已关",
+		"fallbackMicFailed": "保存备用麦克风音轨失败",
+		"savedWithoutFallbackMicTrack": "{{error}}。录制已保存，但不包含备用麦克风音轨。",
+		"nativeWindowsUnavailable": "原生 Windows 捕获不可用。将回退到浏览器捕获。",
+		"nativeWindowsCheckFailed": "无法检查原生 Windows 捕获。将回退到浏览器捕获。",
+		"nativeWindowsStartFailed": "原生 Windows 捕获启动失败。将回退到浏览器捕获。",
+		"finalizeMacFailed": "无法完成 macOS 录制，因此未打开编辑器。",
+		"finalizeFailed": "无法完成录制，因此未打开编辑器。",
+		"storeFailed": "保存录制失败。",
+		"saveFailed": "无法保存录制。",
+		"finalizeFailedWithReason": "完成录制失败。{{error}}",
+		"nativeStartFailed": "启动原生屏幕录制失败",
+		"nativePauseFailed": "倒计时前暂停原生捕获失败",
+		"nativeResumeFailed": "倒计时后恢复原生捕获失败",
+		"displayUnavailable": "此系统上的浏览器捕获无法使用所选显示器。",
+		"videoTrackUnavailable": "视频轨道不可用。",
+		"mediaStreamUnavailable": "媒体流不可用。",
+		"micPermissionDenied": "麦克风权限被拒绝。将继续录制但不包含麦克风音频。",
+		"continueWithoutMic": "{{error}}。将继续录制但不包含麦克风音频。",
+		"savedFile": "已保存文件：{{path}}",
+		"unexpectedError": "发生意外错误",
 		"update": {
 			"update": "更新",
 			"updated": "已是最新",
@@ -91,6 +114,26 @@
 		"notNow": "暂不",
 		"updateNow": "立即更新",
 		"restartToUpdate": "重新启动以更新",
-		"tryAgain": "重试"
+		"tryAgain": "重试",
+		"windowLabel": "Recordly 更新",
+		"downloadingProgressLabel": "正在下载更新"
+	},
+	"onboarding": {
+		"record": {
+			"title": "从一个瞬间开始。",
+			"description": "选择屏幕或窗口。加入你的声音和摄像头，然后开始录制。"
+		},
+		"preview": {
+			"title": "让它成为你的作品。",
+			"description": "裁剪片段、调整画面构图，让重要细节脱颖而出。"
+		},
+		"share": {
+			"title": "随时准备就绪。",
+			"description": "发布链接供任何人观看，或将完成的视频保存到你的设备。"
+		},
+		"backToSignIn": "返回登录",
+		"previousFeature": "上一个功能",
+		"getStarted": "开始使用",
+		"next": "下一步"
 	}
 }

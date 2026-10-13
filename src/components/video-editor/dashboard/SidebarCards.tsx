@@ -1,13 +1,15 @@
 import { Card } from "@heroui/react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import { useScopedT } from "@/contexts/I18nContext";
 import { sidebarCardConfig } from "./sidebarCardConfig";
 
 export function SidebarCards() {
+	const t = useScopedT("common");
 	if (!sidebarCardConfig.enabled || sidebarCardConfig.cards.length === 0) return null;
 	return (
 		<div
-			aria-label="Sidebar announcements"
+			aria-label={t("dashboard.sidebarCards.announcements", "Sidebar announcements")}
 			className="mb-4 max-h-[35vh] space-y-3 overflow-y-auto"
 		>
 			{sidebarCardConfig.cards.map((card) => (
@@ -47,13 +49,18 @@ export function SidebarCards() {
 										.then((result) => {
 											if (!result.success)
 												throw new Error(
-													result.error || "Could not open link",
+													result.error ||
+														t(
+															"dashboard.sidebarCards.couldNotOpenLink",
+															"Could not open link",
+														),
 												);
 										})
 										.catch((error) => toast.error(String(error)))
 								}
 							>
-								{card.linkLabel ?? "Learn more"}
+								{card.linkLabel ??
+									t("dashboard.sidebarCards.learnMore", "Learn more")}
 							</Button>
 						</Card.Footer>
 					)}

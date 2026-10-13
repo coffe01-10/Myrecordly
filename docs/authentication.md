@@ -1,3 +1,5 @@
+Language: EN | [简中](authentication.zh-CN.md)
+
 # Recordly authentication setup
 
 Recordly uses Supabase Auth for one shared session across email/password and Google. The desktop application uses PKCE and returns from the system browser through a loopback callback in development and `recordly://auth/callback` in production. X is shown in the sign-in dialog and requires its provider to be enabled in Supabase. SAML is intentionally hidden until configured.

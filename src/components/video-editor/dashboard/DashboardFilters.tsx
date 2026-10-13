@@ -1,6 +1,7 @@
 import type { DashboardProps } from "./types";
 import { Dropdown } from "@heroui/react";
 import { CaretDown, Trash } from "@/components/ui/icons";
+import { useScopedT } from "@/contexts/I18nContext";
 
 import { Button } from "@/components/ui/button";
 
@@ -35,14 +36,18 @@ export function DashboardFilters({
 	| "busy"
 	| "deleteEntries"
 > & { hideSelection?: boolean }) {
+	const t = useScopedT("common");
 	return (
 		<>
 			<div className="flex items-center gap-3 px-7 pb-7 lg:px-10">
-				<div className="flex gap-2" aria-label="Time filters">
+				<div
+					className="flex gap-2"
+					aria-label={t("dashboard.filters.timeFilters", "Time filters")}
+				>
 					{[
-						["all", "All"],
-						["week", "Last 7 days"],
-						["month", "Last 30 days"],
+						["all", t("dashboard.filters.all", "All")],
+						["week", t("dashboard.filters.lastSevenDays", "Last 7 days")],
+						["month", t("dashboard.filters.lastThirtyDays", "Last 30 days")],
 					].map(([id, label]) => (
 						<Button
 							key={id}
@@ -61,7 +66,12 @@ export function DashboardFilters({
 							size="icon"
 							className="size-7 min-w-7 text-danger"
 							aria-label={
-								isRaw ? "Select raw files to remove" : "Select projects to delete"
+								isRaw
+									? t("dashboard.filters.selectRaw", "Select raw files to remove")
+									: t(
+											"dashboard.filters.selectProjects",
+											"Select projects to delete",
+										)
 							}
 							aria-pressed={selecting}
 							onClick={() => {
@@ -78,30 +88,40 @@ export function DashboardFilters({
 						<Button
 							variant="ghost"
 							size="sm"
-							aria-label={isRaw ? "Sort raw files" : "Sort projects"}
+							aria-label={
+								isRaw
+									? t("dashboard.filters.sortRaw", "Sort raw files")
+									: t("dashboard.filters.sortProjects", "Sort projects")
+							}
 							className="h-7 gap-2 text-xs text-muted-foreground"
 						>
 							{sort === "recent"
 								? isRaw
-									? "Last created"
-									: "Last edited"
+									? t("dashboard.filters.lastCreated", "Last created")
+									: t("dashboard.filters.lastEdited", "Last edited")
 								: sort === "created"
-									? "Last created"
-									: "Name"}
+									? t("dashboard.filters.lastCreated", "Last created")
+									: t("dashboard.filters.name", "Name")}
 							<CaretDown className="size-3" />
 						</Button>
 						<Dropdown.Popover>
-							<Dropdown.Menu aria-label={isRaw ? "Sort raw files" : "Sort projects"}>
+							<Dropdown.Menu
+								aria-label={
+									isRaw
+										? t("dashboard.filters.sortRaw", "Sort raw files")
+										: t("dashboard.filters.sortProjects", "Sort projects")
+								}
+							>
 								{!isRaw && (
 									<Dropdown.Item id="recent" onAction={() => setSort("recent")}>
-										Last edited
+										{t("dashboard.filters.lastEdited", "Last edited")}
 									</Dropdown.Item>
 								)}
 								<Dropdown.Item id="created" onAction={() => setSort("created")}>
-									Last created
+									{t("dashboard.filters.lastCreated", "Last created")}
 								</Dropdown.Item>
 								<Dropdown.Item id="name" onAction={() => setSort("name")}>
-									Name
+									{t("dashboard.filters.name", "Name")}
 								</Dropdown.Item>
 							</Dropdown.Menu>
 						</Dropdown.Popover>
@@ -115,16 +135,22 @@ export function DashboardFilters({
 						size="sm"
 						onClick={() => setSelected(visible.map((e) => e.path))}
 					>
-						Select all
+						{t("dashboard.filters.selectAll", "Select all")}
 					</Button>
-					<span>{selected.length} selected</span>
+					<span>
+						{t("dashboard.filters.selectedCount", "{{count}} selected", {
+							count: selected.length,
+						})}
+					</span>
 					<Button
 						variant="destructive"
 						size="sm"
 						disabled={!selected.length || busy}
 						onClick={() => void deleteEntries(selected)}
 					>
-						{isRaw ? "Remove" : "Delete"}
+						{isRaw
+							? t("dashboard.filters.remove", "Remove")
+							: t("actions.delete", "Delete")}
 					</Button>
 					<Button
 						variant="ghost"
@@ -134,7 +160,7 @@ export function DashboardFilters({
 							setSelected([]);
 						}}
 					>
-						Cancel
+						{t("actions.cancel", "Cancel")}
 					</Button>
 				</div>
 			)}

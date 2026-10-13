@@ -1,5 +1,6 @@
 import { Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
+import { useScopedT } from "@/contexts/I18nContext";
 import { cn } from "@/lib/utils";
 
 export function RecordNewButton({
@@ -13,6 +14,7 @@ export function RecordNewButton({
 	className?: string;
 	first?: boolean;
 }) {
+	const t = useScopedT("common");
 	return (
 		<Button
 			variant="default"
@@ -21,7 +23,9 @@ export function RecordNewButton({
 			className={cn("h-10 shrink-0 gap-2 text-[13px]", className)}
 		>
 			<Plus className="size-4" />
-			{first ? "Record your first video" : "Record new"}
+			{first
+				? t("dashboard.recordNew.firstVideo", "Record your first video")
+				: t("dashboard.recordNew.recordNew", "Record new")}
 		</Button>
 	);
 }

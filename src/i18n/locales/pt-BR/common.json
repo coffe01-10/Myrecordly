@@ -16,11 +16,151 @@
 		"save": "Salvar",
 		"undo": "Desfazer",
 		"delete": "Excluir",
-		"done": "Concluído"
+		"done": "Concluído",
+		"rename": "Rename"
 	},
 	"errors": {
 		"invalidFileType": "Tipo de arquivo inválido",
 		"failedToUploadImage": "Falha ao enviar imagem",
 		"fileReadError": "Ocorreu um erro ao ler o arquivo."
+	},
+	"dashboard": {
+		"dialogLabel": "Projects dashboard",
+		"import": "Import",
+		"signIn": "Sign in",
+		"sidebar": {
+			"navigation": "Library navigation",
+			"home": "Home",
+			"shared": "Shared",
+			"raw": "Raw",
+			"folders": "Folders",
+			"newFolder": "New folder",
+			"untitledFolder": "Untitled folder",
+			"settings": "Settings"
+		},
+		"filters": {
+			"timeFilters": "Time filters",
+			"all": "All",
+			"lastSevenDays": "Last 7 days",
+			"lastThirtyDays": "Last 30 days",
+			"selectRaw": "Select raw files to remove",
+			"selectProjects": "Select projects to delete",
+			"sortRaw": "Sort raw files",
+			"sortProjects": "Sort projects",
+			"lastEdited": "Last edited",
+			"lastCreated": "Last created",
+			"name": "Name",
+			"selectAll": "Select all",
+			"selectedCount": "{{count}} selected",
+			"remove": "Remove"
+		},
+		"grid": {
+			"cloudSharingUnavailable": "Cloud sharing is not available in this build yet.",
+			"signInToManage": "Sign in to manage shared videos.",
+			"rawFiles": "Raw files",
+			"yourProjects": "Your projects",
+			"loadingRecordings": "Loading recordings…",
+			"noMatchingRaw": "No matching raw files",
+			"noRawRecordings": "No raw recordings yet",
+			"noMatchingProjects": "No matching projects",
+			"emptyProjects": "It's looking empty in here...",
+			"retry": "Retry",
+			"clearSearch": "Clear search"
+		},
+		"toolbar": {
+			"searchRaw": "Search raw files",
+			"searchProjects": "Search projects",
+			"searchRawPlaceholder": "Search raw files…",
+			"searchProjectsPlaceholder": "Search projects…"
+		},
+		"recordNew": {
+			"firstVideo": "Record your first video",
+			"recordNew": "Record new"
+		},
+		"skeleton": {
+			"loadingProjects": "Loading projects"
+		},
+		"rawPreview": {
+			"title": "Raw file preview"
+		},
+		"sidebarCards": {
+			"announcements": "Sidebar announcements",
+			"couldNotOpenLink": "Could not open link",
+			"learnMore": "Learn more"
+		},
+		"folderChips": {
+			"removeFrom": "Remove {{name}} from {{folder}}",
+			"foldersFor": "Folders for {{name}}",
+			"moreFolders": "{{count}} more folders: {{names}}"
+		},
+		"folderRow": {
+			"nameLabel": "Folder name",
+			"optionsFor": "Options for {{name}}",
+			"options": "Folder options",
+			"removeFolder": "Remove folder"
+		},
+		"folderColors": {
+			"changeColorFor": "Change color for {{name}}",
+			"folderColor": "Folder color",
+			"folderColors": "Folder colors",
+			"removeCustomColor": "Remove custom color",
+			"saveCustomColor": "Save custom color"
+		},
+		"announcements": {
+			"label": "Announcements",
+			"carousel": "carousel",
+			"couldNotOpen": "Could not open announcement",
+			"previous": "Previous announcement",
+			"choose": "Choose announcement",
+			"slide": "Announcement {{number}}",
+			"next": "Next announcement"
+		},
+		"browser": {
+			"title": "Projects",
+			"noPreview": "No preview",
+			"currentProject": "Current project",
+			"noProjects": "No saved projects yet"
+		},
+		"projectCard": {
+			"rawFileName": "Raw file name",
+			"projectName": "Project name",
+			"webProject": "Web project",
+			"incompleteUpload": "Incomplete upload",
+			"addFolderTo": "Add folder to {{name}}",
+			"addFolder": "Add folder",
+			"assignFolderLabel": "Assign project folder",
+			"removeFromAllFolders": "Remove from all folders",
+			"createFolderHint": "Create a folder in the sidebar",
+			"optionsFor": "Options for {{name}}",
+			"projectOptions": "Project options",
+			"openLink": "Open link",
+			"previewFile": "Preview file",
+			"openProject": "Open project",
+			"viewInWeb": "View in web",
+			"share": "Share",
+			"showInFolderLabel": "Show {{name}} in folder",
+			"showInFolder": "Show in folder",
+			"deleteRecording": "Delete recording",
+			"removeFromLibrary": "Remove from library",
+			"deleteProject": "Delete project"
+		},
+		"errors": {
+			"actionFailed": "Could not complete action",
+			"savePreferences": "Could not save library preferences",
+			"saveFolders": "Could not save folders"
+		}
+	},
+	"colorPicker": {
+		"colors": "Colors",
+		"none": "None",
+		"presetColors": "Preset colors",
+		"hexColor": "Hex color",
+		"clearBackground": "Clear background"
+	},
+	"audioMeter": {
+		"microphoneLevel": "Microphone level"
+	},
+	"dropdownMenu": {
+		"actions": "Actions"
 	}
 }

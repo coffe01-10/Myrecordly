@@ -1,5 +1,6 @@
 import { useTimelineContext } from "dnd-timeline";
 import { useEffect, useState, type RefObject } from "react";
+import { useScopedT } from "@/contexts/I18nContext";
 import { cn } from "@/lib/utils";
 import { formatPlayheadTime } from "../../core/time";
 
@@ -29,6 +30,7 @@ export default function PlaybackCursor({
 	isLoading = false,
 }: PlaybackCursorProps) {
 	const { sidebarWidth, direction, range, valueToPixels, pixelsToValue } = useTimelineContext();
+	const t = useScopedT("timeline");
 	const sideProperty = direction === "rtl" ? "right" : "left";
 	const [isDragging, setIsDragging] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
@@ -107,7 +109,7 @@ export default function PlaybackCursor({
 			>
 				<button
 					type="button"
-					aria-label={`Playhead ${formatPlayheadTime(clampedTime)}`}
+					aria-label={t("playhead.aria", undefined, { time: formatPlayheadTime(clampedTime) })}
 					data-testid="playhead-cap"
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}

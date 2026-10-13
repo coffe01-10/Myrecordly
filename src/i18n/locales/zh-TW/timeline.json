@@ -2,6 +2,8 @@
 	"zoom": {
 		"cannotPlace": "無法在此處新增縮放",
 		"existsOrNoSpace": "此位置已存在縮放，或可用空間不足。",
+		"notEnoughRoom": "此位置已存在縮放，或下一個縮放或片段結尾前空間不足。",
+		"suggestUnavailableLoop": "啟用游標循環時無法使用縮放建議。",
 		"suggestHandlerUnavailable": "無法使用縮放建議功能",
 		"noTelemetry": "沒有可用的游標追蹤資料",
 		"recordFirst": "請先錄製螢幕影片，以產生基於游標的建議。",
@@ -33,7 +35,45 @@
 		"addAnnotation": "新增註解（A）"
 	},
 	"audio": {
-		"label": "音訊"
+		"label": "音訊",
+		"readFailed": "無法讀取音訊檔案",
+		"readFailedDesc": "選取的檔案可能已損毀或格式不受支援。",
+		"cannotPlace": "無法在此處新增音訊",
+		"noSpace": "目前播放頭位置沒有剩餘空間。",
+		"occupied": "此位置已存在音訊區域，或可用空間不足。"
+	},
+	"caption": {
+		"cannotPlace": "無法在此處新增字幕",
+		"occupied": "此位置已存在字幕。"
+	},
+	"item": {
+		"loading": "載入中...",
+		"clip": "片段",
+		"trim": "修剪",
+		"manual": "手動",
+		"auto": "自動"
+	},
+	"timeline": {
+		"noVideoLoaded": "未載入影片",
+		"dragToStart": "拖放影片以開始編輯"
+	},
+	"hintClip": "按 C 分割片段",
+	"hintAnnotation": "按 A 新增註解",
+	"hintAudio": "點擊音樂圖示新增音訊",
+	"playhead": {
+		"aria": "播放頭 {{time}}"
+	},
+	"keyframe": {
+		"title": "關鍵影格 @ {{time}}ms（拖曳移動，Delete/Backspace 刪除）"
+	},
+	"model": {
+		"emptyText": "空白文字",
+		"image": "圖片",
+		"annotation": "註解",
+		"audio": "音訊",
+		"caption": "字幕",
+		"zoom": "縮放 {{index}}",
+		"clip": "片段 {{index}}"
 	},
 	"addSpeed": "新增速度（S）",
 	"resizeLeft": "向左調整大小",

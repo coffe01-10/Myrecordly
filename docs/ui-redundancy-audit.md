@@ -1,3 +1,5 @@
+Language: EN | [简中](ui-redundancy-audit.zh-CN.md)
+
 # HeroUI editor redundancy audit
 
 Reviewed 19 September 2026 in the `recordly-heroui` redesign. Findings use the current renderer and source, including the existing uncommitted redesign work.

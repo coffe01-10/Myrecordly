@@ -5,7 +5,13 @@ import { app, BrowserWindow, dialog } from "electron";
 import { autoUpdater } from "electron-updater";
 import { USER_DATA_PATH } from "./appPaths";
 import { readAppSetting, writeAppSetting } from "./appSettingsStore";
+import { t } from "./i18n";
 import { EXPERIMENTAL_UPDATE_DESCRIPTION, getUpdateChannelConfiguration } from "./updateChannel";
+
+/** Localized experimental-update blurb (English source lives in updateChannel). */
+function experimentalUpdateDescription(): string {
+	return t("update.experimentalDescription", EXPERIMENTAL_UPDATE_DESCRIPTION);
+}
 
 const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const INITIAL_UPDATE_CHECK_DELAY_MS = 15 * 1000;
@@ -221,8 +227,11 @@ function createAvailableUpdateToastPayload(
 		version,
 		phase: "available",
 		detail: isExperimental
-			? EXPERIMENTAL_UPDATE_DESCRIPTION
-			: "Install the latest version now, or remind yourself to come back to it later.",
+			? experimentalUpdateDescription()
+			: t(
+					"update.toastAvailable",
+					"Install the latest version now, or remind yourself to come back to it later.",
+				),
 		delayMs: UPDATE_REMINDER_DELAY_MS,
 		isExperimental,
 		primaryAction: "install-and-restart",
@@ -261,10 +270,18 @@ function createDownloadingUpdateToastPayload(
 		phase: "downloading",
 		detail:
 			normalizedProgress >= 100
-				? "Finishing the update download. Recordly will restart as soon as the installer is ready."
+				? t(
+						"update.toastDownloadingFinishing",
+						"Finishing the update download. Recordly will restart as soon as the installer is ready.",
+					)
 				: remainingMb !== null
-					? `${remainingMb.toFixed(1)} MB left before Recordly restarts.`
-					: "Downloading the update now. Recordly will restart when it finishes.",
+					? t("update.toastDownloadingMb", "{{mb}} MB left before Recordly restarts.", {
+							mb: remainingMb.toFixed(1),
+						})
+					: t(
+							"update.toastDownloading",
+							"Downloading the update now. Recordly will restart when it finishes.",
+						),
 		delayMs: UPDATE_REMINDER_DELAY_MS,
 		isExperimental,
 		progressPercent: normalizedProgress,
@@ -283,7 +300,10 @@ function createDownloadedUpdateToastPayload(
 	return {
 		version,
 		phase: "ready",
-		detail: "The update is ready. Install and restart now, or remind yourself later.",
+		detail: t(
+			"update.toastReady",
+			"The update is ready. Install and restart now, or remind yourself later.",
+		),
 		delayMs: UPDATE_REMINDER_DELAY_MS,
 		isExperimental,
 		primaryAction: "install-and-restart",
@@ -298,7 +318,9 @@ function createUpdateErrorToastPayload(
 	return {
 		version,
 		phase: "error",
-		detail: `The update could not be downloaded. ${String(error)}`,
+		detail: t("update.toastError", "The update could not be downloaded. {{error}}", {
+			error: String(error),
+		}),
 		delayMs: UPDATE_REMINDER_DELAY_MS,
 		isExperimental,
 		primaryAction: "install-and-restart",
@@ -452,15 +474,24 @@ export async function downloadAvailableUpdate(
 	}
 
 	if (!availableVersion) {
-		return { success: false, message: "No update is ready to download." };
+		return {
+			success: false,
+			message: t("update.noUpdateReady", "No update is ready to download."),
+		};
 	}
 
 	if (pendingDownloadedVersion === availableVersion) {
-		return { success: false, message: "This update has already been downloaded." };
+		return {
+			success: false,
+			message: t("update.alreadyDownloaded", "This update has already been downloaded."),
+		};
 	}
 
 	if (downloadInProgress) {
-		return { success: false, message: "This update is already downloading." };
+		return {
+			success: false,
+			message: t("update.alreadyDownloading", "This update is already downloading."),
+		};
 	}
 
 	clearDeferredReminderTimer();
@@ -471,7 +502,9 @@ export async function downloadAvailableUpdate(
 	setUpdateStatusSummary({
 		status: "downloading",
 		availableVersion,
-		detail: `Downloading Recordly ${availableVersion}`,
+		detail: t("update.statusDownloading", "Downloading Recordly {{version}}", {
+			version: availableVersion,
+		}),
 	});
 	emitUpdateToastState(
 		sendToRenderer,
@@ -509,7 +542,10 @@ export function deferUpdateReminder(
 ) {
 	const payload = getReminderPayload();
 	if (!payload) {
-		return { success: false, message: "No update reminder is ready yet." };
+		return {
+			success: false,
+			message: t("update.noReminderReady", "No update reminder is ready yet."),
+		};
 	}
 
 	clearDeferredReminderTimer();
@@ -539,7 +575,10 @@ export function deferUpdateReminder(
 export function skipAvailableUpdateVersion(sendToRenderer?: UpdateToastSender) {
 	const versionToSkip = pendingDownloadedVersion ?? availableVersion;
 	if (!versionToSkip) {
-		return { success: false, message: "No update is available to skip." };
+		return {
+			success: false,
+			message: t("update.noUpdateToSkip", "No update is available to skip."),
+		};
 	}
 
 	skippedVersion = versionToSkip;
@@ -570,8 +609,11 @@ export function previewUpdateToast(sendToRenderer: UpdateToastSender) {
 		version: DEV_UPDATE_PREVIEW_VERSION,
 		phase: "available",
 		detail: DEV_UPDATE_PREVIEW_IS_EXPERIMENTAL
-			? EXPERIMENTAL_UPDATE_DESCRIPTION
-			: "This is a development preview of the in-app update toast.",
+			? experimentalUpdateDescription()
+			: t(
+					"update.previewToastDetail",
+					"This is a development preview of the in-app update toast.",
+				),
 		delayMs: UPDATE_REMINDER_DELAY_MS,
 		isPreview: true,
 		isExperimental: DEV_UPDATE_PREVIEW_IS_EXPERIMENTAL,
@@ -588,14 +630,25 @@ async function showAvailableUpdateDialog(
 	const isExperimental = options?.isExperimental ?? getExperimentalUpdatesEnabled();
 	const result = await showMessageBox(getMainWindow, {
 		type: "info",
-		title: isExperimental ? "Experimental Update Available" : "Update Available",
-		message: `Recordly ${version} is available${isExperimental ? " on the experimental channel" : ""}.`,
+		title: isExperimental
+			? t("update.experimentalAvailableTitle", "Experimental Update Available")
+			: t("update.availableTitle", "Update Available"),
+		message: isExperimental
+			? t(
+					"update.messageAvailableExperimental",
+					"Recordly {{version}} is available on the experimental channel.",
+					{ version },
+				)
+			: t("update.messageAvailable", "Recordly {{version}} is available.", { version }),
 		detail: isPreview
-			? `${isExperimental ? EXPERIMENTAL_UPDATE_DESCRIPTION : "This is a development preview of the standard update flow."} No real update will be installed.`
+			? `${isExperimental ? experimentalUpdateDescription() : t("update.previewStandardFlow", "This is a development preview of the standard update flow.")} No real update will be installed.`
 			: isExperimental
-				? EXPERIMENTAL_UPDATE_DESCRIPTION
-				: "Install and restart now, or remind me later.",
-		buttons: ["Install & Restart", "Later"],
+				? experimentalUpdateDescription()
+				: t("update.installAndRestartHint", "Install and restart now, or remind me later."),
+		buttons: [
+			t("update.installAndRestart", "Install & Restart"),
+			t("update.later", "Later"),
+		],
 		defaultId: 0,
 		cancelId: 1,
 		noLink: true,
@@ -605,9 +658,12 @@ async function showAvailableUpdateDialog(
 		if (isPreview) {
 			await showMessageBox(getMainWindow, {
 				type: "info",
-				title: "Preview Only",
-				message: "No real update was installed.",
-				detail: "This was only a manual development preview of the update prompt.",
+				title: t("update.previewOnlyTitle", "Preview Only"),
+				message: t("update.previewOnlyMessage", "No real update was installed."),
+				detail: t(
+					"update.previewOnlyDetail",
+					"This was only a manual development preview of the update prompt.",
+				),
 			});
 			return;
 		}
@@ -631,14 +687,20 @@ async function showDownloadedUpdateDialog(
 	const isPreview = Boolean(options?.isPreview);
 	const result = await showMessageBox(getMainWindow, {
 		type: "info",
-		title: "Update Ready",
+		title: t("update.readyTitle", "Update Ready"),
 		message: isPreview
-			? `Recordly ${version} is ready to install.`
-			: `Recordly ${version} has been downloaded.`,
+			? t("update.readyToInstall", "Recordly {{version}} is ready to install.", { version })
+			: t("update.hasBeenDownloaded", "Recordly {{version}} has been downloaded.", { version }),
 		detail: isPreview
-			? "Development preview of the native update prompt. No real update will be installed."
-			: "Install and restart now, or remind me later.",
-		buttons: ["Install & Restart", "Later"],
+			? t(
+					"update.previewNativePrompt",
+					"Development preview of the native update prompt. No real update will be installed.",
+				)
+			: t("update.installAndRestartHint", "Install and restart now, or remind me later."),
+		buttons: [
+			t("update.installAndRestart", "Install & Restart"),
+			t("update.later", "Later"),
+		],
 		defaultId: 0,
 		cancelId: 1,
 		noLink: true,
@@ -648,9 +710,12 @@ async function showDownloadedUpdateDialog(
 		if (isPreview) {
 			await showMessageBox(getMainWindow, {
 				type: "info",
-				title: "Preview Only",
-				message: "No real update was installed.",
-				detail: "This was only a manual development preview of the update prompt.",
+				title: t("update.previewOnlyTitle", "Preview Only"),
+				message: t("update.previewOnlyMessage", "No real update was installed."),
+				detail: t(
+					"update.previewOnlyDetail",
+					"This was only a manual development preview of the update prompt.",
+				),
 			});
 			return;
 		}
@@ -685,10 +750,12 @@ async function showUpdateErrorDialog(
 ) {
 	await showMessageBox(getMainWindow, {
 		type: "error",
-		title: "Update Failed",
-		message: `Recordly ${version} could not be downloaded.`,
+		title: t("update.errorTitle", "Update Failed"),
+		message: t("update.errorMessage", "Recordly {{version}} could not be downloaded.", {
+			version,
+		}),
 		detail: String(error),
-		buttons: ["OK"],
+		buttons: [t("update.ok", "OK")],
 		defaultId: 0,
 		noLink: true,
 	});
@@ -705,11 +772,20 @@ export async function checkForAppUpdates(
 		if (options?.manual) {
 			await showMessageBox(getMainWindow, {
 				type: "info",
-				title: "Updates Not Enabled",
-				message: "Auto-updates are only available in packaged releases.",
+				title: t("update.notEnabledTitle", "Updates Not Enabled"),
+				message: t(
+					"update.notEnabledMessage",
+					"Auto-updates are only available in packaged releases.",
+				),
 				detail: AUTO_UPDATES_DISABLED
-					? "This build disabled auto-updates through RECORDLY_DISABLE_AUTO_UPDATES=1."
-					: "Development builds do not ship the packaged update metadata required by electron-updater.",
+					? t(
+							"update.notEnabledDetailDisabled",
+							"This build disabled auto-updates through RECORDLY_DISABLE_AUTO_UPDATES=1.",
+						)
+					: t(
+							"update.notEnabledDetailDev",
+							"Development builds do not ship the packaged update metadata required by electron-updater.",
+						),
 			});
 		}
 		return;
@@ -766,7 +842,7 @@ export function setupAutoUpdates(
 		setUpdateStatusSummary({
 			status: "checking",
 			availableVersion: null,
-			detail: "Checking for updates...",
+			detail: t("update.statusChecking", "Checking for updates..."),
 		});
 		writeUpdaterLog("electron-updater emitted checking-for-update.");
 	});
@@ -782,7 +858,9 @@ export function setupAutoUpdates(
 		setUpdateStatusSummary({
 			status: "available",
 			availableVersion: info.version,
-			detail: `Recordly ${info.version} is available.`,
+			detail: t("update.statusAvailable", "Recordly {{version}} is available.", {
+				version: info.version,
+			}),
 		});
 		if (skippedVersion === info.version) {
 			manualCheckRequested = false;
@@ -810,7 +888,9 @@ export function setupAutoUpdates(
 		setUpdateStatusSummary({
 			status: "up-to-date",
 			availableVersion: null,
-			detail: `Recordly ${app.getVersion()} is up to date.`,
+			detail: t("update.statusUpToDate", "Recordly {{version}} is up to date.", {
+				version: app.getVersion(),
+			}),
 		});
 		clearVisibleUpdateToast(sendToRenderer);
 		manualCheckRequested = false;
@@ -825,7 +905,9 @@ export function setupAutoUpdates(
 		setUpdateStatusSummary({
 			status: "downloading",
 			availableVersion,
-			detail: `Downloading Recordly ${availableVersion}`,
+			detail: t("update.statusDownloading", "Downloading Recordly {{version}}", {
+			version: availableVersion,
+		}),
 		});
 		writeUpdaterLog(
 			`Download progress for ${availableVersion}: ${progress.percent.toFixed(1)}%`,
@@ -884,7 +966,9 @@ export function setupAutoUpdates(
 		setUpdateStatusSummary({
 			status: "ready",
 			availableVersion: info.version,
-			detail: `Recordly ${info.version} is ready to install.`,
+			detail: t("update.statusReady", "Recordly {{version}} is ready to install.", {
+				version: info.version,
+			}),
 		});
 		clearDeferredReminderTimer();
 

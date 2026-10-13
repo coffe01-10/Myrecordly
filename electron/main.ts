@@ -21,6 +21,7 @@ import { RECORDINGS_DIR } from "./appPaths";
 import { createAuthCallbackController } from "./authCallback";
 import { showCursor } from "./cursorHider";
 import { getGpuSwitches } from "./gpuSwitches";
+import { initializeMainLocale, setMainLocale, t } from "./i18n";
 import {
 	cleanupAllExportStreams,
 	cleanupNativeVideoExportSessions,
@@ -178,6 +179,7 @@ let sourceSelectorWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let trayContextMenu: Menu | null = null;
 let selectedSourceName = "";
+let isRecordingActive = false;
 let editorHasUnsavedChanges = false;
 let isForceClosing = false;
 let isAppQuitting = false;
@@ -464,20 +466,20 @@ function setupApplicationMenu() {
 
 	template.push(
 		{
-			label: "File",
+			label: t("menu.file", "File"),
 			submenu: [
 				{
-					label: "Open Projects…",
+					label: t("menu.openProjects", "Open Projects…"),
 					accelerator: "CmdOrCtrl+O",
 					click: () => sendEditorMenuAction("menu-load-project"),
 				},
 				{
-					label: "Save Project…",
+					label: t("menu.saveProject", "Save Project…"),
 					accelerator: "CmdOrCtrl+S",
 					click: () => sendEditorMenuAction("menu-save-project"),
 				},
 				{
-					label: "Save Project As…",
+					label: t("menu.saveProjectAs", "Save Project As…"),
 					accelerator: "CmdOrCtrl+Shift+S",
 					click: () => sendEditorMenuAction("menu-save-project-as"),
 				},
@@ -490,7 +492,7 @@ function setupApplicationMenu() {
 			],
 		},
 		{
-			label: "Edit",
+			label: t("menu.edit", "Edit"),
 			submenu: [
 				{ role: "undo" },
 				{ role: "redo" },
@@ -502,7 +504,7 @@ function setupApplicationMenu() {
 			],
 		},
 		{
-			label: "View",
+			label: t("menu.view", "View"),
 			submenu: [
 				{ role: "reload" },
 				{ role: "forceReload" },
@@ -516,16 +518,16 @@ function setupApplicationMenu() {
 			],
 		},
 		{
-			label: "Window",
+			label: t("menu.window", "Window"),
 			submenu: isMac
 				? [{ role: "minimize" }, { role: "zoom" }, { type: "separator" }, { role: "front" }]
 				: [{ role: "minimize" }, { role: "close" }],
 		},
 		{
-			label: "Help",
+			label: t("menu.help", "Help"),
 			submenu: [
 				{
-					label: "Check for Updates…",
+					label: t("menu.checkForUpdates", "Check for Updates…"),
 					click: () => {
 						void checkForAppUpdates(getUpdateDialogWindow, { manual: true });
 					},
@@ -713,14 +715,17 @@ ipcMain.handle("check-for-app-updates", async () => {
 	return { success: true, logPath: getUpdaterLogPath() };
 });
 
-function updateTrayMenu(recording: boolean = false) {
+function updateTrayMenu(recording: boolean = isRecordingActive) {
+	isRecordingActive = recording;
 	if (!tray) return;
 	const trayIcon = recording ? getRecordingTrayIcon() : getDefaultTrayIcon();
-	const trayToolTip = recording ? `Recording: ${selectedSourceName}` : "Recordly";
+	const trayToolTip = recording
+		? t("tray.recording", "Recording: {{name}}", { name: selectedSourceName })
+		: "Recordly";
 	const menuTemplate = recording
 		? [
 				{
-					label: "Show Controls",
+					label: t("tray.showControls", "Show Controls"),
 					click: () => {
 						if (!showHudOverlayFromTray()) {
 							focusOrCreateMainWindow();
@@ -728,7 +733,7 @@ function updateTrayMenu(recording: boolean = false) {
 					},
 				},
 				{
-					label: "Stop Recording",
+					label: t("tray.stopRecording", "Stop Recording"),
 					click: () => {
 						if (mainWindow && !mainWindow.isDestroyed()) {
 							mainWindow.webContents.send("stop-recording-from-tray");
@@ -738,7 +743,7 @@ function updateTrayMenu(recording: boolean = false) {
 			]
 		: [
 				{
-					label: "Open",
+					label: t("tray.open", "Open"),
 					click: () => {
 						if (!showHudOverlayFromTray()) {
 							focusOrCreateMainWindow();
@@ -746,7 +751,7 @@ function updateTrayMenu(recording: boolean = false) {
 					},
 				},
 				{
-					label: "Quit",
+					label: t("tray.quit", "Quit"),
 					click: () => {
 						app.quit();
 					},
@@ -834,11 +839,14 @@ function createEditorWindowWrapper() {
 		offerDiscard: async () => {
 			const result = await dialog.showMessageBox(editorWindow, {
 				type: "warning",
-				buttons: ["Discard & Close", "Cancel"],
+				buttons: [t("dialog.discardAndClose", "Discard & Close"), t("dialog.cancel", "Cancel")],
 				defaultId: 1,
 				cancelId: 1,
-				title: "Project could not be saved",
-				message: "Saving failed or did not respond. Discard unsaved changes and close?",
+				title: t("dialog.unsavedChangesTitle", "Project could not be saved"),
+				message: t(
+					"dialog.unsavedChangesMessage",
+					"Saving failed or did not respond. Discard unsaved changes and close?",
+				),
 			});
 			return result.response === 0;
 		},
@@ -906,6 +914,7 @@ app.on("second-instance", (_event, commandLine) => {
 
 // Register all IPC handlers when app is ready
 app.whenReady().then(async () => {
+	initializeMainLocale();
 	authCallbacks.startDevServer();
 	if (process.defaultApp && process.argv[1]) {
 		app.setAsDefaultProtocolClient(authCallbacks.protocol, process.execPath, [
@@ -1043,6 +1052,19 @@ app.whenReady().then(async () => {
 			}
 		},
 	);
+
+	// Rebuild native surfaces when the renderer reports a language change.
+	ipcMain.handle("set-locale", (_event, locale: unknown) => {
+		if (typeof locale === "string" && locale.length > 0) {
+			setMainLocale(locale);
+			setupApplicationMenu();
+			if (shouldUseTray()) {
+				if (!tray) createTray();
+				updateTrayMenu();
+			}
+		}
+		return { success: true };
+	});
 
 	if (IS_SMOKE_EXPORT || process.env.RECORDLY_DEV_OPEN_RECORDING_INPUT) {
 		await logSmokeExportGpuDiagnostics();

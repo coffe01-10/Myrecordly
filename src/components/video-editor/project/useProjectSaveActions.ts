@@ -1,7 +1,8 @@
-import { moveProjectFolderReferences } from "../dashboard/useProjectFolders";
-import { moveProjectShareLink } from "../cloud/projectShareLinks";
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { toast } from "@/components/ui/toast";
+import { useI18n } from "@/contexts/I18nContext";
+import { moveProjectShareLink } from "../cloud/projectShareLinks";
+import { moveProjectFolderReferences } from "../dashboard/useProjectFolders";
 import { createProjectData, type EditorProjectData } from "../projectPersistence";
 import type { useProjectState } from "../state/useProjectState";
 import { cloneStructured, getErrorMessage } from "../videoEditorUtils";
@@ -46,6 +47,7 @@ export function useProjectSaveActions({
 	refreshProjectLibrary,
 	remountPreview,
 }: UseProjectSaveActionsInput) {
+	const { t } = useI18n();
 	const {
 		currentProjectPath,
 		lastSavedSnapshot,
@@ -85,11 +87,15 @@ export function useProjectSaveActions({
 	const saveProject = useCallback(
 		async (forceSaveAs: boolean, options?: SaveProjectOptions) => {
 			clearPendingAutosave();
-			if (forceSaveAs) return openProjectSaveDialog(projectDisplayName || "Untitled Project");
+			if (forceSaveAs)
+				return openProjectSaveDialog(
+					projectDisplayName || t("editor.project.untitledProject", "Untitled Project"),
+				);
 			return queueSave(async () => {
 				if (activeSourceRef.current !== currentSourcePath) return false;
 				if (!currentSourcePath) {
-					if (!options?.silent) toast.error("No video loaded");
+					if (!options?.silent)
+						toast.error(t("editor.project.noVideoLoaded", "No video loaded"));
 					return false;
 				}
 
@@ -126,11 +132,15 @@ export function useProjectSaveActions({
 								thumbnail,
 							);
 					if (result.canceled) {
-						if (!options?.silent) toast.info("Project save canceled");
+						if (!options?.silent)
+							toast.info(t("editor.project.saveCanceled", "Project save canceled"));
 						return false;
 					}
 					if (!result.success) {
-						toast.error(result.message || "Failed to save project");
+						toast.error(
+							result.message ||
+								t("editor.project.saveFailed", "Failed to save project"),
+						);
 						return false;
 					}
 
@@ -152,7 +162,11 @@ export function useProjectSaveActions({
 
 					return true;
 				} catch (error) {
-					toast.error(`Could not save project: ${getErrorMessage(error)}`);
+					toast.error(
+						t("editor.project.saveError", "Could not save project: {{error}}", {
+							error: getErrorMessage(error),
+						}),
+					);
 					return false;
 				} finally {
 					if (remount) remountPreview();
@@ -173,6 +187,7 @@ export function useProjectSaveActions({
 			captureProjectThumbnail,
 			refreshProjectLibrary,
 			remountPreview,
+			t,
 		],
 	);
 
@@ -205,11 +220,11 @@ export function useProjectSaveActions({
 		async (name: string, mode: "rename" | "copy" = "rename") => {
 			const trimmedName = name.trim();
 			if (!trimmedName) {
-				toast.error("Project name is required");
+				toast.error(t("editor.project.nameRequired", "Project name is required"));
 				return false;
 			}
 			if (!currentSourcePath) {
-				toast.error("No video loaded");
+				toast.error(t("editor.project.noVideoLoaded", "No video loaded"));
 				return false;
 			}
 			clearPendingAutosave();
@@ -232,11 +247,14 @@ export function useProjectSaveActions({
 						mode,
 					);
 					if (result.canceled) {
-						toast.info("Project save canceled");
+						toast.info(t("editor.project.saveCanceled", "Project save canceled"));
 						return false;
 					}
 					if (!result.success) {
-						toast.error(result.message || "Failed to save project");
+						toast.error(
+							result.message ||
+								t("editor.project.saveFailed", "Failed to save project"),
+						);
 						return false;
 					}
 					if (activeSourceRef.current !== currentSourcePath) return true;
@@ -251,7 +269,10 @@ export function useProjectSaveActions({
 							moveProjectShareLink(previousPath, result.path);
 						} catch {
 							toast.error(
-								"Project renamed, but library preferences could not be updated",
+								t(
+									"editor.project.renamePreferencesFailed",
+									"Project renamed, but library preferences could not be updated",
+								),
 							);
 						}
 					}
@@ -288,6 +309,7 @@ export function useProjectSaveActions({
 			captureProjectThumbnail,
 			refreshProjectLibrary,
 			remountPreview,
+			t,
 		],
 	);
 
@@ -296,7 +318,7 @@ export function useProjectSaveActions({
 			event?.preventDefault();
 			const name = projectSaveDialogDraft.trim();
 			if (!name) {
-				toast.error("Project name is required");
+				toast.error(t("editor.project.nameRequired", "Project name is required"));
 				projectSaveDialogInputRef.current?.focus();
 				return;
 			}
@@ -321,6 +343,7 @@ export function useProjectSaveActions({
 			projectSaveDialogInputRef,
 			resolveProjectSaveDialog,
 			saveProjectWithName,
+			t,
 		],
 	);
 

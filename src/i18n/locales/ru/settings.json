@@ -1,4 +1,10 @@
 {
+	"updates": {
+		"title": "Обновления",
+		"experimental": "Экспериментальные обновления",
+		"experimentalDescription": "Вы включили экспериментальные обновления, поэтому можете протестировать последнее обновление Recordly до его широкого выпуска.",
+		"saveFailed": "Не удалось изменить канал обновлений."
+	},
 	"zoom": {
 		"level": "Масштабирование",
 		"selectRegion": "Выберите область для масштабирования",
@@ -6,7 +12,8 @@
 		"modeAuto": "Автоматически",
 		"modeManual": "Вручную",
 		"modeManualDescription": "Установить фиксированную точку фокусировки",
-		"modeAutoDescription": "Камера выравнивается по центру, когда курсор приближается к краю увеличенного изображения"
+		"modeAutoDescription": "Камера выравнивается по центру, когда курсор приближается к краю увеличенного изображения",
+		"modeAria": "Zoom mode"
 	},
 	"trim": {
 		"deleteRegion": "Удалить"
@@ -151,6 +158,8 @@
 		"paddingBottom": "Снизу",
 		"paddingLeft": "Слева",
 		"paddingRight": "Справа",
+		"linkPaddingSides": "Link padding sides",
+		"customEffectColor": "Custom effect color",
 		"removeBackground": "Удалить фон"
 	},
 	"sections": {
@@ -176,6 +185,28 @@
 		"generateFull": "Создать субтитры",
 		"regenerateFull": "Пересоздать субтитры",
 		"clearFull": "Удалить субтитры",
+		"modelDownloadingAria": "Downloading caption model",
+		"whisperExecutableSelected": "Whisper executable selected",
+		"whisperModelSelected": "Whisper model selected",
+		"whisperModelDeleted": "Whisper small model deleted",
+		"whisperModelDownloadFailed": "Failed to download Whisper small model",
+		"whisperModelDeleteFailed": "Failed to delete Whisper small model",
+		"whisperModelMissing": "Select a Whisper model or download the small model first",
+		"noSourceVideo": "No source video is loaded",
+		"recordingChanged": "Recording changed; generated captions were not applied.",
+		"generateFailed": "Failed to generate captions",
+		"generatedCount": "Generated {{count}} captions",
+		"editSaved": "Caption updated",
+		"languageAutoDetect": "Auto Detect",
+		"languageEnglish": "English",
+		"languageSpanish": "Spanish",
+		"languageFrench": "French",
+		"languageGerman": "German",
+		"languageItalian": "Italian",
+		"languagePortuguese": "Portuguese",
+		"languageChineseSimplified": "Chinese (Simplified)",
+		"languageJapanese": "Japanese",
+		"languageKorean": "Korean",
 		"fontSettings": "Настройка шрифта",
 		"defaultFont": "По умолчанию",
 		"fontFamily": "Шрифт",
@@ -218,7 +249,12 @@
 		"uploadCustom": "Загрузить",
 		"uploadSuccess": "Изображение загружено.",
 		"uploadError": "Загрузите JPG или JPEG.",
-		"uploadErrorDescription": "Поддерживаются только JPG и JPEG."
+		"uploadErrorDescription": "Поддерживаются только JPG и JPEG.",
+		"customColor": "Custom color",
+		"videoUnsupportedFormat": "Unsupported format",
+		"videoUnsupportedFormatDescription": "Please select a video file (mp4, webm, mov, etc.)",
+		"videoAdded": "Video background added",
+		"videoImportFailed": "Failed to import video background"
 	},
 	"export": {
 		"title": "Экспорт",
@@ -253,10 +289,36 @@
 		"mixedLabel": "Источник",
 		"deleteRegion": "Удалить аудио"
 	},
-	"updates": {
-		"title": "Обновления",
-		"experimental": "Экспериментальные обновления",
-		"saveFailed": "Не удалось изменить канал обновлений.",
-		"experimentalDescription": "Вы включили экспериментальные обновления, поэтому можете протестировать последнее обновление Recordly до его широкого выпуска."
+	"settingsSections": {
+		"aria": "Settings sections",
+		"regionAria": "{{section}} settings",
+		"general": "General",
+		"motion": "Motion",
+		"recording": "Recording",
+		"files": "Files",
+		"advanced": "Advanced"
+	},
+	"onboarding": {
+		"title": "Onboarding",
+		"show": "Show onboarding"
+	},
+	"dashboard": {
+		"title": "Settings",
+		"settingsAria": "Dashboard settings",
+		"openVideoOrProject": "Open video or project",
+		"openFile": "Open file",
+		"recordingsFolder": "Recordings folder",
+		"changeRecordingsFolderFailed": "Could not change recordings folder",
+		"changeFolder": "Change folder",
+		"hideHud": "Hide HUD from recordings",
+		"hideHudDescription": "Only while recording. The idle HUD stays visible in captures.",
+		"updateCaptureProtectionFailed": "Could not update capture protection",
+		"previewUpdateUi": "Preview update UI",
+		"preview": "Preview",
+		"projectsFolder": "Projects folder",
+		"projectsFolderDescription": "Named projects save automatically.",
+		"openProjectsFolderFailed": "Could not open projects folder",
+		"showFolder": "Show folder",
+		"projectsNote": "Named projects save automatically. Previews refresh when you return to Projects."
 	}
 }

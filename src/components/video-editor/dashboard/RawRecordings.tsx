@@ -1,6 +1,7 @@
 import { Modal } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 import { MusicNotes } from "@/components/ui/icons";
+import { useScopedT } from "@/contexts/I18nContext";
 import type { ProjectLibraryEntry } from "../ProjectBrowserDialog";
 import type { RecordingLibraryEntry } from "@/types/recordingLibrary";
 const isAudio = (name: string) => /\.(wav|m4a|mp3|ogg|flac)$/i.test(name);
@@ -70,6 +71,7 @@ export function RawPreview({
 	entry: ProjectLibraryEntry | null;
 	onClose: () => void;
 }) {
+	const t = useScopedT("common");
 	return (
 		<Modal
 			isOpen={!!entry}
@@ -79,7 +81,7 @@ export function RawPreview({
 		>
 			<Modal.Backdrop>
 				<Modal.Container size="lg">
-					<Modal.Dialog aria-label="Raw file preview">
+					<Modal.Dialog aria-label={t("dashboard.rawPreview.title", "Raw file preview")}>
 						<Modal.CloseTrigger />
 						<Modal.Header>
 							<Modal.Heading>{entry?.name}</Modal.Heading>

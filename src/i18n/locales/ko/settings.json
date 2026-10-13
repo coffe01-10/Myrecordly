@@ -1,4 +1,10 @@
 {
+	"updates": {
+		"title": "업데이트",
+		"experimental": "실험적 업데이트",
+		"experimentalDescription": "실험적 업데이트를 선택했으므로 Recordly의 최신 업데이트가 널리 제공되기 전에 먼저 테스트해 볼 수 있습니다.",
+		"saveFailed": "업데이트 채널을 변경하지 못했습니다."
+	},
 	"zoom": {
 		"level": "확대 레벨",
 		"selectRegion": "조정할 확대 구간을 선택하세요",
@@ -6,7 +12,8 @@
 		"modeAuto": "자동",
 		"modeManual": "수동",
 		"modeManualDescription": "이 확대에 고정 초점을 설정합니다",
-		"modeAutoDescription": "카메라가 커서를 자동으로 따라갑니다"
+		"modeAutoDescription": "카메라가 커서를 자동으로 따라갑니다",
+		"modeAria": "Zoom mode"
 	},
 	"trim": {
 		"deleteRegion": "트림 구간 삭제"
@@ -151,6 +158,8 @@
 		"paddingBottom": "아래",
 		"paddingLeft": "왼쪽",
 		"paddingRight": "오른쪽",
+		"linkPaddingSides": "Link padding sides",
+		"customEffectColor": "Custom effect color",
 		"removeBackground": "배경 제거"
 	},
 	"sections": {
@@ -176,6 +185,28 @@
 		"generateFull": "자막 생성",
 		"regenerateFull": "자막 다시 생성",
 		"clearFull": "자막 지우기",
+		"modelDownloadingAria": "Downloading caption model",
+		"whisperExecutableSelected": "Whisper executable selected",
+		"whisperModelSelected": "Whisper model selected",
+		"whisperModelDeleted": "Whisper small model deleted",
+		"whisperModelDownloadFailed": "Failed to download Whisper small model",
+		"whisperModelDeleteFailed": "Failed to delete Whisper small model",
+		"whisperModelMissing": "Select a Whisper model or download the small model first",
+		"noSourceVideo": "No source video is loaded",
+		"recordingChanged": "Recording changed; generated captions were not applied.",
+		"generateFailed": "Failed to generate captions",
+		"generatedCount": "Generated {{count}} captions",
+		"editSaved": "Caption updated",
+		"languageAutoDetect": "Auto Detect",
+		"languageEnglish": "English",
+		"languageSpanish": "Spanish",
+		"languageFrench": "French",
+		"languageGerman": "German",
+		"languageItalian": "Italian",
+		"languagePortuguese": "Portuguese",
+		"languageChineseSimplified": "Chinese (Simplified)",
+		"languageJapanese": "Japanese",
+		"languageKorean": "Korean",
 		"fontSettings": "글꼴 설정",
 		"defaultFont": "기본값",
 		"fontFamily": "글꼴",
@@ -218,7 +249,12 @@
 		"uploadCustom": "사용자 이미지 업로드",
 		"uploadSuccess": "사용자 이미지를 업로드했습니다!",
 		"uploadError": "JPG 또는 JPEG 이미지 파일을 업로드해 주세요.",
-		"uploadErrorDescription": "JPG 또는 JPEG 이미지 파일을 업로드해 주세요."
+		"uploadErrorDescription": "JPG 또는 JPEG 이미지 파일을 업로드해 주세요.",
+		"customColor": "Custom color",
+		"videoUnsupportedFormat": "Unsupported format",
+		"videoUnsupportedFormatDescription": "Please select a video file (mp4, webm, mov, etc.)",
+		"videoAdded": "Video background added",
+		"videoImportFailed": "Failed to import video background"
 	},
 	"export": {
 		"title": "내보내기",
@@ -253,10 +289,36 @@
 		"mixedLabel": "소스",
 		"deleteRegion": "오디오 삭제"
 	},
-	"updates": {
-		"experimentalDescription": "실험적 업데이트를 선택했으므로 Recordly의 최신 업데이트가 널리 제공되기 전에 먼저 테스트해 볼 수 있습니다.",
-		"title": "업데이트",
-		"experimental": "실험적 업데이트",
-		"saveFailed": "업데이트 채널을 변경하지 못했습니다."
+	"settingsSections": {
+		"aria": "Settings sections",
+		"regionAria": "{{section}} settings",
+		"general": "General",
+		"motion": "Motion",
+		"recording": "Recording",
+		"files": "Files",
+		"advanced": "Advanced"
+	},
+	"onboarding": {
+		"title": "Onboarding",
+		"show": "Show onboarding"
+	},
+	"dashboard": {
+		"title": "Settings",
+		"settingsAria": "Dashboard settings",
+		"openVideoOrProject": "Open video or project",
+		"openFile": "Open file",
+		"recordingsFolder": "Recordings folder",
+		"changeRecordingsFolderFailed": "Could not change recordings folder",
+		"changeFolder": "Change folder",
+		"hideHud": "Hide HUD from recordings",
+		"hideHudDescription": "Only while recording. The idle HUD stays visible in captures.",
+		"updateCaptureProtectionFailed": "Could not update capture protection",
+		"previewUpdateUi": "Preview update UI",
+		"preview": "Preview",
+		"projectsFolder": "Projects folder",
+		"projectsFolderDescription": "Named projects save automatically.",
+		"openProjectsFolderFailed": "Could not open projects folder",
+		"showFolder": "Show folder",
+		"projectsNote": "Named projects save automatically. Previews refresh when you return to Projects."
 	}
 }

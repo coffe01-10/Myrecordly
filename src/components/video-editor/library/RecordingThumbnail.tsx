@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { FilmStrip } from "@/components/ui/icons";
+import { useScopedT } from "@/contexts/I18nContext";
 import type { RecordingLibraryEntry } from "@/types/recordingLibrary";
 
 export function RecordingThumbnail({ entry }: { entry: RecordingLibraryEntry }) {
+	const t = useScopedT("editor");
 	const host = useRef<HTMLSpanElement>(null);
 	const [src, setSrc] = useState<string>();
 	const [failed, setFailed] = useState(false);
@@ -42,7 +44,7 @@ export function RecordingThumbnail({ entry }: { entry: RecordingLibraryEntry }) 
 			{src ? (
 				<img
 					src={src}
-					alt={`Preview of ${entry.name}`}
+					alt={t("clips.thumbnailPreview", "Preview of {{name}}", { name: entry.name })}
 					className="size-full object-cover"
 					draggable={false}
 					onError={() => {
@@ -51,11 +53,14 @@ export function RecordingThumbnail({ entry }: { entry: RecordingLibraryEntry }) 
 					}}
 				/>
 			) : failed ? (
-				<FilmStrip className="size-5" aria-label="Preview unavailable" />
+				<FilmStrip
+					className="size-5"
+					aria-label={t("clips.thumbnailUnavailable", "Preview unavailable")}
+				/>
 			) : (
 				<span
 					className="size-full animate-pulse bg-default"
-					aria-label="Loading preview image"
+					aria-label={t("clips.thumbnailLoading", "Loading preview image")}
 				/>
 			)}
 		</span>

@@ -1,6 +1,7 @@
 import { Card, Popover } from "@heroui/react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { useScopedT } from "@/contexts/I18nContext";
 import { toFileUrl } from "./projectPersistence";
 
 export type ProjectLibraryEntry = {
@@ -35,6 +36,7 @@ export default function ProjectBrowserDialog({
 	onPanelHeightChange,
 	renderMode = "floating",
 }: ProjectBrowserDialogProps) {
+	const t = useScopedT("common");
 	const panelRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (!open) {
@@ -59,10 +61,10 @@ export default function ProjectBrowserDialog({
 			className={`${renderMode === "inline" ? "w-full" : "w-[340px]"} min-w-0 max-w-[calc(100vw-24px)] rounded-none bg-transparent p-3 shadow-none`}
 		>
 			<Card.Header className="flex-row items-center justify-between gap-3">
-				<Card.Title>Projects</Card.Title>
+				<Card.Title>{t("dashboard.browser.title", "Projects")}</Card.Title>
 				{onImportFile && (
 					<Button size="sm" variant="secondary" onClick={onImportFile}>
-						Import
+						{t("dashboard.import", "Import")}
 					</Button>
 				)}
 			</Card.Header>
@@ -92,7 +94,7 @@ export default function ProjectBrowserDialog({
 										/>
 									) : (
 										<span className="flex h-full items-center justify-center text-[10px] text-muted">
-											No preview
+											{t("dashboard.browser.noPreview", "No preview")}
 										</span>
 									)}
 								</div>
@@ -100,7 +102,10 @@ export default function ProjectBrowserDialog({
 									<span className="truncate text-[13px]">{entry.name}</span>
 									<span className="text-[11px] text-muted">
 										{entry.isCurrent
-											? "Current project"
+											? t(
+													"dashboard.browser.currentProject",
+													"Current project",
+												)
 											: new Date(entry.updatedAt).toLocaleDateString()}
 									</span>
 								</span>
@@ -108,7 +113,9 @@ export default function ProjectBrowserDialog({
 						))}
 					</div>
 				) : (
-					<p className="py-8 text-center text-sm text-muted">No saved projects yet</p>
+					<p className="py-8 text-center text-sm text-muted">
+						{t("dashboard.browser.noProjects", "No saved projects yet")}
+					</p>
 				)}
 			</Card.Content>
 		</Card>
@@ -121,7 +128,10 @@ export default function ProjectBrowserDialog({
 				triggerRef={anchorRef}
 				placement={preferredDirection === "up" ? "top end" : "bottom start"}
 			>
-				<Popover.Dialog aria-label="Projects" className="p-0">
+				<Popover.Dialog
+					aria-label={t("dashboard.browser.title", "Projects")}
+					className="p-0"
+				>
 					{content}
 				</Popover.Dialog>
 			</Popover.Content>

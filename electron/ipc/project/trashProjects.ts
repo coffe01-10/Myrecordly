@@ -1,5 +1,6 @@
 import path from "node:path";
 import fs from "node:fs/promises";
+import { t } from "../../i18n";
 import { getProjectBackupPath } from "./atomicSave";
 
 type Dependencies = {
@@ -15,10 +16,11 @@ export async function trashLibraryProjects(paths: unknown, deps: Dependencies) {
 		paths.length > 500 ||
 		paths.some((p) => typeof p !== "string")
 	)
-		throw new Error("Invalid project selection");
+		throw new Error(t("error.invalidProjectSelection", "Invalid project selection"));
 	const allowed = new Set((await deps.list()).entries.map((e) => path.resolve(e.path)));
 	const selected = [...new Set((paths as string[]).map((p) => path.resolve(p)))];
-	if (selected.some((p) => !allowed.has(p))) throw new Error("Project is not in the library");
+	if (selected.some((p) => !allowed.has(p)))
+		throw new Error(t("error.projectNotInLibrary", "Project is not in the library"));
 	const deleted: string[] = [];
 	const errors: string[] = [];
 	for (const projectPath of selected) {

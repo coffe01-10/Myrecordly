@@ -16,6 +16,7 @@ import { getRegionDisplaySpan, snapRegionSpan } from "./core/clipPresentation";
 import { resolveDragEnd, resolveResizeEnd } from "./dnd/engine";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useScopedT } from "@/contexts/I18nContext";
 import { formatClipSpeedLabel } from "../clipSpeedChange";
 import { getTimeAtClipSeam, type ClipPresentation } from "./core/clipPresentation";
 import { formatPlayheadTime } from "./core/time";
@@ -92,6 +93,7 @@ export default function Item({
 	loadingLabel,
 	children,
 }: ItemProps) {
+	const t = useScopedT("timeline");
 	const timeline = useTimelineContext();
 	const presentation = useTimelinePresentation();
 	const clipPresentation =
@@ -218,7 +220,7 @@ export default function Item({
 			>
 				<Skeleton
 					animationType="shimmer"
-					aria-label={loadingLabel || "Loading..."}
+					aria-label={loadingLabel || t("item.loading")}
 					className="w-full"
 					style={{ height: "85%", minHeight: 22 }}
 				/>
@@ -274,7 +276,7 @@ export default function Item({
 			data-end-ms={span.end}
 			aria-label={
 				isClip
-					? `Clip${clipSpeedLabel ? ` ${clipSpeedLabel}` : ""} · ${timeLabel}`
+					? `${t("item.clip")}${clipSpeedLabel ? ` ${clipSpeedLabel}` : ""} · ${timeLabel}`
 					: undefined
 			}
 			onPointerDownCapture={handleSelect}
@@ -332,7 +334,7 @@ export default function Item({
 							pointerEvents: isClip ? "none" : "auto",
 							display: isClip && sharedLeftGrip ? "none" : undefined,
 						}}
-						title="Resize left"
+						title={t("resizeLeft")}
 					/>
 					<div
 						className={cn(
@@ -345,7 +347,7 @@ export default function Item({
 							pointerEvents: isClip ? "none" : "auto",
 							display: isClip && sharedRightGrip ? "none" : undefined,
 						}}
-						title="Resize right"
+						title={t("resizeRight")}
 					/>
 					{showAudioWaveform && waveformPeaks && (
 						<AudioWaveform
@@ -366,7 +368,7 @@ export default function Item({
 					{/* Normal-speed clips show only the filmstrip and resize handles. */}
 					{(!isClip || clipSpeedLabel) && (
 						<div
-							title={`${isZoom ? `${ZOOM_LABELS[zoomDepth]} ${zoomMode === "manual" ? "Manual" : "Auto"}` : typeof children === "string" ? children : "Clip"} · ${timeLabel}`}
+							title={`${isZoom ? `${ZOOM_LABELS[zoomDepth]} ${zoomMode === "manual" ? t("item.manual") : t("item.auto")}` : typeof children === "string" ? children : t("item.clip")} · ${timeLabel}`}
 							className={cn(
 								"relative z-10 flex max-w-full items-center justify-center gap-1 px-1 text-[11px] font-medium text-black/70 dark:text-white/90 select-none overflow-hidden",
 								isClip &&
@@ -386,7 +388,7 @@ export default function Item({
 									<span className="zoom-value whitespace-nowrap">
 										{ZOOM_LABELS[zoomDepth] || `${zoomDepth}×`}
 										<span className="zoom-mode font-normal">
-											{zoomMode === "manual" ? "Manual" : "Auto"}
+											{zoomMode === "manual" ? t("item.manual") : t("item.auto")}
 										</span>
 									</span>
 								</>
@@ -404,7 +406,7 @@ export default function Item({
 										<MessageSquare className="size-3 shrink-0" />
 									)}
 									<span className="truncate">
-										{isTrim ? "Trim" : isSpeed ? `${speedValue}×` : children}
+										{isTrim ? t("item.trim") : isSpeed ? `${speedValue}×` : children}
 									</span>
 								</>
 							)}

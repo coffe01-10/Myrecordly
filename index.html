@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/app-icons/recordly-32.png" />
@@ -21,6 +21,22 @@
           (preference !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)
             ? "dark" : "light";
       }
+      // Localize the boot shell for screen readers before the app bundle loads.
+      document.addEventListener("DOMContentLoaded", () => {
+        const shell = document.querySelector(".boot-shell");
+        if (!shell) return;
+        let locale = "zh-CN";
+        try {
+          locale = window.electronAPI?.getAppSetting("recordly.locale") ||
+            localStorage.getItem("recordly.locale") || "zh-CN";
+        } catch { /* Fall back to the default locale. */ }
+        const loadingLabels = {
+          "zh-CN": "正在加载编辑器",
+          "zh-TW": "正在載入編輯器",
+          en: "Loading editor",
+        };
+        shell.setAttribute("aria-label", loadingLabels[locale] || loadingLabels["zh-CN"]);
+      });
     </script>
     <style>
       .boot-shell { display: none; }

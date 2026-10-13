@@ -2,6 +2,7 @@ import { Button, Card, Link } from "@heroui/react";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight } from "@/components/ui/icons";
 import { toast } from "@/components/ui/toast";
+import { useScopedT } from "@/contexts/I18nContext";
 import { dashboardAnnouncements, type AnnouncementConfig } from "./announcementConfig";
 
 export function DashboardAnnouncements({
@@ -9,6 +10,7 @@ export function DashboardAnnouncements({
 }: {
 	config?: AnnouncementConfig;
 }) {
+	const t = useScopedT("common");
 	const { enabled, banners } = config;
 	const [index, setIndex] = useState(0);
 	if (!enabled || !banners.length) return null;
@@ -28,8 +30,8 @@ export function DashboardAnnouncements({
 	const href = banner.href && /^https?:\/\//.test(banner.href) ? banner.href : undefined;
 	return (
 		<Card
-			aria-label="Announcements"
-			aria-roledescription="carousel"
+			aria-label={t("dashboard.announcements.label", "Announcements")}
+			aria-roledescription={t("dashboard.announcements.carousel", "carousel")}
 			className="relative mx-7 mt-7 shrink-0 overflow-hidden rounded-2xl p-0 shadow-none lg:mx-10"
 		>
 			<div aria-live="polite" aria-atomic="true">
@@ -42,7 +44,14 @@ export function DashboardAnnouncements({
 							event.preventDefault();
 							void window.electronAPI
 								.openExternalUrl(href)
-								.catch(() => toast.error("Could not open announcement"));
+								.catch(() =>
+									toast.error(
+										t(
+											"dashboard.announcements.couldNotOpen",
+											"Could not open announcement",
+										),
+									),
+								);
 						}}
 					>
 						{image}
@@ -57,21 +66,25 @@ export function DashboardAnnouncements({
 						isIconOnly
 						size="sm"
 						variant="secondary"
-						aria-label="Previous announcement"
+						aria-label={t("dashboard.announcements.previous", "Previous announcement")}
 						onPress={() => setIndex((active + banners.length - 1) % banners.length)}
 					>
 						<ArrowLeft className="size-4" />
 					</Button>
 					<div
 						className="flex gap-2 rounded-full bg-black/30 px-2 py-0.5"
-						aria-label="Choose announcement"
+						aria-label={t("dashboard.announcements.choose", "Choose announcement")}
 					>
 						{banners.map((banner, slide) => (
 							<Button
 								key={`${slide}:${banner.src}`}
 								isIconOnly
 								variant="ghost"
-								aria-label={`Announcement ${slide + 1}`}
+								aria-label={t(
+									"dashboard.announcements.slide",
+									"Announcement {{number}}",
+									{ number: slide + 1 },
+								)}
 								aria-pressed={slide === active}
 								onPress={() => setIndex(slide)}
 								className="!size-6 !min-h-6 !min-w-6 rounded-full p-0"
@@ -86,7 +99,7 @@ export function DashboardAnnouncements({
 						isIconOnly
 						size="sm"
 						variant="secondary"
-						aria-label="Next announcement"
+						aria-label={t("dashboard.announcements.next", "Next announcement")}
 						onPress={() => setIndex((active + 1) % banners.length)}
 					>
 						<ArrowRight className="size-4" />

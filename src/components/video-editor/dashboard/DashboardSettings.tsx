@@ -5,8 +5,10 @@ import { Switch } from "@/components/ui/switch";
 import { supportsHudCaptureProtection } from "@/lib/hudCaptureProtection";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import { useScopedT } from "@/contexts/I18nContext";
 export const DashboardSettingsContext = createContext<ReactNode>(null);
 export function DashboardSettings({ onImportFile }: { onImportFile: () => Promise<void> }) {
+	const t = useScopedT("settings");
 	const settingsContent = useContext(DashboardSettingsContext);
 	const [directory, setDirectory] = useState("");
 	const [recordings, setRecordings] = useState("");
@@ -42,27 +44,27 @@ export function DashboardSettings({ onImportFile }: { onImportFile: () => Promis
 		};
 	}, []);
 	return (
-		<section aria-label="Dashboard settings" className="dashboard-settings max-w-2xl py-10">
-			<h1 className="mb-8 text-lg font-semibold">Settings</h1>
+		<section aria-label={t("dashboard.settingsAria")} className="dashboard-settings max-w-2xl py-10">
+			<h1 className="mb-8 text-lg font-semibold">{t("dashboard.title")}</h1>
 			<SettingsSections categories={["general", "motion", "recording", "files", "advanced"]}>
 				<SettingsCategory category={["general", "motion", "advanced"]}>
 					{settingsContent}
 				</SettingsCategory>
 				<SettingsCategory category="files">
-					<SettingsRow title="Open video or project">
+					<SettingsRow title={t("dashboard.openVideoOrProject")}>
 						<Button
 							variant="secondary"
 							size="sm"
 							disabled={busy}
 							onClick={() => void run(onImportFile)}
 						>
-							Open file
+							{t("dashboard.openFile")}
 						</Button>
 					</SettingsRow>
 				</SettingsCategory>
 				<SettingsCategory category="recording">
 					<SettingsRow
-						title="Recordings folder"
+						title={t("dashboard.recordingsFolder")}
 						description={
 							<span className="block truncate" title={recordings}>
 								{recordings}
@@ -79,21 +81,21 @@ export function DashboardSettings({ onImportFile }: { onImportFile: () => Promis
 										await window.electronAPI.chooseRecordingsDirectory();
 									if (result.canceled) return;
 									if (!result.success || !result.path)
-										throw Error("Could not change recordings folder");
+										throw Error(t("dashboard.changeRecordingsFolderFailed"));
 									setRecordings(result.path);
 								})
 							}
 						>
-							Change folder
+							{t("dashboard.changeFolder")}
 						</Button>
 					</SettingsRow>
 					{captureSupported && (
 						<SettingsRow
-							title="Hide HUD from recordings"
-							description="Only while recording. The idle HUD stays visible in captures."
+							title={t("dashboard.hideHud")}
+							description={t("dashboard.hideHudDescription")}
 						>
 							<Switch
-								aria-label="Hide HUD from recordings"
+								aria-label={t("dashboard.hideHud")}
 								checked={hideHud}
 								disabled={busy}
 								onCheckedChange={(enabled) =>
@@ -103,7 +105,7 @@ export function DashboardSettings({ onImportFile }: { onImportFile: () => Promis
 												enabled,
 											);
 										if (!result.success)
-											throw Error("Could not update capture protection");
+											throw Error(t("dashboard.updateCaptureProtectionFailed"));
 										setHideHud(result.enabled);
 									})
 								}
@@ -113,7 +115,7 @@ export function DashboardSettings({ onImportFile }: { onImportFile: () => Promis
 				</SettingsCategory>
 				<SettingsCategory category="advanced">
 					{import.meta.env.DEV && (
-						<SettingsRow title="Preview update UI">
+						<SettingsRow title={t("dashboard.previewUpdateUi")}>
 							<Button
 								variant="secondary"
 								size="sm"
@@ -124,15 +126,15 @@ export function DashboardSettings({ onImportFile }: { onImportFile: () => Promis
 									})
 								}
 							>
-								Preview
+								{t("dashboard.preview")}
 							</Button>
 						</SettingsRow>
 					)}
 				</SettingsCategory>
 				<SettingsCategory category="files">
 					<SettingsRow
-						title="Projects folder"
-						description={directory || "Named projects save automatically."}
+						title={t("dashboard.projectsFolder")}
+						description={directory || t("dashboard.projectsFolderDescription")}
 					>
 						<Button
 							variant="secondary"
@@ -141,7 +143,7 @@ export function DashboardSettings({ onImportFile }: { onImportFile: () => Promis
 								try {
 									const result = await window.electronAPI.getProjectsDirectory();
 									if (!result.success || !result.path)
-										throw Error("Could not open projects folder");
+										throw Error(t("dashboard.openProjectsFolderFailed"));
 									setDirectory(result.path);
 									await window.electronAPI.revealInFolder(result.path);
 								} catch (e) {
@@ -149,12 +151,11 @@ export function DashboardSettings({ onImportFile }: { onImportFile: () => Promis
 								}
 							}}
 						>
-							Show folder
+							{t("dashboard.showFolder")}
 						</Button>
 					</SettingsRow>
 					<p className="text-xs text-muted-foreground">
-						Named projects save automatically. Previews refresh when you return to
-						Projects.
+						{t("dashboard.projectsNote")}
 					</p>
 				</SettingsCategory>
 			</SettingsSections>

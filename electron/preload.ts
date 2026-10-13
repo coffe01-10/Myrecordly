@@ -1071,6 +1071,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		};
 		return result?.success === true;
 	},
+	setLocale: (locale: string) => {
+		return ipcRenderer.invoke("set-locale", locale) as Promise<{ success: boolean }>;
+	},
 	setHasUnsavedChanges: (hasChanges: boolean) => {
 		ipcRenderer.send("set-has-unsaved-changes", hasChanges);
 	},

@@ -6,13 +6,14 @@ import {
 	useCallback,
 	useEffect,
 } from "react";
-import type { useProjectSaveActions } from "./useProjectSaveActions";
 import { toast } from "@/components/ui/toast";
+import { useI18n } from "@/contexts/I18nContext";
 import { fromFileUrl, resolveVideoUrl } from "../projectPersistence";
 import type { useAppearanceState } from "../state/useAppearanceState";
 import type { useProjectState } from "../state/useProjectState";
 import { DEFAULT_WEBCAM_TIME_OFFSET_MS } from "../types";
 import type { VideoPlaybackRef } from "../VideoPlayback";
+import type { useProjectSaveActions } from "./useProjectSaveActions";
 
 type Set<T> = Dispatch<SetStateAction<T>>;
 
@@ -52,6 +53,7 @@ export function useProjectOpenActions({
 	handleSaveProject,
 	handleSaveProjectAs,
 }: UseProjectOpenActionsInput) {
+	const { t } = useI18n();
 	const confirmReplaceSourceWithUnsavedChanges = useCallback(
 		async (_actionLabel: string) => {
 			if (!hasUnsavedChanges) return true;
@@ -62,16 +64,30 @@ export function useProjectOpenActions({
 
 	const handleOpenProjectFromLibrary = useCallback(
 		async (projectPath: string) => {
-			if (!(await confirmReplaceSourceWithUnsavedChanges("open another project"))) return;
+			if (
+				!(await confirmReplaceSourceWithUnsavedChanges(
+					t("editor.project.actionOpenProject", "open another project"),
+				))
+			)
+				return;
 			try {
 				const result = await window.electronAPI.openProjectFileAtPath(projectPath);
 				if (result.canceled) return;
 				if (!result.success) {
-					project.setError(result.error || result.message || "Failed to load project");
+					project.setError(
+						result.error ||
+							result.message ||
+							t("editor.project.loadFailed", "Failed to load project"),
+					);
 					return;
 				}
 				if (!(await applyLoadedProject(result.project, result.path ?? null))) {
-					project.setError("Could not load project: invalid project file format");
+					project.setError(
+						t(
+							"editor.project.invalidFormat",
+							"Could not load project: invalid project file format",
+						),
+					);
 					return;
 				}
 				project.setProjectBrowserOpen(false);
@@ -79,7 +95,9 @@ export function useProjectOpenActions({
 				return true;
 			} catch (error) {
 				project.setError(
-					`Could not load project: ${error instanceof Error ? error.message : String(error)}`,
+					t("editor.project.loadError", "Could not load project: {{error}}", {
+						error: error instanceof Error ? error.message : String(error),
+					}),
 				);
 			}
 		},
@@ -88,32 +106,49 @@ export function useProjectOpenActions({
 			confirmReplaceSourceWithUnsavedChanges,
 			project,
 			refreshProjectLibrary,
+			t,
 		],
 	);
 
 	const handleImportMediaOrProject = useCallback(async () => {
-		if (!(await confirmReplaceSourceWithUnsavedChanges("import a file"))) return;
+		if (
+			!(await confirmReplaceSourceWithUnsavedChanges(
+				t("editor.project.actionImportFile", "import a file"),
+			))
+		)
+			return;
 		try {
 			const result = await window.electronAPI.openVideoFilePicker({ includeProjects: true });
 			if (result.canceled) return;
 			if (!result.success) {
-				toast.error(result.message || "Failed to import file");
+				toast.error(
+					result.message || t("editor.project.importFailed", "Failed to import file"),
+				);
 				return;
 			}
 			if (result.kind === "project" || result.project) {
 				if (!(await applyLoadedProject(result.project, result.path ?? null))) {
-					project.setError("Could not load project: invalid project file format");
+					project.setError(
+						t(
+							"editor.project.invalidFormat",
+							"Could not load project: invalid project file format",
+						),
+					);
 					return;
 				}
 				project.setProjectBrowserOpen(false);
 				await refreshProjectLibrary();
 				toast.success(
-					result.path ? `Project loaded from ${result.path}` : "Project loaded",
+					result.path
+						? t("editor.project.loadedFrom", "Project loaded from {{path}}", {
+								path: result.path,
+							})
+						: t("editor.project.loaded", "Project loaded"),
 				);
 				return;
 			}
 			if (!result.path) {
-				toast.error("No media file selected");
+				toast.error(t("editor.project.noMediaSelected", "No media file selected"));
 				return;
 			}
 
@@ -121,7 +156,8 @@ export function useProjectOpenActions({
 			const setPathResult = await window.electronAPI.setCurrentVideoPath(sourcePath, {
 				preserveProjectPath: false,
 			});
-			if (!setPathResult.success) throw new Error("Could not load media");
+			if (!setPathResult.success)
+				throw new Error(t("editor.project.mediaLoadFailed", "Could not load media"));
 			const sourceVideoUrl = await resolveVideoUrl(sourcePath);
 			try {
 				videoPlaybackRef.current?.pause();
@@ -148,10 +184,12 @@ export function useProjectOpenActions({
 			applySessionPresentation(null);
 			project.setProjectBrowserOpen(false);
 			await refreshProjectLibrary();
-			toast.success("Media imported");
+			toast.success(t("editor.project.mediaImported", "Media imported"));
 		} catch (error) {
 			project.setError(
-				`Could not load file: ${error instanceof Error ? error.message : String(error)}`,
+				t("editor.project.fileLoadError", "Could not load file: {{error}}", {
+					error: error instanceof Error ? error.message : String(error),
+				}),
 			);
 		}
 	}, [
@@ -167,6 +205,7 @@ export function useProjectOpenActions({
 		pendingFreshRecordingAutoZoomPathRef,
 		applySessionPresentation,
 		refreshProjectLibrary,
+		t,
 	]);
 
 	const handleOpenProjectBrowser = useCallback(async () => {
@@ -241,12 +280,12 @@ export function useProjectOpenActions({
 		async (path: string, name: string) => {
 			const result = await window.electronAPI.renameLibraryProject(path, name);
 			if (!result.success || !result.path)
-				throw new Error(result.error || "Could not rename project");
+				throw new Error(t("editor.project.renameFailed", "Could not rename project"));
 			if (project.currentProjectPath === path) project.setCurrentProjectPath(result.path);
 			await refreshProjectLibrary();
 			return result.path;
 		},
-		[project, refreshProjectLibrary],
+		[project, refreshProjectLibrary, t],
 	);
 
 	return {

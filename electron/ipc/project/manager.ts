@@ -8,6 +8,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { app } from "electron";
 import { RECORDINGS_DIR, USER_DATA_PATH } from "../../appPaths";
+import { t } from "../../i18n";
 import { isSupportedLocalMediaPath } from "../../mediaTypes";
 import {
 	LEGACY_PROJECT_FILE_EXTENSIONS,
@@ -189,17 +190,17 @@ export async function resolveProjectMediaSources(
 	| { success: false; message: string }
 > {
 	if (!project || typeof project !== "object") {
-		return { success: false, message: "Invalid project file format" };
+		return { success: false, message: t("error.invalidProjectFileFormat", "Invalid project file format") };
 	}
 
 	const rawVideoPath = (project as { videoPath?: unknown }).videoPath;
 	if (typeof rawVideoPath !== "string") {
-		return { success: false, message: "Project file is missing a video path" };
+		return { success: false, message: t("error.projectMissingVideoPath", "Project file is missing a video path") };
 	}
 
 	const normalizedVideoPath = normalizeVideoSourcePath(rawVideoPath);
 	if (!normalizedVideoPath) {
-		return { success: false, message: "Project file is missing a valid video path" };
+		return { success: false, message: t("error.projectMissingValidVideoPath", "Project file is missing a valid video path") };
 	}
 
 	try {
@@ -207,7 +208,11 @@ export async function resolveProjectMediaSources(
 	} catch {
 		return {
 			success: false,
-			message: `Project video file not found: ${normalizedVideoPath}`,
+			message: t(
+				"error.projectVideoFileNotFound",
+				"Project video file not found: {{path}}",
+				{ path: normalizedVideoPath },
+			),
 		};
 	}
 
@@ -489,17 +494,17 @@ function isLoadableProjectData(projectData: unknown) {
 
 /** Read a listed project's preview without changing the active project or recording session. */
 export async function readProjectPreview(projectPath: string): Promise<ProjectPreviewData> {
-	if (typeof projectPath !== "string") throw new Error("Invalid project path");
+	if (typeof projectPath !== "string") throw new Error(t("error.invalidProjectPath", "Invalid project path"));
 	const normalizedPath = normalizePath(projectPath);
 	const { entries } = await listProjectLibraryEntries();
 	if (!entries.some((entry) => entry.path === normalizedPath))
-		throw new Error("Project is not in the library");
+		throw new Error(t("error.projectNotInLibrary", "Project is not in the library"));
 	const project = parseJsonWithByteOrderMark(await fs.readFile(normalizedPath, "utf-8"));
-	if (!isLoadableProjectData(project)) throw new Error("Invalid project file format");
+	if (!isLoadableProjectData(project)) throw new Error(t("error.invalidProjectFileFormat", "Invalid project file format"));
 	const media = await resolveProjectMediaSources(project);
 	if (!media.success) throw new Error(media.message);
 	const baseUrl = getMediaServerBaseUrl();
-	if (!baseUrl) throw new Error("Media server is not ready");
+	if (!baseUrl) throw new Error(t("error.mediaServerNotReady", "Media server is not ready"));
 	await rememberApprovedLocalReadPath(media.videoPath);
 	if (media.webcamPath) await rememberApprovedLocalReadPath(media.webcamPath);
 	return {
@@ -526,7 +531,7 @@ export async function loadProjectFromPath(projectPath: string) {
 		return {
 			success: false,
 			canceled: false,
-			message: "Invalid project file format",
+			message: t("error.invalidProjectFileFormat", "Invalid project file format"),
 		};
 	}
 	const mediaSources = await resolveProjectMediaSources(project);

@@ -1,3 +1,5 @@
+Language: EN | [简中](EXTENSIONS.zh-CN.md)
+
 # Recordly Extension API
 
 Go to https://www.marketplace.recordly.dev/extensions for full, regularly updated documentation

@@ -1,8 +1,10 @@
 import { Skeleton } from "@heroui/react";
+import { useScopedT } from "@/contexts/I18nContext";
 export function LibrarySkeleton() {
+	const t = useScopedT("common");
 	return (
 		<div
-			aria-label="Loading projects"
+			aria-label={t("dashboard.skeleton.loadingProjects", "Loading projects")}
 			aria-busy="true"
 			className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-x-7 gap-y-10 lg:gap-x-9"
 		>

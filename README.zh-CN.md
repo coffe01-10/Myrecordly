@@ -1,7 +1,7 @@
 语言: [EN](README.md) | 简中
 
 <p align="center">
-  <img width="220" alt="Recordly logo" src="https://github.com/user-attachments/assets/082bb4b0-5fc5-4e9f-abda-55611fd6aded" />
+  <img width="220" alt="Recordly Logo" src="https://github.com/user-attachments/assets/414b8838-6731-45d4-a815-6e3c0aa1fe52" />
 </p>
 
 <p align="center">
@@ -9,11 +9,16 @@
   <img src="https://img.shields.io/badge/open%20source-AGPL3.0-2563eb?style=for-the-badge" alt="AGPL 3.0 license" />
 </p>
 
-### 无需额外剪辑，也能做出精致的屏幕录制。
+### 几分钟内做出精致的演示视频
 [Recordly](https://www.recordly.dev) 是一款**开源屏幕录制器**和编辑器，适合制作**操作讲解、演示、产品视频**等内容。  
-**欢迎提交 PR。** [赞助](https://ko-fi.com/webadderall/goal?g=0)
+**欢迎提交 PR。**
 
-https://github.com/user-attachments/assets/9b66c71d-ac97-49ff-a0c9-63ac26edf2e4
+<img width="1280" height="720" alt="MP4 to GIF export (4)" src="https://github.com/user-attachments/assets/e6d68606-5fc0-4f70-99cd-7521982dc13b" />
+
+
+---
+### 社区支持
+<a href="https://coderabbit.link/recordly"><img width="400" alt="CodeRabbit Typemark" src="https://github.com/user-attachments/assets/3926ecfd-8652-4f2d-8da8-ac7641017cf5" /></a>
 
 ---
 
@@ -368,13 +373,17 @@ https://github.com/webadderallorg/Recordly/issues
 
 [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/webadderall)
 
+- Tom Egan @tomegan on X
+- Robin Ebers @robinebers on X
 - Tadees
 - buildwithfur
+- piccinato
 - Tobias
 - Anonymous Supporter
 - Tandava Appadoo
 - Digitalfastmind
 - Roberto Marcelino
+- Tony
 - Rajan RK
 - Francesco
 - Erwan
@@ -392,7 +401,8 @@ Recordly 基于 **AGPL 3.0** 发布。
 
 ## 鸣谢
 
-Recordly 最初是从 [OpenScreen](https://github.com/siddharthvaddem/openscreen) 分叉而来，之后已逐步演变为一个不同的项目。
+Recordly 最初是从 [OpenScreen](https://github.com/siddharthvaddem/openscreen) 分叉而来。此后已有超过 80% 的代码发生了分化。
+OpenScreen 的许多功能（例如其缩放动画）直接移植自 Recordly 的早期版本。
 
 创建者  
 [@webadderall](https://x.com/webadderall)

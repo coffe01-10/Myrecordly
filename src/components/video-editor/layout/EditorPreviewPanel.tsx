@@ -1,5 +1,11 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
+import type { Dispatch, RefObject, SetStateAction } from "react";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
 	CaretDown,
 	Check,
@@ -16,15 +22,9 @@ import {
 	SpeakerLow,
 	SpeakerX,
 } from "@/components/ui/icons";
-import type { Dispatch, RefObject, SetStateAction } from "react";
-import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Slider } from "@/components/ui/slider";
 import type { useI18n } from "@/contexts/I18nContext";
 import { ASPECT_RATIOS, type AspectRatio, getAspectRatioLabel } from "@/utils/aspectRatioUtils";
 import type { useVideoEditorAudio } from "../audio/useVideoEditorAudio";
@@ -185,7 +185,10 @@ export function EditorPreviewPanel(props: Props) {
 							>
 								{videoPath && !isPreviewReady && (
 									<Skeleton
-										aria-label="Loading preview"
+										aria-label={t(
+											"editor.preview.loadingPreview",
+											"Loading preview",
+										)}
 										className="pointer-events-none absolute inset-0 z-20 h-full w-full rounded-xl"
 									/>
 								)}
@@ -319,7 +322,11 @@ export function EditorPreviewPanel(props: Props) {
 							size="icon"
 							className={`h-9 w-9  ${isPlaying ? "bg-foreground/10 text-foreground hover:bg-foreground/20" : "bg-neutral-800 text-white hover:bg-neutral-700 dark:bg-white dark:text-black dark:hover:bg-white/90"} `}
 							onClick={playback.togglePlayPause}
-							title={isPlaying ? "Pause" : "Play"}
+							title={
+								isPlaying
+									? t("editor.playback.pause", "Pause")
+									: t("editor.playback.play", "Play")
+							}
 						>
 							{isPlaying ? (
 								<Pause className="h-3.5 w-3.5" weight="fill" />
@@ -363,7 +370,7 @@ export function EditorPreviewPanel(props: Props) {
 						<PopoverContent
 							side="top"
 							sideOffset={10}
-							aria-label="Preview volume"
+							aria-label={t("editor.playback.volume", "Preview volume")}
 							className="flex w-14 flex-col items-center gap-3 p-3"
 						>
 							<span className="text-[10px] tabular-nums text-muted-foreground">

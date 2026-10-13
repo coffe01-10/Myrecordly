@@ -1,14 +1,5 @@
-import {
-	checkShareCapacity,
-	RECORDING_LIMIT_MESSAGE,
-	subscribeShareCapacityChanges,
-} from "./shareCapacity";
-import { SharedRecordings } from "./SharedRecordings";
-import { saveProjectShareLink } from "./projectShareLinks";
-import { useI18n } from "@/contexts/I18nContext";
-import { Check } from "@/components/ui/icons";
+import { Export, LinkSimple } from "@phosphor-icons/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -17,10 +8,14 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { Export, LinkSimple } from "@phosphor-icons/react";
+import { Check } from "@/components/ui/icons";
 import { Label } from "@/components/ui/label";
-
+import { toast } from "@/components/ui/toast";
+import { useI18n } from "@/contexts/I18nContext";
 import { CLOUD_SHARE_ENDPOINT as DEFAULT_CLOUD_ENDPOINT } from "./endpoint";
+import { saveProjectShareLink } from "./projectShareLinks";
+import { SharedRecordings } from "./SharedRecordings";
+import { checkShareCapacity, subscribeShareCapacityChanges } from "./shareCapacity";
 
 type Props = {
 	projectPath?: string | null;
@@ -79,7 +74,11 @@ export function CloudShareButton({
 		const refresh = () => {
 			const request = ++generation;
 			setCheckingCapacity(true);
-			void checkShareCapacity(DEFAULT_CLOUD_ENDPOINT, authToken)
+			void checkShareCapacity(
+				DEFAULT_CLOUD_ENDPOINT,
+				authToken,
+				t("editor.cloud.capacityCheckFailed", "Could not check cloud storage. Try again."),
+			)
 				.then((available) => {
 					if (active && request === generation) setCapacityAvailable(available);
 				})
@@ -96,7 +95,7 @@ export function CloudShareButton({
 			active = false;
 			unsubscribe();
 		};
-	}, [authToken]);
+	}, [authToken, t]);
 	useEffect(() => {
 		onBusyChange?.(uploading);
 	}, [uploading, onBusyChange]);
@@ -173,12 +172,27 @@ export function CloudShareButton({
 		setShareUrl(undefined);
 		try {
 			if (!DEFAULT_CLOUD_ENDPOINT)
-				throw new Error("Cloud sharing is not available in this build yet.");
+				throw new Error(
+					t(
+						"editor.cloud.sharingUnavailable",
+						"Cloud sharing is not available in this build yet.",
+					),
+				);
 			if (!authToken) throw new Error(t("editor.cloud.signInRequired"));
-			const available = await checkShareCapacity(DEFAULT_CLOUD_ENDPOINT, authToken);
+			const available = await checkShareCapacity(
+				DEFAULT_CLOUD_ENDPOINT,
+				authToken,
+				t("editor.cloud.capacityCheckFailed", "Could not check cloud storage. Try again."),
+			);
 			if (!isCurrentAccount()) return;
 			setCapacityAvailable(available);
-			if (!available) throw new Error(RECORDING_LIMIT_MESSAGE);
+			if (!available)
+				throw new Error(
+					t(
+						"editor.cloud.recordingLimit",
+						"You have 5 cloud recordings. Delete one from Shared before sharing another.",
+					),
+				);
 			if (cancelRequestedRef.current) return;
 			setPhase("preparing");
 			let resolvedFilePath = filePath ?? preparedFileRef.current;
@@ -216,7 +230,12 @@ export function CloudShareButton({
 				try {
 					saveProjectShareLink(projectPath, result.shareUrl);
 				} catch {
-					toast.error("Share created, but its link could not be saved locally");
+					toast.error(
+						t(
+							"editor.cloud.linkSaveFailed",
+							"Share created, but its link could not be saved locally",
+						),
+					);
 				}
 			}
 			toast.success(t("editor.cloud.linkCreated"));
@@ -254,7 +273,7 @@ export function CloudShareButton({
 			{shareUrl ? (
 				<Button type="button" size="lg" onClick={copyShareUrl} className="w-full">
 					{copied ? <Check className="h-4 w-4" /> : <LinkSimple className="h-4 w-4" />}
-					{copied ? t("editor.cloud.copied") : "Copy link"}
+					{copied ? t("editor.cloud.copied") : t("editor.cloud.copyLink", "Copy link")}
 				</Button>
 			) : (
 				<div className="space-y-4">
@@ -284,12 +303,20 @@ export function CloudShareButton({
 									style={{ width: `${progress}%` }}
 								/>
 							</div>
-							<p className="text-xs text-muted-foreground">Uploading · {progress}%</p>
+							<p className="text-xs text-muted-foreground">
+								{t("editor.cloud.uploadingProgress", "Uploading · {{progress}}%", {
+									progress,
+								})}
+							</p>
 						</div>
 					) : null}
 					{error || capacityAvailable === false ? (
 						<p className="text-sm text-destructive">
-							{error || RECORDING_LIMIT_MESSAGE}
+							{error ||
+								t(
+									"editor.cloud.recordingLimit",
+									"You have 5 cloud recordings. Delete one from Shared before sharing another.",
+								)}
 						</p>
 					) : null}
 					<div className="flex justify-end gap-2">
@@ -316,7 +343,9 @@ export function CloudShareButton({
 								}}
 							>
 								<Export className="h-4 w-4" />
-								{authToken ? "Share" : "Sign in to share"}
+								{authToken
+									? t("editor.cloud.share", "Share")
+									: t("editor.cloud.signInToShare", "Sign in to share")}
 							</Button>
 						)}
 					</div>
@@ -349,7 +378,7 @@ export function CloudShareButton({
 						<DialogTitle>{t("editor.cloud.heading")}</DialogTitle>
 						<DialogDescription>{t("editor.cloud.description")}</DialogDescription>
 						<p className="text-xs text-muted-foreground">
-							Free-plan links expire after 14 days.
+							{t("editor.cloud.linkExpiry", "Free-plan links expire after 14 days.")}
 						</p>
 					</DialogHeader>
 

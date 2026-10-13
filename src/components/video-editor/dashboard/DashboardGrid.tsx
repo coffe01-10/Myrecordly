@@ -4,6 +4,7 @@ import { CLOUD_SHARE_ENDPOINT } from "../cloud/endpoint";
 import { RecordNewButton } from "./RecordNewButton";
 import { RawPreview } from "./RawRecordings";
 import { Cloud, ImageSquare } from "@/components/ui/icons";
+import { useScopedT } from "@/contexts/I18nContext";
 
 import { Button } from "@/components/ui/button";
 
@@ -76,6 +77,7 @@ export function DashboardGrid({
 	| "deleteEntries"
 	| "run"
 >) {
+	const t = useScopedT("common");
 	return (
 		<>
 			<main className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-7 pb-10 lg:px-10">
@@ -102,12 +104,18 @@ export function DashboardGrid({
 							<Cloud weight="fill" className="size-8 opacity-40" />
 							<p>
 								{authToken
-									? "Cloud sharing is not available in this build yet."
-									: "Sign in to manage shared videos."}
+									? t(
+											"dashboard.grid.cloudSharingUnavailable",
+											"Cloud sharing is not available in this build yet.",
+										)
+									: t(
+											"dashboard.grid.signInToManage",
+											"Sign in to manage shared videos.",
+										)}
 							</p>
 							{!authToken && (
 								<Button variant="secondary" onClick={onSignIn}>
-									Sign in
+									{t("dashboard.signIn", "Sign in")}
 								</Button>
 							)}
 						</div>
@@ -116,7 +124,11 @@ export function DashboardGrid({
 					<LibrarySkeleton />
 				) : visible.length ? (
 					<ul
-						aria-label={isRaw ? "Raw files" : "Your projects"}
+						aria-label={
+							isRaw
+								? t("dashboard.grid.rawFiles", "Raw files")
+								: t("dashboard.grid.yourProjects", "Your projects")
+						}
 						className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-x-7 gap-y-10 lg:gap-x-9"
 					>
 						{visible.map((entry) => (
@@ -153,24 +165,35 @@ export function DashboardGrid({
 						<p>
 							{isRaw
 								? rawLoading
-									? "Loading recordings…"
+									? t("dashboard.grid.loadingRecordings", "Loading recordings…")
 									: rawError ||
 										(hasActiveFilters
-											? "No matching raw files"
-											: "No raw recordings yet")
+											? t(
+													"dashboard.grid.noMatchingRaw",
+													"No matching raw files",
+												)
+											: t(
+													"dashboard.grid.noRawRecordings",
+													"No raw recordings yet",
+												))
 								: hasActiveFilters
-									? "No matching projects"
-									: "It's looking empty in here..."}
+									? t("dashboard.grid.noMatchingProjects", "No matching projects")
+									: t(
+											"dashboard.grid.emptyProjects",
+											"It's looking empty in here...",
+										)}
 						</p>
 						{!isRaw && !hasActiveFilters && (
 							<RecordNewButton busy={busy} run={run} first className="mt-2" />
 						)}
 						{isRaw && rawError && (
-							<Button onClick={() => void refreshRaw()}>Retry</Button>
+							<Button onClick={() => void refreshRaw()}>
+								{t("dashboard.grid.retry", "Retry")}
+							</Button>
 						)}
 						{query && (
 							<Button variant="ghost" size="sm" onClick={() => setQuery("")}>
-								Clear search
+								{t("dashboard.grid.clearSearch", "Clear search")}
 							</Button>
 						)}
 					</div>

@@ -1,6 +1,7 @@
 import { MagnifyingGlass, UploadSimple, ArrowClockwise } from "@/components/ui/icons";
 import { type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
+import { useScopedT } from "@/contexts/I18nContext";
 
 import { Input } from "@/components/ui/input";
 
@@ -15,12 +16,13 @@ export function DashboardToolbar({
 	setQuery,
 	run,
 	busy,
-	actionLabel = "Import",
+	actionLabel,
 	action = "import",
 }: Pick<
 	DashboardProps & DashboardModel,
 	"onImportFile" | "query" | "setQuery" | "run" | "busy" | "isRaw"
 > & { actionLabel?: string; action?: "import" | "refresh" }) {
+	const t = useScopedT("common");
 	return (
 		<>
 			<header
@@ -35,8 +37,19 @@ export function DashboardToolbar({
 					<Input
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
-						aria-label={isRaw ? "Search raw files" : "Search projects"}
-						placeholder={isRaw ? "Search raw files…" : "Search projects…"}
+						aria-label={
+							isRaw
+								? t("dashboard.toolbar.searchRaw", "Search raw files")
+								: t("dashboard.toolbar.searchProjects", "Search projects")
+						}
+						placeholder={
+							isRaw
+								? t("dashboard.toolbar.searchRawPlaceholder", "Search raw files…")
+								: t(
+										"dashboard.toolbar.searchProjectsPlaceholder",
+										"Search projects…",
+									)
+						}
 						className="h-11 w-full border-0 bg-default/30 pl-10 shadow-none"
 					/>
 				</div>
@@ -52,7 +65,7 @@ export function DashboardToolbar({
 						) : (
 							<UploadSimple className="size-4" />
 						)}
-						{actionLabel}
+						{actionLabel ?? t("dashboard.import", "Import")}
 					</Button>
 				</div>
 			</header>

@@ -11,6 +11,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useScopedT } from "@/contexts/I18nContext";
 import { getAssetPath, getRenderableAssetUrl, getRenderableVideoUrl } from "@/lib/assetPath";
 import { getWebcamShadowFilter } from "@/lib/exporter/shadowProfile";
 import { getSquircleSvgPath } from "@/lib/geometry/squircle";
@@ -112,17 +113,17 @@ import {
 import { updateOverlayIndicator } from "./videoPlayback/overlayUtils";
 import { supportsPreviewPlaybackRate } from "./videoPlayback/playbackRate";
 import { PreviewVideoSource } from "./videoPlayback/previewVideoSource";
-import { usePreviewVideoReady } from "./videoPlayback/usePreviewVideoReady";
 import { getSceneEffectMetrics } from "./videoPlayback/sceneEffects";
 import {
 	resolvePreviewMotionMode,
 	resolveSceneZoomTarget,
 	shouldComposePreviewFrame,
 } from "./videoPlayback/sceneMotion";
+import { usePreviewVideoReady } from "./videoPlayback/usePreviewVideoReady";
 import {
 	getWebcamMediaTargetTimeSeconds,
-	isWebcamVisibleAtSourceTime,
 	isWebcamMediaSynchronized,
+	isWebcamVisibleAtSourceTime,
 	shouldSeekWebcamMedia,
 } from "./videoPlayback/webcamSync";
 import {
@@ -373,6 +374,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		},
 		ref,
 	) => {
+		const t = useScopedT("editor");
 		const videoRef = useRef<HTMLVideoElement | null>(null);
 		const previewVideoSourceRef = useRef(new PreviewVideoSource());
 		const attachVideo = useCallback((video: HTMLVideoElement | null) => {
@@ -2511,7 +2513,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 										}
 										aria-label={
 											onEditAutoCaption && !isCaptionEditing
-												? "Edit current caption"
+												? t("playback.editCaption", "Edit current caption")
 												: undefined
 										}
 										onClick={(event) => event.stopPropagation()}
@@ -2610,7 +2612,10 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 													1,
 													activeCaptionLayout.visibleLines.length,
 												)}
-												aria-label="Edit current caption"
+												aria-label={t(
+													"playback.editCaption",
+													"Edit current caption",
+												)}
 												style={{
 													display: "block",
 													width: `${
@@ -2818,19 +2823,26 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 						const msg = mediaError?.message;
 						const detail =
 							code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
-								? "format not supported"
+								? t("playback.videoErrorFormat", "format not supported")
 								: code === MediaError.MEDIA_ERR_NETWORK
-									? "network error"
+									? t("playback.videoErrorNetwork", "network error")
 									: code === MediaError.MEDIA_ERR_DECODE
-										? "decode error"
-										: msg || `code ${code ?? "unknown"}`;
+										? t("playback.videoErrorDecode", "decode error")
+										: msg ||
+											t("playback.videoErrorCode", "code {{code}}", {
+												code: code ?? "unknown",
+											});
 						console.error(
 							"[VideoPlayback] Video load error:",
 							detail,
 							"src:",
 							videoPath,
 						);
-						onError(`Failed to load video (${detail})`);
+						onError(
+							t("playback.videoLoadFailed", "Failed to load video ({{detail}})", {
+								detail,
+							}),
+						);
 					}}
 				/>
 			</div>

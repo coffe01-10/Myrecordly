@@ -1,5 +1,6 @@
 import type { Span } from "dnd-timeline";
 import { useCallback, useEffect, useMemo } from "react";
+import { useScopedT } from "@/contexts/I18nContext";
 import type { CursorTelemetryPoint, ZoomFocus, ZoomRegion } from "../../../types";
 import { buildInteractionZoomSuggestions } from "../../zoomSuggestionUtils";
 import { timelineNotifications } from "../utils/timelineNotifications";
@@ -37,6 +38,7 @@ export function useTimelineZoomActions({
 	const { videoDuration, totalMs, currentTimeMs } = timeline;
 	const { zoom: zoomRegions, clip: clipRegions } = regions;
 	const { disableSuggestedZooms } = options;
+	const t = useScopedT("timeline");
 	const defaultRegionDurationMs = useMemo(() => Math.min(1000, totalMs), [totalMs]);
 
 	const canPlaceZoomAtMs = useCallback(
@@ -88,15 +90,15 @@ export function useTimelineZoomActions({
 			const startPos = Math.max(0, Math.min(startMs, totalMs));
 			if (!canPlaceZoomAtMs(startPos)) {
 				timelineNotifications.error(
-					"Cannot place zoom here",
-					"Zoom already exists here or there is not enough room before the next zoom or clip end.",
+					t("zoom.cannotPlace"),
+					t("zoom.notEnoughRoom"),
 				);
 				return;
 			}
 
 			onZoomAdded({ start: startPos, end: startPos + defaultDuration });
 		},
-		[videoDuration, totalMs, defaultRegionDurationMs, canPlaceZoomAtMs, onZoomAdded],
+		[videoDuration, totalMs, defaultRegionDurationMs, canPlaceZoomAtMs, onZoomAdded, t],
 	);
 
 	const handleAddZoom = useCallback(() => {
@@ -113,22 +115,17 @@ export function useTimelineZoomActions({
 		}
 
 		if (disableSuggestedZooms) {
-			timelineNotifications.info(
-				"Suggested zooms are unavailable while cursor looping is enabled.",
-			);
+			timelineNotifications.info(t("zoom.suggestUnavailableLoop"));
 			return;
 		}
 
 		if (!onZoomSuggested) {
-			timelineNotifications.error("Zoom suggestion handler unavailable");
+			timelineNotifications.error(t("zoom.suggestHandlerUnavailable"));
 			return;
 		}
 
 		if (cursorTelemetry.length < 2) {
-			timelineNotifications.info(
-				"No cursor telemetry available",
-				"Record a screencast first to generate cursor-based suggestions.",
-			);
+			timelineNotifications.info(t("zoom.noTelemetry"), t("zoom.recordFirst"));
 			return;
 		}
 
@@ -147,26 +144,17 @@ export function useTimelineZoomActions({
 		});
 
 		if (result.status === "no-telemetry") {
-			timelineNotifications.info(
-				"No usable cursor telemetry",
-				"The recording does not include enough cursor movement data.",
-			);
+			timelineNotifications.info(t("zoom.noUsableTelemetry"), t("zoom.notEnoughMovement"));
 			return;
 		}
 
 		if (result.status === "no-interactions") {
-			timelineNotifications.info(
-				"No clear interaction moments found",
-				"Try a recording with pauses or clicks around important actions.",
-			);
+			timelineNotifications.info(t("zoom.noInteractionMoments"), t("zoom.tryRecording"));
 			return;
 		}
 
 		if (result.status === "no-slots" || result.suggestions.length === 0) {
-			timelineNotifications.info(
-				"No auto-zoom slots available",
-				"Detected dwell points overlap existing zoom regions.",
-			);
+			timelineNotifications.info(t("zoom.noAutoZoomSlots"), t("zoom.dwellPointsOverlap"));
 			return;
 		}
 
@@ -175,7 +163,7 @@ export function useTimelineZoomActions({
 		}
 
 		timelineNotifications.success(
-			`Added ${result.suggestions.length} interaction-based zoom suggestion${result.suggestions.length === 1 ? "" : "s"}`,
+			t("zoom.addedSuggestions", undefined, { count: result.suggestions.length }),
 		);
 	}, [
 		videoDuration,
@@ -185,6 +173,7 @@ export function useTimelineZoomActions({
 		cursorTelemetry,
 		defaultRegionDurationMs,
 		zoomRegions,
+		t,
 	]);
 
 	useEffect(() => {

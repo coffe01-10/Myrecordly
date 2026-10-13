@@ -1,3 +1,5 @@
+Language: EN | [简中](HEROUI_MIGRATION.zh-CN.md)
+
 # HeroUI UI branch
 
 This migration is isolated on `codex/heroui-ui`, based on `9693ad7` from

@@ -1,5 +1,6 @@
 import type { Span } from "dnd-timeline";
 import { useCallback } from "react";
+import { useScopedT } from "@/contexts/I18nContext";
 import type { CaptionCue } from "../../../types";
 import { timelineNotifications } from "../utils/timelineNotifications";
 
@@ -19,6 +20,7 @@ export function useTimelineCaptionActions({
 	captionRegions,
 	onCaptionAdded,
 }: UseTimelineCaptionActionsParams) {
+	const t = useScopedT("timeline");
 	const canPlaceCaptionAtMs = useCallback(
 		(startMs: number) => {
 			if (totalMs === 0) {
@@ -67,10 +69,7 @@ export function useTimelineCaptionActions({
 			}
 			const startPos = Math.max(0, Math.min(startMs, totalMs));
 			if (!canPlaceCaptionAtMs(startPos)) {
-				timelineNotifications.error(
-					"Cannot place caption here",
-					"A caption already exists at this position.",
-				);
+				timelineNotifications.error(t("caption.cannotPlace"), t("caption.occupied"));
 				return;
 			}
 			const span = resolveCaptionSpanAtMs(startPos);
@@ -79,7 +78,7 @@ export function useTimelineCaptionActions({
 			}
 			onCaptionAdded(span);
 		},
-		[onCaptionAdded, totalMs, canPlaceCaptionAtMs, resolveCaptionSpanAtMs],
+		[onCaptionAdded, totalMs, canPlaceCaptionAtMs, resolveCaptionSpanAtMs, t],
 	);
 
 	return {

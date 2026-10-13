@@ -1,3 +1,5 @@
+Language: EN | [简中](timeline-sequence.zh-CN.md)
+
 # Clip sequence timing
 
 Primary footage is an ordered, contiguous sequence. A visual clip separator has no duration. Both sides of a cut at 2.8 seconds represent 2.8 seconds, even if the second clip starts at a different point in the source recording.

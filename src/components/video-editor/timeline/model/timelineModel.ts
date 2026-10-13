@@ -18,44 +18,68 @@ import {
 } from "../core/rows";
 import type { TimelineRegionSpan, TimelineRenderItem } from "../core/timelineTypes";
 
-export function getAnnotationLabel(region: AnnotationRegion): string {
+export type TimelineTranslate = (
+	key: string,
+	fallback?: string,
+	vars?: Record<string, string | number>,
+) => string;
+
+// Falls back to the English literal when no translator is supplied (e.g. unit tests).
+const defaultTranslate: TimelineTranslate = (_key, fallback, vars) => {
+	const template = fallback ?? _key;
+	if (!vars) return template;
+	return template.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_match, key) =>
+		vars[key] === undefined ? "" : String(vars[key]),
+	);
+};
+
+export function getAnnotationLabel(
+	region: AnnotationRegion,
+	t: TimelineTranslate = defaultTranslate,
+): string {
 	if (region.type === "text") {
-		const preview = region.content.trim() || "Empty text";
+		const preview = region.content.trim() || t("model.emptyText", "Empty text");
 		return preview.length > 20 ? `${preview.substring(0, 20)}...` : preview;
 	}
 	if (region.type === "image") {
-		return "Image";
+		return t("model.image", "Image");
 	}
-	return "Annotation";
+	return t("model.annotation", "Annotation");
 }
 
-export function getAudioLabel(region: AudioRegion): string {
+export function getAudioLabel(
+	region: AudioRegion,
+	t: TimelineTranslate = defaultTranslate,
+): string {
 	return (
 		region.audioPath
 			.split(/[\\/]/)
 			.pop()
-			?.replace(/\.[^.]+$/, "") || "Audio"
+			?.replace(/\.[^.]+$/, "") || t("model.audio", "Audio")
 	);
 }
 
-function getCaptionLabel(cue: CaptionCue): string {
-	const preview = cue.text.trim() || "Caption";
+function getCaptionLabel(cue: CaptionCue, t: TimelineTranslate = defaultTranslate): string {
+	const preview = cue.text.trim() || t("model.caption", "Caption");
 	return preview.length > 24 ? `${preview.substring(0, 24)}...` : preview;
 }
 
-export function buildTimelineItems(params: {
-	zoomRegions: ZoomRegion[];
-	clipRegions: ClipRegion[];
-	annotationRegions: AnnotationRegion[];
-	audioRegions: AudioRegion[];
-	captionCues?: CaptionCue[];
-}): TimelineRenderItem[] {
+export function buildTimelineItems(
+	params: {
+		zoomRegions: ZoomRegion[];
+		clipRegions: ClipRegion[];
+		annotationRegions: AnnotationRegion[];
+		audioRegions: AudioRegion[];
+		captionCues?: CaptionCue[];
+	},
+	t: TimelineTranslate = defaultTranslate,
+): TimelineRenderItem[] {
 	const { zoomRegions, clipRegions, annotationRegions, audioRegions, captionCues = [] } = params;
 	const zooms: TimelineRenderItem[] = zoomRegions.map((region, index) => ({
 		id: region.id,
 		rowId: ZOOM_ROW_ID,
 		span: { start: region.startMs, end: region.endMs },
-		label: `Zoom ${index + 1}`,
+		label: t("zoom.label", "Zoom {{index}}", { index: index + 1 }),
 		zoomDepth: region.depth,
 		zoomMode: region.mode ?? "auto",
 		variant: "zoom",
@@ -71,7 +95,7 @@ export function buildTimelineItems(params: {
 			rowId: CLIP_ROW_ID,
 			span: { start: region.startMs, end: region.endMs },
 			sourceSpan: { start: getClipSourceStartMs(region), end: sourceEndMs },
-			label: speedLabel ? `Clip ${index + 1} ${speedLabel}` : `Clip ${index + 1}`,
+			label: `${t("model.clip", "Clip {{index}}", { index: index + 1 })}${speedLabel ? ` ${speedLabel}` : ""}`,
 			speedValue: speedLabel ? speed : undefined,
 			showSourceAudio: region.showSourceAudio,
 			muted: Boolean(region.muted),
@@ -83,7 +107,7 @@ export function buildTimelineItems(params: {
 		id: region.id,
 		rowId: getAnnotationTrackRowId(region.trackIndex ?? 0),
 		span: { start: region.startMs, end: region.endMs },
-		label: getAnnotationLabel(region),
+		label: getAnnotationLabel(region, t),
 		variant: "annotation",
 	}));
 
@@ -91,7 +115,7 @@ export function buildTimelineItems(params: {
 		id: region.id,
 		rowId: getAudioTrackRowId(region.trackIndex ?? 0),
 		span: { start: region.startMs, end: region.endMs },
-		label: getAudioLabel(region),
+		label: getAudioLabel(region, t),
 		audioPath: region.audioPath,
 		audioGain: region.volume,
 		audioNormalize: Boolean(region.normalize),
@@ -102,7 +126,7 @@ export function buildTimelineItems(params: {
 		id: cue.id,
 		rowId: CAPTION_ROW_ID,
 		span: { start: cue.startMs, end: cue.endMs },
-		label: getCaptionLabel(cue),
+		label: getCaptionLabel(cue, t),
 		variant: "caption",
 	}));
 

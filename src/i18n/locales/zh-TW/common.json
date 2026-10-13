@@ -16,11 +16,151 @@
 		"save": "保存",
 		"undo": "撤銷",
 		"delete": "刪除",
-		"done": "完成"
+		"done": "完成",
+		"rename": "重新命名"
 	},
 	"errors": {
 		"invalidFileType": "無效的檔案類型",
 		"failedToUploadImage": "上傳圖片失敗",
 		"fileReadError": "讀取檔案時出錯。"
+	},
+	"dashboard": {
+		"dialogLabel": "專案面板",
+		"import": "匯入",
+		"signIn": "登入",
+		"sidebar": {
+			"navigation": "媒體庫導覽",
+			"home": "首頁",
+			"shared": "共享",
+			"raw": "原始錄影",
+			"folders": "資料夾",
+			"newFolder": "新增資料夾",
+			"untitledFolder": "未命名資料夾",
+			"settings": "設定"
+		},
+		"filters": {
+			"timeFilters": "時間篩選",
+			"all": "全部",
+			"lastSevenDays": "最近 7 天",
+			"lastThirtyDays": "最近 30 天",
+			"selectRaw": "選擇要移除的原始錄影",
+			"selectProjects": "選擇要刪除的專案",
+			"sortRaw": "排序原始錄影",
+			"sortProjects": "排序專案",
+			"lastEdited": "最近編輯",
+			"lastCreated": "最近建立",
+			"name": "名稱",
+			"selectAll": "全選",
+			"selectedCount": "已選擇 {{count}} 項",
+			"remove": "移除"
+		},
+		"grid": {
+			"cloudSharingUnavailable": "目前版本尚不支援雲端共享。",
+			"signInToManage": "登入以管理共享影片。",
+			"rawFiles": "原始檔案",
+			"yourProjects": "你的專案",
+			"loadingRecordings": "正在載入錄影…",
+			"noMatchingRaw": "沒有符合的原始檔案",
+			"noRawRecordings": "還沒有原始錄影",
+			"noMatchingProjects": "沒有符合的專案",
+			"emptyProjects": "這裡空空如也……",
+			"retry": "重試",
+			"clearSearch": "清除搜尋"
+		},
+		"toolbar": {
+			"searchRaw": "搜尋原始檔案",
+			"searchProjects": "搜尋專案",
+			"searchRawPlaceholder": "搜尋原始檔案…",
+			"searchProjectsPlaceholder": "搜尋專案…"
+		},
+		"recordNew": {
+			"firstVideo": "錄製你的第一個影片",
+			"recordNew": "新增錄影"
+		},
+		"skeleton": {
+			"loadingProjects": "正在載入專案"
+		},
+		"rawPreview": {
+			"title": "原始檔案預覽"
+		},
+		"sidebarCards": {
+			"announcements": "側邊欄公告",
+			"couldNotOpenLink": "無法開啟連結",
+			"learnMore": "瞭解更多"
+		},
+		"folderChips": {
+			"removeFrom": "將 {{name}} 從 {{folder}} 中移除",
+			"foldersFor": "{{name}} 的資料夾",
+			"moreFolders": "還有 {{count}} 個資料夾：{{names}}"
+		},
+		"folderRow": {
+			"nameLabel": "資料夾名稱",
+			"optionsFor": "{{name}} 的選項",
+			"options": "資料夾選項",
+			"removeFolder": "移除資料夾"
+		},
+		"folderColors": {
+			"changeColorFor": "變更 {{name}} 的顏色",
+			"folderColor": "資料夾顏色",
+			"folderColors": "資料夾顏色",
+			"removeCustomColor": "移除自訂顏色",
+			"saveCustomColor": "儲存自訂顏色"
+		},
+		"announcements": {
+			"label": "公告",
+			"carousel": "輪播",
+			"couldNotOpen": "無法開啟公告",
+			"previous": "上一則公告",
+			"choose": "選擇公告",
+			"slide": "公告 {{number}}",
+			"next": "下一則公告"
+		},
+		"browser": {
+			"title": "專案",
+			"noPreview": "無預覽",
+			"currentProject": "目前專案",
+			"noProjects": "還沒有已儲存的專案"
+		},
+		"projectCard": {
+			"rawFileName": "原始檔案名稱",
+			"projectName": "專案名稱",
+			"webProject": "網頁專案",
+			"incompleteUpload": "上傳未完成",
+			"addFolderTo": "為 {{name}} 新增資料夾",
+			"addFolder": "新增資料夾",
+			"assignFolderLabel": "指派專案資料夾",
+			"removeFromAllFolders": "從所有資料夾中移除",
+			"createFolderHint": "在側邊欄中建立資料夾",
+			"optionsFor": "{{name}} 的選項",
+			"projectOptions": "專案選項",
+			"openLink": "開啟連結",
+			"previewFile": "預覽檔案",
+			"openProject": "開啟專案",
+			"viewInWeb": "在網頁中檢視",
+			"share": "共享",
+			"showInFolderLabel": "在資料夾中顯示 {{name}}",
+			"showInFolder": "在資料夾中顯示",
+			"deleteRecording": "刪除錄影",
+			"removeFromLibrary": "從媒體庫中移除",
+			"deleteProject": "刪除專案"
+		},
+		"errors": {
+			"actionFailed": "無法完成操作",
+			"savePreferences": "無法儲存媒體庫偏好設定",
+			"saveFolders": "無法儲存資料夾"
+		}
+	},
+	"colorPicker": {
+		"colors": "顏色",
+		"none": "無",
+		"presetColors": "預設顏色",
+		"hexColor": "十六進位顏色",
+		"clearBackground": "清除背景"
+	},
+	"audioMeter": {
+		"microphoneLevel": "麥克風音量"
+	},
+	"dropdownMenu": {
+		"actions": "操作"
 	}
 }

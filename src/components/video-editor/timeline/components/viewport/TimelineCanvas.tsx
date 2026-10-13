@@ -16,6 +16,7 @@ import type {
 	SourceAudioTrackWithPeaks,
 } from "@/components/video-editor/audio/audioTypes";
 import { cn } from "@/lib/utils";
+import { useScopedT } from "@/contexts/I18nContext";
 import {
 	CAPTION_ROW_ID,
 	CLIP_ROW_ID,
@@ -50,9 +51,9 @@ import {
 } from "../../timelineLayout";
 import PlaybackCursor from "../playhead/PlaybackCursor";
 
-const HINT_CLIP = "Press C to split clip";
-const HINT_ANNOTATION = "Press A to add annotation";
-const HINT_AUDIO = "Click music icon to add audio";
+const HINT_CLIP = "hintClip";
+const HINT_ANNOTATION = "hintAnnotation";
+const HINT_AUDIO = "hintAudio";
 
 interface TimelineCanvasProps {
 	videoPath?: string | null;
@@ -517,6 +518,7 @@ const TimelineCanvasRows = memo(function TimelineCanvasRows({
 	onCaptionRowMouseDown,
 	onCaptionRowClick,
 }: TimelineCanvasRowsProps) {
+	const t = useScopedT("timeline");
 	const {
 		pixelsToValue,
 		valueToPixels,
@@ -703,7 +705,7 @@ const TimelineCanvasRows = memo(function TimelineCanvasRows({
 					})}
 				</Row>
 			)}
-			<Row filmstrip id={CLIP_ROW_ID} isEmpty={clipItems.length === 0} hint={HINT_CLIP}>
+			<Row filmstrip id={CLIP_ROW_ID} isEmpty={clipItems.length === 0} hint={t(HINT_CLIP)}>
 				{clipPresentation.map((item) => (
 					<Item
 						id={item.id}
@@ -854,7 +856,7 @@ const TimelineCanvasRows = memo(function TimelineCanvasRows({
 					key={rowId}
 					id={rowId}
 					isEmpty={rowItems.length === 0}
-					hint={index === 0 ? HINT_ANNOTATION : undefined}
+					hint={index === 0 ? t(HINT_ANNOTATION) : undefined}
 				>
 					{rowItems.map((item) => (
 						<Item
@@ -877,7 +879,7 @@ const TimelineCanvasRows = memo(function TimelineCanvasRows({
 					key={rowId}
 					id={rowId}
 					isEmpty={rowItems.length === 0}
-					hint={index === 0 ? HINT_AUDIO : undefined}
+					hint={index === 0 ? t(HINT_AUDIO) : undefined}
 				>
 					{rowItems.map((item) => (
 						<AudioItemWithWaveform

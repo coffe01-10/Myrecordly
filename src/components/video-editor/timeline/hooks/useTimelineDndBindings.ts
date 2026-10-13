@@ -1,5 +1,6 @@
 import type { Span } from "dnd-timeline";
 import { useCallback, useMemo } from "react";
+import { useScopedT } from "@/contexts/I18nContext";
 import type {
 	AnnotationRegion,
 	AudioRegion,
@@ -62,6 +63,7 @@ export function useTimelineDndBindings({
 	onAudioSpanChange,
 	onCaptionSpanChange,
 }: UseTimelineDndBindingsParams) {
+	const t = useScopedT("timeline");
 	const resolveItemKind = useCallback(
 		(id: string): TimelineItemKind => {
 			if (zoomRegions.some((r) => r.id === id)) return "zoom";
@@ -142,14 +144,17 @@ export function useTimelineDndBindings({
 
 	const timelineItems = useMemo<TimelineRenderItem[]>(
 		() =>
-			buildTimelineItems({
-				zoomRegions,
-				clipRegions,
-				annotationRegions,
-				audioRegions,
-				captionCues,
-			}),
-		[zoomRegions, clipRegions, annotationRegions, audioRegions, captionCues],
+			buildTimelineItems(
+				{
+					zoomRegions,
+					clipRegions,
+					annotationRegions,
+					audioRegions,
+					captionCues,
+				},
+				t,
+			),
+		[zoomRegions, clipRegions, annotationRegions, audioRegions, captionCues, t],
 	);
 
 	const allRegionSpans = useMemo(

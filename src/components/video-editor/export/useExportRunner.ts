@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 import { toast } from "@/components/ui/toast";
+import { useI18n } from "@/contexts/I18nContext";
 import { getMp4ExportBitrate } from "@/lib/exporter/exportBitrate";
 import { DEFAULT_MP4_CODEC } from "@/lib/exporter/mp4Support";
 import type { ExportSettings } from "@/lib/exporter/types";
@@ -23,6 +24,7 @@ import {
 export function useExportRunner(input: ExportRunnerInput) {
 	const inputRef = useRef(input);
 	inputRef.current = input;
+	const { t } = useI18n();
 	const showExportSuccessToast = useExportSuccessToast();
 
 	const handleExport = useCallback(
@@ -74,13 +76,13 @@ export function useExportRunner(input: ExportRunnerInput) {
 				cancelledExportRunIdRef,
 			} = exportSession;
 			if (!videoPath) {
-				toast.error("No video loaded");
+				toast.error(t("editor.export.noVideoLoaded", "No video loaded"));
 				return;
 			}
 
 			const video = videoPlaybackRef.current?.video;
 			if (!video) {
-				toast.error("Video not ready");
+				toast.error(t("editor.export.videoNotReady", "Video not ready"));
 				return;
 			}
 
@@ -170,7 +172,12 @@ export function useExportRunner(input: ExportRunnerInput) {
 						if (options?.destination === "share") {
 							const tempPath = await streamExportBlobToTempFile(result.blob, "gif");
 							if (!tempPath)
-								throw new Error("Could not prepare the GIF for sharing.");
+								throw new Error(
+									t(
+										"editor.export.prepareGifFailed",
+										"Could not prepare the GIF for sharing.",
+									),
+								);
 							return tempPath;
 						}
 						markExportAsSaving();
@@ -189,9 +196,17 @@ export function useExportRunner(input: ExportRunnerInput) {
 							pendingExportSaveRef.current = pendingSave;
 							setHasPendingExportSave(true);
 							setExportError(
-								"Save dialog canceled. Click Save Again to save without re-rendering.",
+								t(
+									"editor.export.saveCanceled",
+									"Save dialog canceled. Click Save Again to save without re-rendering.",
+								),
 							);
-							toast.info("Save canceled. You can save again without re-exporting.");
+							toast.info(
+								t(
+									"editor.export.saveCanceledToast",
+									"Save canceled. You can save again without re-exporting.",
+								),
+							);
 							keepExportDialogOpen = true;
 						} else if (saveResult.success && saveResult.path) {
 							if (smokeExportStartedAt !== null) {
@@ -206,16 +221,26 @@ export function useExportRunner(input: ExportRunnerInput) {
 								return;
 							}
 						} else {
-							setExportError(saveResult.message || "Failed to save GIF");
-							toast.error(saveResult.message || "Failed to save GIF");
+							setExportError(
+								saveResult.message ||
+									t("editor.export.saveGifFailed", "Failed to save GIF"),
+							);
+							toast.error(
+								saveResult.message ||
+									t("editor.export.saveGifFailed", "Failed to save GIF"),
+							);
 							if (smokeExportConfig.enabled) {
 								window.close();
 								return;
 							}
 						}
 					} else {
-						setExportError(result.error || "GIF export failed");
-						toast.error(result.error || "GIF export failed");
+						setExportError(
+							result.error || t("editor.export.gifExportFailed", "GIF export failed"),
+						);
+						toast.error(
+							result.error || t("editor.export.gifExportFailed", "GIF export failed"),
+						);
 						if (smokeExportConfig.enabled) {
 							window.close();
 							return;
@@ -356,7 +381,12 @@ export function useExportRunner(input: ExportRunnerInput) {
 								);
 								if (tempPath) return tempPath;
 							}
-							throw new Error("Could not prepare the video for sharing.");
+							throw new Error(
+								t(
+									"editor.export.prepareVideoFailed",
+									"Could not prepare the video for sharing.",
+								),
+							);
 						}
 						const sidecarForThisExport =
 							settings.includeCaptionSidecar && captionSidecarPayload
@@ -415,7 +445,13 @@ export function useExportRunner(input: ExportRunnerInput) {
 							saveResult = blobSave.saveResult;
 							pendingOnCancel = blobSave.pendingSave;
 						} else {
-							saveResult = { success: false, message: "Export produced no output" };
+							saveResult = {
+								success: false,
+								message: t(
+									"editor.export.exportProducedNoOutput",
+									"Export produced no output",
+								),
+							};
 							pendingOnCancel = { fileName };
 						}
 
@@ -438,9 +474,17 @@ export function useExportRunner(input: ExportRunnerInput) {
 							pendingExportSaveRef.current = pendingOnCancel;
 							setHasPendingExportSave(true);
 							setExportError(
-								"Save dialog canceled. Click Save Again to save without re-rendering.",
+								t(
+									"editor.export.saveCanceled",
+									"Save dialog canceled. Click Save Again to save without re-rendering.",
+								),
 							);
-							toast.info("Save canceled. You can save again without re-exporting.");
+							toast.info(
+								t(
+									"editor.export.saveCanceledToast",
+									"Save canceled. You can save again without re-exporting.",
+								),
+							);
 							keepExportDialogOpen = true;
 						} else if (saveResult.success && saveResult.path) {
 							if (smokeExportConfig.enabled) {
@@ -485,8 +529,14 @@ export function useExportRunner(input: ExportRunnerInput) {
 									metrics: result.metrics,
 								});
 							}
-							setExportError(saveResult.message || "Failed to save video");
-							showExportErrorToast(saveResult.message || "Failed to save video");
+							setExportError(
+								saveResult.message ||
+									t("editor.export.saveVideoFailed", "Failed to save video"),
+							);
+							showExportErrorToast(
+								saveResult.message ||
+									t("editor.export.saveVideoFailed", "Failed to save video"),
+							);
 							// Keep the pending-save entry so the user can retry without
 							// re-rendering. The temp file is still on disk (the main
 							// process only moves/deletes it on success) and the
@@ -517,8 +567,12 @@ export function useExportRunner(input: ExportRunnerInput) {
 								metrics: result.metrics,
 							});
 						}
-						setExportError(result.error || "Export failed");
-						showExportErrorToast(result.error || "Export failed");
+						setExportError(
+							result.error || t("editor.export.exportFailed", "Export failed"),
+						);
+						showExportErrorToast(
+							result.error || t("editor.export.exportFailed", "Export failed"),
+						);
 						keepExportDialogOpen = options?.destination !== "share";
 						if (smokeExportConfig.enabled) {
 							window.close();
@@ -535,7 +589,10 @@ export function useExportRunner(input: ExportRunnerInput) {
 			} catch (error) {
 				if (exportWasCancelled()) return;
 				console.error("Export error:", error);
-				const errorMessage = error instanceof Error ? error.message : "Unknown error";
+				const errorMessage =
+					error instanceof Error
+						? error.message
+						: t("editor.export.unknownError", "Unknown error");
 				if (smokeExportConfig.enabled) {
 					await writeSmokeExportReport(smokeExportConfig.outputPath, {
 						success: false,
@@ -549,7 +606,11 @@ export function useExportRunner(input: ExportRunnerInput) {
 					});
 				}
 				setExportError(errorMessage);
-				showExportErrorToast(`Export failed: ${errorMessage}`);
+				showExportErrorToast(
+					t("editor.export.exportFailedWithError", "Export failed: {{error}}", {
+						error: errorMessage,
+					}),
+				);
 				keepExportDialogOpen = options?.destination !== "share";
 				if (smokeExportConfig.enabled) {
 					window.close();
@@ -569,7 +630,7 @@ export function useExportRunner(input: ExportRunnerInput) {
 				}
 			}
 		},
-		[showExportSuccessToast],
+		[showExportSuccessToast, t],
 	);
 
 	return { handleExport, showExportSuccessToast };

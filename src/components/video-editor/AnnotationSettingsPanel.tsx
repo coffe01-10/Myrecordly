@@ -147,7 +147,7 @@ export function AnnotationSettingsPanel({
 					{/* Type Selector */}
 					<div className="space-y-4">
 						<ChoiceGroup
-							aria-label="Annotation type"
+							aria-label={t("annotations.typeLabel", "Annotation type")}
 							value={annotation.type}
 							onValueChange={(value) => onTypeChange(value as AnnotationType)}
 							className="grid grid-cols-4 gap-2"
@@ -486,7 +486,7 @@ export function AnnotationSettingsPanel({
 										<div className="rounded-lg border border-foreground/10 overflow-hidden bg-foreground/5 p-2">
 											<img
 												src={annotation.content}
-												alt="Uploaded annotation"
+												alt={t("annotations.uploadedAlt", "Uploaded annotation")}
 												className="w-full h-auto rounded-md"
 											/>
 										</div>

@@ -1,15 +1,13 @@
-import { ExportErrorReportButton } from "@/components/feedback/ExportErrorReportButton";
-import { LinkSimple, HardDrive, Export } from "@phosphor-icons/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { CloudShareButton } from "../cloud/CloudShareButton";
-import { Card, TagGroup, Tag } from "@heroui/react";
+import { Card, ProgressBar, Tag, TagGroup } from "@heroui/react";
+import { Export, HardDrive, LinkSimple } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
-import { ProgressBar } from "@heroui/react";
-
-import { toast } from "@/components/ui/toast";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ExportErrorReportButton } from "@/components/feedback/ExportErrorReportButton";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { toast } from "@/components/ui/toast";
 import type { useI18n } from "@/contexts/I18nContext";
+import { CloudShareButton } from "../cloud/CloudShareButton";
 import { ExportSettingsMenu } from "../ExportSettingsMenu";
 import type { useExportDimensions } from "../export/useExportDimensions";
 import type { useExportSession } from "../export/useExportSession";
@@ -182,11 +180,13 @@ export function EditorExportMenu(props: Props) {
 						className="inline-flex h-9 min-w-[104px] items-center justify-center gap-2 px-4.5"
 					>
 						<Export className="h-4 w-4" />
-						<span className="text-sm font-semibold tracking-tight">Publish</span>
+						<span className="text-sm font-semibold tracking-tight">
+							{t("editor.cloud.publishButton", "Publish")}
+						</span>
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent
-					aria-label="Publish"
+					aria-label={t("editor.cloud.publishButton", "Publish")}
 					align="end"
 					sideOffset={10}
 					className="w-[360px] max-h-none overflow-hidden p-0"
@@ -201,9 +201,14 @@ export function EditorExportMenu(props: Props) {
 					>
 						<div ref={contentRef}>
 							<div className="p-5 space-y-3">
-								<h2 className="text-sm font-semibold">Publish</h2>
+								<h2 className="text-sm font-semibold">
+									{t("editor.cloud.publishButton", "Publish")}
+								</h2>
 								<TagGroup
-									aria-label="Publish destination"
+									aria-label={t(
+										"editor.cloud.publishDestination",
+										"Publish destination",
+									)}
 									selectionMode="single"
 									disallowEmptySelection
 									selectedKeys={[destination]}
@@ -224,7 +229,7 @@ export function EditorExportMenu(props: Props) {
 											className="h-24 flex-1 flex-col justify-center gap-2 rounded-xl border border-foreground/10"
 										>
 											<LinkSimple className="size-6" />
-											Link
+											{t("editor.cloud.link", "Link")}
 										</Tag>
 										<Tag
 											id="local"
@@ -232,7 +237,7 @@ export function EditorExportMenu(props: Props) {
 											className="h-24 flex-1 flex-col justify-center gap-2 rounded-xl border border-foreground/10"
 										>
 											<HardDrive className="size-6" />
-											Local
+											{t("editor.cloud.local", "Local")}
 										</Tag>
 									</TagGroup.List>
 								</TagGroup>
@@ -286,8 +291,10 @@ export function EditorExportMenu(props: Props) {
 												) : null}
 												{isLegacyExportInProgress ? (
 													<p className="mt-1 text-[11px] text-muted-foreground/70">
-														Export too slow? Cancel and try Lightning
-														export!
+														{t(
+															"editor.exportStatus.exportTooSlow",
+															"Export too slow? Cancel and try Lightning export!",
+														)}
 													</p>
 												) : null}
 											</div>
@@ -340,7 +347,13 @@ export function EditorExportMenu(props: Props) {
 										) : null}
 										{exportRuntimeLabel ? (
 											<p className="mt-1 text-[11px] text-muted-foreground/70">
-												Path: {exportRuntimeLabel}
+												{t(
+													"editor.exportStatus.runtimePath",
+													"Path: {{path}}",
+													{
+														path: exportRuntimeLabel,
+													},
+												)}
 											</p>
 										) : null}
 										{exportNativeSkipLabel ? (
@@ -356,7 +369,11 @@ export function EditorExportMenu(props: Props) {
 										</p>
 										{exportRuntimeLabel ? (
 											<p className="mt-1 text-[11px] text-muted-foreground/70">
-												Path: {exportRuntimeLabel}
+												{t(
+													"editor.exportStatus.runtimePath",
+													"Path: {{path}}",
+													{ path: exportRuntimeLabel },
+												)}
 											</p>
 										) : null}
 										<p className="mt-1 select-text whitespace-pre-wrap break-words text-xs leading-relaxed text-muted-foreground">
@@ -427,7 +444,11 @@ export function EditorExportMenu(props: Props) {
 										</p>
 										{exportRuntimeLabel ? (
 											<p className="mt-1 text-[11px] text-muted-foreground/70">
-												Path: {exportRuntimeLabel}
+												{t(
+													"editor.exportStatus.runtimePath",
+													"Path: {{path}}",
+													{ path: exportRuntimeLabel },
+												)}
 											</p>
 										) : null}
 										<p className="mt-3 truncate text-xs text-muted-foreground/70">

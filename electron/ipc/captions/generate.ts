@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import { app } from "electron";
+import { t } from "../../i18n";
 import { getFfmpegBinaryPath } from "../ffmpeg/binary";
 import { getBundledWhisperExecutableCandidates } from "../paths/binaries";
 import { resolveRecordingSession } from "../project/session";
@@ -104,8 +105,11 @@ export async function resolveWhisperExecutablePath(preferredPath?: string | null
 	}
 
 	throw new Error(
-		`No Whisper runtime was found for ${process.platform}/${process.arch}. ` +
-			"This Recordly build is missing its bundled caption runtime. Reinstall or update Recordly, or select a whisper-cli executable in Caption settings.",
+		t(
+			"error.whisperRuntimeMissing",
+			"No Whisper runtime was found for {{platform}}/{{arch}}. This Recordly build is missing its bundled caption runtime. Reinstall or update Recordly, or select a whisper-cli executable in Caption settings.",
+			{ platform: process.platform, arch: process.arch },
+		),
 	);
 }
 

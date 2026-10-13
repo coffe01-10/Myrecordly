@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useScopedT } from "@/contexts/I18nContext";
 import {
 	buildExportErrorReport,
 	submitExportErrorReport,
@@ -14,6 +15,7 @@ export function ExportErrorReportButton({
 	error: string;
 	format: "mp4" | "gif";
 }) {
+	const t = useScopedT("dialogs");
 	const [open, setOpen] = useState(false);
 	const [plan, setPlan] = useState<CloudPlan>("unknown");
 	const [sending, setSending] = useState(false);
@@ -29,7 +31,9 @@ export function ExportErrorReportButton({
 				className="h-8 text-xs"
 				onClick={() => setOpen(true)}
 			>
-				{sent ? "Report sent" : "Report error"}
+				{sent
+					? t("errorReport.reportSent", "Report sent")
+					: t("errorReport.reportError", "Report error")}
 			</Button>
 			<Dialog
 				open={open}
@@ -39,42 +43,59 @@ export function ExportErrorReportButton({
 			>
 				<DialogContent className="max-w-md">
 					<DialogHeader>
-						<DialogTitle>{sent ? "Report sent" : "Report export error"}</DialogTitle>
+						<DialogTitle>
+							{sent
+								? t("errorReport.reportSent", "Report sent")
+								: t("errorReport.title", "Report export error")}
+						</DialogTitle>
 					</DialogHeader>
 					{sent ? (
 						<p className="text-sm">
-							Thanks. The technical report was sent to Recordly support.
+							{t(
+								"errorReport.sentMessage",
+								"Thanks. The technical report was sent to Recordly support.",
+							)}
 						</p>
 					) : (
 						<>
 							<p className="text-sm text-muted-foreground">
-								Send technical details to Recordly support through Supabase. No
-								account ID, email, recording, file path, attachments or console logs
-								are included. Supabase may keep connection logs separately.
+								{t(
+									"errorReport.privacyNotice",
+									"Send technical details to Recordly support through Supabase. No account ID, email, recording, file path, attachments or console logs are included. Supabase may keep connection logs separately.",
+								)}
 							</p>
 							<label className="flex flex-col gap-2 text-sm">
-								Cloud plan (optional, self-reported)
+								{t("errorReport.cloudPlanLabel", "Cloud plan (optional, self-reported)")}
 								<select
 									value={plan}
 									onChange={(event) => setPlan(event.target.value as CloudPlan)}
 									disabled={sending}
 									className="rounded-md border bg-background p-2"
 								>
-									<option value="unknown">Unknown / prefer not to say</option>
-									<option value="paid">Paid cloud plan</option>
-									<option value="not_paid">No paid cloud plan</option>
+									<option value="unknown">
+										{t("errorReport.cloudPlanUnknown", "Unknown / prefer not to say")}
+									</option>
+									<option value="paid">
+										{t("errorReport.cloudPlanPaid", "Paid cloud plan")}
+									</option>
+									<option value="not_paid">
+										{t("errorReport.cloudPlanNotPaid", "No paid cloud plan")}
+									</option>
 								</select>
 							</label>
 							<details>
 								<summary className="cursor-pointer text-sm">
-									View data to be sent
+									{t("errorReport.viewData", "View data to be sent")}
 								</summary>
 								<pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs mt-2">
 									{JSON.stringify(report, null, 2)}
 								</pre>
 							</details>
 							<p className="text-xs text-muted-foreground">
-								Reports are kept for 30 days, then removed by daily cleanup.
+								{t(
+									"errorReport.retentionNotice",
+									"Reports are kept for 30 days, then removed by daily cleanup.",
+								)}
 							</p>
 							{sendError && (
 								<p role="alert" className="text-sm text-destructive">
@@ -91,11 +112,12 @@ export function ExportErrorReportButton({
 									try {
 										await submitExportErrorReport(report);
 										setSent(true);
-									} catch (error) {
+									} catch {
 										setSendError(
-											error instanceof Error
-												? error.message
-												: "Could not send the report. Please try again.",
+											t(
+												"errorReport.sendFailed",
+												"Could not send the report. Please try again.",
+											),
 										);
 									} finally {
 										sendingRef.current = false;
@@ -103,7 +125,9 @@ export function ExportErrorReportButton({
 									}
 								}}
 							>
-								{sending ? "Sending…" : "Send report"}
+								{sending
+									? t("errorReport.sending", "Sending…")
+									: t("errorReport.sendReport", "Send report")}
 							</Button>
 						</>
 					)}

@@ -1,5 +1,6 @@
 import { Dropdown, Label, Separator, Kbd } from "@heroui/react";
 import { type ComponentProps, type ReactNode } from "react";
+import { useScopedT } from "@/contexts/I18nContext";
 export function DropdownMenu({
 	open,
 	modal: _modal,
@@ -19,13 +20,16 @@ export function DropdownMenuContent({
 	align?: "start" | "end" | "center";
 	sideOffset?: number;
 }) {
+	const t = useScopedT("common");
 	return (
 		<Dropdown.Popover
 			{...props}
 			placement={align === "center" ? "bottom" : `bottom ${align}`}
 			offset={sideOffset}
 		>
-			<Dropdown.Menu aria-label="Actions">{children}</Dropdown.Menu>
+			<Dropdown.Menu aria-label={t("dropdownMenu.actions", "Actions")}>
+				{children}
+			</Dropdown.Menu>
 		</Dropdown.Popover>
 	);
 }

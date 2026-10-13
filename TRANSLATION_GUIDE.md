@@ -1,3 +1,5 @@
+Language: EN | [简中](TRANSLATION_GUIDE.zh-CN.md)
+
 # Translation Guide
 
 This project uses a namespace-based i18n setup so contributors can localize safely without changing app logic.

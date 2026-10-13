@@ -1,15 +1,17 @@
 import { Card, Skeleton } from "@heroui/react";
+import { useScopedT } from "@/contexts/I18nContext";
 
 /** Keep the editor's proportions visible while project media is being opened. */
 export function EditorLoadingSkeleton() {
+	const t = useScopedT("editor");
 	return (
 		<div
 			className="flex h-screen flex-col overflow-hidden bg-editor-bg"
 			role="status"
-			aria-label="Loading editor"
+			aria-label={t("loading.editor", "Loading editor")}
 			aria-busy="true"
 		>
-			<span className="sr-only">Loading editor…</span>
+			<span className="sr-only">{t("loading.editorEllipsis", "Loading editor…")}</span>
 			<div
 				aria-hidden="true"
 				className="flex h-14 shrink-0 items-center justify-between px-5"

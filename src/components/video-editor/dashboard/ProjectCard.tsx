@@ -6,6 +6,7 @@ import { Dropdown } from "@heroui/react";
 import { Check, DotsThree, FolderSimple, Plus } from "@/components/ui/icons";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useScopedT } from "@/contexts/I18nContext";
 import { getProjectShareLink, moveProjectShareLink } from "../cloud/projectShareLinks";
 import type { ProjectLibraryEntry } from "../ProjectBrowserDialog";
 import { ProjectThumbnail } from "./ProjectThumbnail";
@@ -45,6 +46,7 @@ export function ProjectCard({
 	save,
 	assignFolder,
 }: Props) {
+	const t = useScopedT("common");
 	const [hovering, setHovering] = useState(false);
 	const [editing, setEditing] = useState(false);
 	const renaming = useRef(false);
@@ -129,7 +131,11 @@ export function ProjectCard({
 							<input
 								autoFocus
 								onFocus={(event) => event.currentTarget.select()}
-								aria-label={entry.rawSource ? "Raw file name" : "Project name"}
+								aria-label={
+									entry.rawSource
+										? t("dashboard.projectCard.rawFileName", "Raw file name")
+										: t("dashboard.projectCard.projectName", "Project name")
+								}
 								className="inline-project-name h-5 w-full pr-8 text-[12px] font-medium"
 								value={name}
 								disabled={busy}
@@ -161,12 +167,14 @@ export function ProjectCard({
 						</p>
 						{webUrl && (
 							<Globe
-								aria-label="Web project"
+								aria-label={t("dashboard.projectCard.webProject", "Web project")}
 								className="size-3.5 text-muted-foreground"
 							/>
 						)}
 						{webUrl && !webReady && (
-							<span className="text-xs text-muted-foreground">Incomplete upload</span>
+							<span className="text-xs text-muted-foreground">
+								{t("dashboard.projectCard.incompleteUpload", "Incomplete upload")}
+							</span>
 						)}
 						{!webUrl && (
 							<>
@@ -179,14 +187,23 @@ export function ProjectCard({
 									<Button
 										variant="ghost"
 										size="sm"
-										aria-label={`Add folder to ${entry.name}`}
+										aria-label={t(
+											"dashboard.projectCard.addFolderTo",
+											"Add folder to {{name}}",
+											{ name: entry.name },
+										)}
 										className="h-6 min-w-0 shrink-0 gap-1.5 rounded-full px-2.5 text-[11px] text-muted-foreground opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100"
 									>
 										<Plus className="size-3" />
-										Add folder
+										{t("dashboard.projectCard.addFolder", "Add folder")}
 									</Button>
 									<Dropdown.Popover>
-										<Dropdown.Menu aria-label="Assign project folder">
+										<Dropdown.Menu
+											aria-label={t(
+												"dashboard.projectCard.assignFolderLabel",
+												"Assign project folder",
+											)}
+										>
 											{folders.map((item) => (
 												<Dropdown.Item
 													key={item.id}
@@ -213,12 +230,18 @@ export function ProjectCard({
 														assignFolder(entry.path, "none")
 													}
 												>
-													Remove from all folders
+													{t(
+														"dashboard.projectCard.removeFromAllFolders",
+														"Remove from all folders",
+													)}
 												</Dropdown.Item>
 											)}
 											{!folders.length && (
 												<Dropdown.Item id="empty" isDisabled>
-													Create a folder in the sidebar
+													{t(
+														"dashboard.projectCard.createFolderHint",
+														"Create a folder in the sidebar",
+													)}
 												</Dropdown.Item>
 											)}
 										</Dropdown.Menu>
@@ -232,23 +255,30 @@ export function ProjectCard({
 					<Button
 						variant="ghost"
 						size="icon"
-						aria-label={`Options for ${entry.name}`}
+						aria-label={t("dashboard.projectCard.optionsFor", "Options for {{name}}", {
+							name: entry.name,
+						})}
 						className="absolute right-0 top-5 size-6 min-w-6 text-muted-foreground"
 					>
 						<DotsThree weight="bold" className="size-5" />
 					</Button>
 					<Dropdown.Popover>
-						<Dropdown.Menu aria-label="Project options">
+						<Dropdown.Menu
+							aria-label={t(
+								"dashboard.projectCard.projectOptions",
+								"Project options",
+							)}
+						>
 							<Dropdown.Item
 								id="open"
 								isDisabled={Boolean(webUrl) && !webReady}
 								onAction={() => openEntry(entry)}
 							>
 								{webUrl
-									? "Open link"
+									? t("dashboard.projectCard.openLink", "Open link")
 									: entry.rawSource
-										? "Preview file"
-										: "Open project"}
+										? t("dashboard.projectCard.previewFile", "Preview file")
+										: t("dashboard.projectCard.openProject", "Open project")}
 							</Dropdown.Item>
 							{!webUrl && (
 								<>
@@ -256,10 +286,12 @@ export function ProjectCard({
 										id="rename"
 										onAction={() => {
 											setName(entry.name);
-											requestAnimationFrame(() => requestAnimationFrame(() => setEditing(true)));
+											requestAnimationFrame(() =>
+												requestAnimationFrame(() => setEditing(true)),
+											);
 										}}
 									>
-										Rename
+										{t("actions.rename", "Rename")}
 									</Dropdown.Item>
 									{!entry.rawSource && (
 										<Dropdown.Item
@@ -274,13 +306,22 @@ export function ProjectCard({
 												})
 											}
 										>
-											{shareUrl ? "View in web" : "Share"}
+											{shareUrl
+												? t(
+														"dashboard.projectCard.viewInWeb",
+														"View in web",
+													)
+												: t("dashboard.projectCard.share", "Share")}
 										</Dropdown.Item>
 									)}
 									<Dropdown.Item
 										aria-label={
 											entry.rawSource
-												? `Show ${entry.name} in folder`
+												? t(
+														"dashboard.projectCard.showInFolderLabel",
+														"Show {{name}} in folder",
+														{ name: entry.name },
+													)
 												: undefined
 										}
 										id="reveal"
@@ -290,7 +331,7 @@ export function ProjectCard({
 											})
 										}
 									>
-										Show in folder
+										{t("dashboard.projectCard.showInFolder", "Show in folder")}
 									</Dropdown.Item>
 								</>
 							)}
@@ -303,10 +344,19 @@ export function ProjectCard({
 									onAction={onDelete}
 								>
 									{webUrl
-										? "Delete recording"
+										? t(
+												"dashboard.projectCard.deleteRecording",
+												"Delete recording",
+											)
 										: entry.rawSource
-											? "Remove from library"
-											: "Delete project"}
+											? t(
+													"dashboard.projectCard.removeFromLibrary",
+													"Remove from library",
+												)
+											: t(
+													"dashboard.projectCard.deleteProject",
+													"Delete project",
+												)}
 								</Dropdown.Item>
 							)}
 						</Dropdown.Menu>

@@ -12,7 +12,8 @@
 		"modeAuto": "Auto",
 		"modeManual": "Manual",
 		"modeManualDescription": "Set a fixed focus point for this zoom",
-		"modeAutoDescription": "Camera recenters when the cursor nears the edge of the zoomed view"
+		"modeAutoDescription": "Camera recenters when the cursor nears the edge of the zoomed view",
+		"modeAria": "Zoom mode"
 	},
 	"trim": {
 		"deleteRegion": "Delete Trim Region"
@@ -157,6 +158,8 @@
 		"paddingBottom": "Bottom",
 		"paddingLeft": "Left",
 		"paddingRight": "Right",
+		"linkPaddingSides": "Link padding sides",
+		"customEffectColor": "Custom effect color",
 		"removeBackground": "Remove background"
 	},
 	"sections": {
@@ -182,6 +185,28 @@
 		"generateFull": "Generate Captions",
 		"regenerateFull": "Regenerate Captions",
 		"clearFull": "Clear Captions",
+		"modelDownloadingAria": "Downloading caption model",
+		"whisperExecutableSelected": "Whisper executable selected",
+		"whisperModelSelected": "Whisper model selected",
+		"whisperModelDeleted": "Whisper small model deleted",
+		"whisperModelDownloadFailed": "Failed to download Whisper small model",
+		"whisperModelDeleteFailed": "Failed to delete Whisper small model",
+		"whisperModelMissing": "Select a Whisper model or download the small model first",
+		"noSourceVideo": "No source video is loaded",
+		"recordingChanged": "Recording changed; generated captions were not applied.",
+		"generateFailed": "Failed to generate captions",
+		"generatedCount": "Generated {{count}} captions",
+		"editSaved": "Caption updated",
+		"languageAutoDetect": "Auto Detect",
+		"languageEnglish": "English",
+		"languageSpanish": "Spanish",
+		"languageFrench": "French",
+		"languageGerman": "German",
+		"languageItalian": "Italian",
+		"languagePortuguese": "Portuguese",
+		"languageChineseSimplified": "Chinese (Simplified)",
+		"languageJapanese": "Japanese",
+		"languageKorean": "Korean",
 		"fontSettings": "Font Settings",
 		"defaultFont": "Default",
 		"fontFamily": "Font",
@@ -224,7 +249,12 @@
 		"uploadCustom": "Upload Custom",
 		"uploadSuccess": "Custom image uploaded successfully!",
 		"uploadError": "Please upload a JPG or JPEG image file.",
-		"uploadErrorDescription": "Only JPG and JPEG images are supported."
+		"uploadErrorDescription": "Only JPG and JPEG images are supported.",
+		"customColor": "Custom color",
+		"videoUnsupportedFormat": "Unsupported format",
+		"videoUnsupportedFormatDescription": "Please select a video file (mp4, webm, mov, etc.)",
+		"videoAdded": "Video background added",
+		"videoImportFailed": "Failed to import video background"
 	},
 	"export": {
 		"title": "Export",
@@ -258,5 +288,37 @@
 		"micLabel": "Source Mic",
 		"mixedLabel": "Source",
 		"deleteRegion": "Delete Audio"
+	},
+	"settingsSections": {
+		"aria": "Settings sections",
+		"regionAria": "{{section}} settings",
+		"general": "General",
+		"motion": "Motion",
+		"recording": "Recording",
+		"files": "Files",
+		"advanced": "Advanced"
+	},
+	"onboarding": {
+		"title": "Onboarding",
+		"show": "Show onboarding"
+	},
+	"dashboard": {
+		"title": "Settings",
+		"settingsAria": "Dashboard settings",
+		"openVideoOrProject": "Open video or project",
+		"openFile": "Open file",
+		"recordingsFolder": "Recordings folder",
+		"changeRecordingsFolderFailed": "Could not change recordings folder",
+		"changeFolder": "Change folder",
+		"hideHud": "Hide HUD from recordings",
+		"hideHudDescription": "Only while recording. The idle HUD stays visible in captures.",
+		"updateCaptureProtectionFailed": "Could not update capture protection",
+		"previewUpdateUi": "Preview update UI",
+		"preview": "Preview",
+		"projectsFolder": "Projects folder",
+		"projectsFolderDescription": "Named projects save automatically.",
+		"openProjectsFolderFailed": "Could not open projects folder",
+		"showFolder": "Show folder",
+		"projectsNote": "Named projects save automatically. Previews refresh when you return to Projects."
 	}
 }

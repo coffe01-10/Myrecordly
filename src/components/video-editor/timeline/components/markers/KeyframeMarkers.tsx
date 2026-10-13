@@ -1,6 +1,7 @@
 import { useTimelinePresentation } from "../../core/TimelinePresentation";
 import { getPlayheadDisplayTime, getTimeAtClipSeam } from "../../core/clipPresentation";
 import { useTimelineContext } from "dnd-timeline";
+import { useScopedT } from "@/contexts/I18nContext";
 import React, { useEffect, useState } from "react";
 
 interface Keyframe {
@@ -27,6 +28,7 @@ const KeyframeMarkers: React.FC<KeyframeMarkersProps> = ({
 }) => {
 	const { sidebarWidth, range, valueToPixels, pixelsToValue } = useTimelineContext();
 	const { clips } = useTimelinePresentation();
+	const t = useScopedT("timeline");
 	const [draggingKeyframeId, setDraggingKeyframeId] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -98,7 +100,7 @@ const KeyframeMarkers: React.FC<KeyframeMarkersProps> = ({
 							e.stopPropagation();
 							setSelectedKeyframeId(kf.id);
 						}}
-						title={`Keyframe @ ${Math.round(kf.time)}ms (drag to move, Delete/Backspace to remove)`}
+						title={t("keyframe.title", undefined, { time: Math.round(kf.time) })}
 					>
 						<div
 							style={{

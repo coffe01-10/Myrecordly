@@ -8,6 +8,7 @@
 		"copyFailed": "无法复制链接，请选中后手动复制。",
 		"copied": "已复制",
 		"copy": "复制",
+		"copyLink": "复制链接",
 		"preparing": "正在准备当前剪辑…",
 		"createLink": "创建链接",
 		"heading": "分享到云端",
@@ -15,10 +16,22 @@
 		"openPage": "打开分享页面",
 		"notes": "备注",
 		"publish": "发布并创建链接",
+		"publishButton": "发布",
+		"publishDestination": "发布目标",
+		"link": "链接",
+		"local": "本地",
 		"createLinkTitle": "创建可分享的链接",
 		"notesPlaceholder": "为观看者添加背景信息、说明或简短摘要…",
 		"description": "将当前剪辑发布到 Recordly 观看和反馈页面，无需下载。分享的视频最高为 1080p。",
 		"uploading": "正在上传… {progress}%",
+		"uploadingProgress": "正在上传 · {{progress}}%",
+		"share": "分享",
+		"signInToShare": "登录后分享",
+		"linkExpiry": "免费套餐的链接将在 14 天后过期。",
+		"linkSaveFailed": "分享已创建，但无法在本地保存链接",
+		"sharingUnavailable": "此版本尚不支持云端分享。",
+		"capacityCheckFailed": "无法检查云端存储，请重试。",
+		"recordingLimit": "你已有 5 个云端录制。请先在“已分享”中删除一个再分享。",
 		"googleUnavailable": "尚未启用 Google 登录。请使用邮箱，或请 Recordly 管理员连接 Google。",
 		"xUnavailable": "尚未启用 X 登录。请使用邮箱，或请 Recordly 管理员连接 X。",
 		"providerUnavailable": "尚未启用此登录方式，请先使用邮箱。",
@@ -42,6 +55,62 @@
 		"addingVideo": "正在添加视频…",
 		"preparingFootage": "正在为时间轴准备视频和音频。"
 	},
+	"signIn": {
+		"welcome": "欢迎使用 Recordly",
+		"yourAccount": "你的账户",
+		"tagline": "精美、可分享的屏幕录制",
+		"signInToStart": "登录以开始使用",
+		"continue": "继续",
+		"continueWithout": "不登录直接继续",
+		"continueWith": "使用 {{provider}} 继续",
+		"orContinueWithEmail": "或使用邮箱继续",
+		"emailPlaceholder": "you@example.com",
+		"sendingLink": "正在发送登录链接…",
+		"emailMagicLink": "通过邮件发送登录链接",
+		"microsoftUnavailable": "暂不支持 Microsoft 登录。",
+		"githubUnavailable": "暂不支持 GitHub 登录。",
+		"emailUnavailable": "暂不支持邮箱登录。",
+		"checkInbox": "请查收邮件以验证邮箱并继续使用 Recordly。请在此电脑上打开链接，并保持 Recordly 运行。"
+	},
+	"clips": {
+		"title": "片段",
+		"library": "片段库",
+		"actions": "片段库操作",
+		"moveAllToTrash": "全部移到废纸篓",
+		"close": "关闭片段",
+		"search": "搜索视频",
+		"searchPlaceholder": "搜索视频",
+		"selectAll": "全选视频",
+		"selected": "已选择 {{count}} 个",
+		"recordingsOne": "{{count}} 个录制",
+		"recordingsMany": "{{count}} 个录制",
+		"moveSelectedToTrash": "将所选视频移到废纸篓",
+		"moveSelectedToTrashTitle": "将所选移到废纸篓",
+		"loading": "正在加载视频…",
+		"retry": "重试",
+		"emptySearch": "没有匹配的视频",
+		"emptySearchHint": "请尝试其他搜索词。",
+		"emptyNone": "你的录制将显示在这里",
+		"emptyNoneHint": "录制一个视频即可开始。",
+		"select": "选择 {{name}}",
+		"addToTimeline": "将 {{name}} 添加到时间轴",
+		"addToTimelineTitle": "添加到时间轴",
+		"movedToTrash": "已移到废纸篓",
+		"dragHint": "拖到时间轴，或点击 + 添加。",
+		"undo": "撤销",
+		"undoTitle": "撤销 (⌘Z / Ctrl+Z)",
+		"removeFailed": "无法移除视频：{{error}}",
+		"restoreFailed": "无法恢复视频：{{error}}",
+		"importCancelFailed": "无法停止导入处理：{{error}}",
+		"addedOne": "视频已添加到时间轴",
+		"addedMany": "已将 {{count}} 个视频添加到时间轴",
+		"addFailed": "无法添加视频：{{error}}",
+		"projectChanged": "导入过程中项目已更改，请重新添加录制。",
+		"finalizeFailed": "无法完成导入的媒体",
+		"thumbnailPreview": "{{name}} 的预览",
+		"thumbnailUnavailable": "预览不可用",
+		"thumbnailLoading": "正在加载预览图"
+	},
 	"library": {
 		"videos": "视频"
 	},
@@ -51,7 +120,13 @@
 		"skipBack": "后退",
 		"skipForward": "前进",
 		"muteUnmute": "静音/取消静音",
-		"volume": "预览音量"
+		"volume": "预览音量",
+		"editCaption": "编辑当前字幕",
+		"videoLoadFailed": "无法加载视频（{{detail}}）",
+		"videoErrorFormat": "格式不受支持",
+		"videoErrorNetwork": "网络错误",
+		"videoErrorDecode": "解码错误",
+		"videoErrorCode": "错误码 {{code}}"
 	},
 	"annotations": {
 		"settings": "注释设置",
@@ -89,9 +164,13 @@
 		"imageUploadError": "请上传 JPG、PNG、GIF 或 WebP 图片文件。",
 		"blurStrength": "模糊强度: {{strength}}",
 		"solidColor": "纯色 (审查)",
-		"borderRadius": "边框半径"
+		"borderRadius": "边框半径",
+		"imageAlt": "注释",
+		"noImage": "无图片",
+		"noArrowData": "无箭头数据",
+		"typeLabel": "注释类型",
+		"uploadedAlt": "已上传的注释"
 	},
-
 	"fontStyles": {
 		"classic": "经典",
 		"editor": "编辑器",
@@ -159,17 +238,76 @@
 	},
 	"project": {
 		"untitled": "未命名",
+		"untitledProject": "未命名项目",
 		"unsavedChangesTitle": "未保存的更改",
 		"unsavedChangesDescription": "在{{action}}之前保存当前项目吗？",
+		"actionOpenProject": "打开另一个项目",
+		"actionImportFile": "导入文件",
 		"discardChanges": "放弃更改",
-		"saveProject": "保存项目"
+		"saveProject": "保存项目",
+		"home": "主页",
+		"renameTitle": "重命名项目",
+		"renameInput": "项目名称",
+		"noVideoLoaded": "未加载视频",
+		"saveCanceled": "项目保存已取消",
+		"saveFailed": "保存项目失败",
+		"saveError": "无法保存项目：{{error}}",
+		"nameRequired": "项目名称为必填项",
+		"renamePreferencesFailed": "项目已重命名，但无法更新库首选项",
+		"loadFailed": "加载项目失败",
+		"invalidFormat": "无法加载项目：项目文件格式无效",
+		"loadError": "无法加载项目：{{error}}",
+		"importFailed": "导入文件失败",
+		"loadedFrom": "项目已从 {{path}} 加载",
+		"loaded": "项目已加载",
+		"noMediaSelected": "未选择媒体文件",
+		"mediaLoadFailed": "无法加载媒体",
+		"mediaImported": "媒体已导入",
+		"fileLoadError": "无法加载文件：{{error}}",
+		"mediaError": "无法加载项目媒体",
+		"renameFailed": "无法重命名项目",
+		"libraryLoadFailed": "无法加载项目库"
 	},
 	"exportTips": {
 		"autoZooms": "提示：可在设置中关闭自动应用的缩放",
 		"experimentalBuilds": "提示：可在设置中开启实验版本访问权限",
 		"cursorAppearance": "提示：你可以自定义光标外观"
 	},
-	"account": { "title": "账户", "comingSoon": "账户功能即将推出" },
+	"account": {
+		"title": "账户",
+		"comingSoon": "账户功能即将推出"
+	},
+	"sidebar": {
+		"recordlyAccount": "Recordly 账户",
+		"advanced": "高级",
+		"advancedSettings": "高级设置"
+	},
+	"extensions": {
+		"title": "扩展功能已不再可用",
+		"description": "扩展安装和应用市场访问已停用。此区域仅作为现有项目和导航的占位保留。"
+	},
+	"loading": {
+		"editor": "正在加载编辑器",
+		"editorEllipsis": "正在加载编辑器…"
+	},
+	"preview": {
+		"loadingPreview": "正在加载预览"
+	},
+	"presets": {
+		"open": "打开预设",
+		"label": "预设",
+		"popoverLabel": "预设",
+		"saveCurrentAs": "将当前预设另存为",
+		"namePlaceholder": "预设名称",
+		"savedList": "已保存的预设",
+		"empty": "尚无预设。",
+		"deleteAriaLabel": "删除预设 {{name}}"
+	},
+	"audio": {
+		"sourceLoadFailed": "无法加载配套音频源：{{error}}",
+		"sourcesLoadFailed": "无法加载配套音频源：{{error}}",
+		"sourcesLoadFailedHint": "无法加载配套音频源。播放和导出可能会缺少麦克风音频。"
+	},
 	"nativeCaptureUnavailable": {
 		"title": "没有出错，但我们无法渲染动画光标叠加层。",
 		"description": "你的设备不支持原生捕获。这可能是由我们尚未确定的多种原因造成的。Recordly 仍可继续运行，但无法进行光标平滑处理。",
@@ -182,10 +320,39 @@
 		"completePercent": "已完成 {{percent}}%",
 		"issue": "导出问题",
 		"complete": "导出完成",
-		"savedSuccessfully": "文件已成功保存。"
+		"savedSuccessfully": "文件已成功保存。",
+		"exportTooSlow": "导出太慢？取消并试试闪电导出！",
+		"runtimePath": "路径：{{path}}",
+		"errorCopied": "错误已复制",
+		"errorCopyFailed": "无法复制。请选中错误文本后手动复制。",
+		"copyError": "复制错误"
 	},
 	"export": {
-		"processingAudioEdits": "正在处理带有速度/叠加编辑的音频"
+		"processingAudioEdits": "正在处理带有速度/叠加编辑的音频",
+		"noVideoLoaded": "未加载视频",
+		"videoNotReady": "视频未就绪",
+		"metadataLoading": "视频元数据仍在加载",
+		"prepareGifFailed": "无法准备用于分享的 GIF。",
+		"prepareVideoFailed": "无法准备用于分享的视频。",
+		"saveCanceled": "保存对话框已取消。点击“再次保存”即可无需重新渲染直接保存。",
+		"saveCanceledToast": "保存已取消。你可以无需重新导出再次保存。",
+		"saveGifFailed": "保存 GIF 失败",
+		"gifExportFailed": "GIF 导出失败",
+		"exportProducedNoOutput": "导出未产生输出",
+		"saveVideoFailed": "保存视频失败",
+		"exportFailed": "导出失败",
+		"exportFailedWithError": "导出失败：{{error}}",
+		"unknownError": "未知错误"
+	},
+	"exportDialog": {
+		"exportCanceled": "导出已取消",
+		"noPendingSave": "没有待保存的导出",
+		"saveCanceledTryAgain": "保存已取消。你可以重试。"
+	},
+	"exportRunner": {
+		"exportedTo": "已成功导出到 {{path}}",
+		"revealFailed": "无法在文件夹中显示项目。",
+		"revealError": "在文件夹中显示时出错：{{error}}"
 	},
 	"toolbar": {
 		"addLayer": "添加图层",

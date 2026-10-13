@@ -1,12 +1,12 @@
 import { Card, Chip, ProgressBar } from "@heroui/react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	ArrowClockwiseIcon,
 	CheckCircleIcon,
 	DownloadSimpleIcon,
 	WarningCircleIcon,
 } from "@/components/ui/icons";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useI18n } from "@/contexts/I18nContext";
 import styles from "./UpdateToastWindow.module.css";
 
@@ -158,7 +158,11 @@ export function UpdateToastWindow({
 
 	return (
 		<div className={`${styles.window} launch-theme`}>
-			<Card className="w-full flex-row gap-3" aria-live="polite" aria-label="Recordly update">
+			<Card
+				className="w-full flex-row gap-3"
+				aria-live="polite"
+				aria-label={t("launch.updateToast.windowLabel", "Recordly update")}
+			>
 				<div
 					className={`${styles.icon} ${payload.phase === "error" ? styles.iconError : ""}`}
 				>
@@ -184,7 +188,13 @@ export function UpdateToastWindow({
 
 					{payload.phase === "downloading" ? (
 						<div className={styles.progressBlock}>
-							<ProgressBar aria-label="Downloading update" value={progress}>
+							<ProgressBar
+								aria-label={t(
+									"launch.updateToast.downloadingProgressLabel",
+									"Downloading update",
+								)}
+								value={progress}
+							>
 								<ProgressBar.Track>
 									<ProgressBar.Fill />
 								</ProgressBar.Track>
