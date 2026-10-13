@@ -1,4 +1,8 @@
 {
+	"theme": {
+		"light": "Claro",
+		"dark": "Oscuro"
+	},
 	"cloud": {
 		"signInRequired": "Inicia sesión en Recordly antes de crear un enlace compartido.",
 		"prepareFailed": "No se pudo preparar la edición actual para compartirla.",

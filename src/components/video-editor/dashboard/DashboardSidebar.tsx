@@ -43,7 +43,7 @@ export function DashboardSidebar({
 		<>
 			<aside
 				aria-label={t("dashboard.sidebar.navigation", "Library navigation")}
-				className="flex w-48 shrink-0 flex-col bg-transparent px-4 pb-5 pt-12 lg:w-56"
+				className="dashboard-navigation flex w-48 shrink-0 flex-col bg-transparent px-4 pb-5 pt-12 lg:w-56"
 			>
 				<div className="mb-4 flex h-10 items-center gap-2.5 px-3">
 					<img

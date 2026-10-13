@@ -1,4 +1,8 @@
 {
+	"theme": {
+		"light": "Licht",
+		"dark": "Donker"
+	},
 	"cloud": {
 		"signInRequired": "Meld je aan bij Recordly voordat je een deellink maakt.",
 		"prepareFailed": "De huidige montage kon niet worden voorbereid om te delen.",

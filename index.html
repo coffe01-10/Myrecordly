@@ -40,15 +40,15 @@
     </script>
     <style>
       .boot-shell { display: none; }
-      html[data-window-type="editor"] { background: #f6f6f7; }
-      html[data-window-type="editor"][data-theme="dark"] { background: #171719; }
+      html[data-window-type="editor"] { background: #f2f3f7; }
+      html[data-window-type="editor"][data-theme="dark"] { background: #0b0c0d; }
       html[data-window-type="editor"] .boot-shell {
         --boot-block: #e5e5e9;
         position: fixed; inset: 0; display: flex; flex-direction: column;
         padding: 0 20px 20px; gap: 16px; box-sizing: border-box;
-        background: #f6f6f7; overflow: hidden;
+        background: #f2f3f7; overflow: hidden;
       }
-      html[data-theme="dark"] .boot-shell { --boot-block: #303034; background: #171719; }
+      html[data-theme="dark"] .boot-shell { --boot-block: #303034; background: #0b0c0d; }
       .boot-shell i { display: block; background: var(--boot-block); border-radius: 8px; }
       .boot-header { height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
       .boot-header i { width: 96px; height: 28px; }
@@ -56,7 +56,7 @@
       .boot-body { display: flex; flex: 1; min-height: 0; gap: 20px; }
       .boot-rail { width: 28px; display: flex; flex-direction: column; gap: 16px; }
       .boot-rail i { height: 32px; flex-shrink: 0; }
-      .boot-settings { width: min(28vw, 320px); padding: 20px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box; }
+      .boot-settings { order: 3; border: 1px solid #80808020; border-radius: 24px; width: min(28vw, 320px); padding: 20px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box; }
       .boot-settings i { height: 20px; }
       .boot-settings i:nth-child(3) { height: 140px; }
       .boot-preview { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }

@@ -1,4 +1,8 @@
 {
+	"theme": {
+		"light": "Light",
+		"dark": "Dark"
+	},
 	"cloud": {
 		"signInRequired": "Sign in to Recordly before creating a shared link.",
 		"prepareFailed": "Could not prepare the current edit for sharing.",

@@ -1,4 +1,8 @@
 {
+	"theme": {
+		"light": "Chiaro",
+		"dark": "Scuro"
+	},
 	"cloud": {
 		"signInRequired": "Accedi a Recordly prima di creare un link condiviso.",
 		"prepareFailed": "Impossibile preparare il montaggio attuale per la condivisione.",

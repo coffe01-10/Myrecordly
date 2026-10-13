@@ -29,13 +29,13 @@ export function WallpaperGrid({
 	isSelected: (value: string, previewUrl?: string) => boolean;
 }) {
 	return (
-		<div className="grid grid-cols-5 gap-2">
+		<div className="wallpaper-gallery grid grid-cols-3 gap-2">
 			<Button
 				variant="secondary"
 				isIconOnly
 				aria-label={addLabel}
 				onPress={onAdd}
-				className="aspect-[4/3] h-auto w-full min-w-0 rounded-md p-0 text-muted"
+				className="aspect-[4/3] h-auto w-full min-w-0 rounded-xl p-0 text-muted"
 			>
 				<Plus className="size-4" />
 			</Button>
@@ -47,7 +47,7 @@ export function WallpaperGrid({
 							isSelected={selected}
 							aria-label={item.label}
 							onChange={() => onSelect(item.value)}
-							className="relative aspect-[4/3] h-auto w-full min-w-0 overflow-hidden rounded-md p-0"
+							className="relative aspect-[4/3] h-auto w-full min-w-0 overflow-hidden rounded-xl p-0"
 						>
 							{isVideoWallpaperSource(item.previewUrl) ? (
 								<WallpaperVideoPreview src={item.previewUrl} />

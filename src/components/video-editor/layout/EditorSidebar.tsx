@@ -59,22 +59,22 @@ export function EditorSidebar({
 			},
 			{
 				id: "settings" as const,
-				label: t("settings.sections.settings", "Settings"),
+				label: t("common.dashboard.sidebar.settings", "Settings"),
 				icon: Gear,
 			},
 		],
 		[t],
 	);
 	return (
-		<div className="flex min-h-0 shrink-0 pb-3 pr-2">
+		<div className="editor-sidebar">
 			<nav
 				aria-label={t("settings.sections.title", "Editor tools")}
-				className="flex w-16 shrink-0 flex-col items-center gap-3 py-2.5"
+				className="editor-tool-rail flex shrink-0 flex-col items-center gap-2"
 			>
 				<ToggleButtonGroup
 					orientation="vertical"
 					isDetached
-					className="w-full items-center gap-2"
+					className="w-full items-center gap-1"
 					selectionMode="single"
 					disallowEmptySelection
 					selectedKeys={panelContent ? [] : [activeSection]}
@@ -88,7 +88,7 @@ export function EditorSidebar({
 							<ToggleButton
 								id={section.id}
 								variant="ghost"
-								isIconOnly
+								className="editor-tool-button"
 								aria-label={section.label}
 							>
 								<section.icon
@@ -99,6 +99,7 @@ export function EditorSidebar({
 									}
 									className="size-5"
 								/>
+								<span className="editor-tool-label">{section.label}</span>
 							</ToggleButton>
 							<Tooltip.Content placement="right">{section.label}</Tooltip.Content>
 						</Tooltip>
@@ -108,7 +109,7 @@ export function EditorSidebar({
 					<Button
 						variant="ghost"
 						isIconOnly
-						className="mt-auto"
+						className="editor-account-button mt-1"
 						aria-label={t("editor.sidebar.recordlyAccount", "Recordly account")}
 						onPress={onAccountClick}
 					>
@@ -121,9 +122,9 @@ export function EditorSidebar({
 			</nav>
 			<aside
 				aria-label={panelContent ? "Clips" : undefined}
-				className="editor-inspector [--text-sm:0.8125rem] [--text-base:0.8125rem] flex w-[320px] min-h-0 flex-col"
+				className="editor-inspector [--text-sm:0.8125rem] [--text-base:0.8125rem] flex min-w-0 min-h-0 flex-col"
 			>
-				<Card className="min-h-0 flex-1 gap-0 overflow-hidden p-0">
+				<Card className="editor-inspector-card min-h-0 flex-1 gap-0 overflow-hidden p-0">
 					{panelContent ?? (
 						<>
 							<header className="flex min-h-14 shrink-0 items-center justify-between gap-3 px-5 py-3">

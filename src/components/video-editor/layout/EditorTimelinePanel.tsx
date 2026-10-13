@@ -62,7 +62,7 @@ export function EditorTimelinePanel(props: Props) {
 			ref={props.panelRef}
 			tabIndex={-1}
 			data-timeline-panel
-			className="outline-none flex flex-shrink-0 flex-col bg-transparent px-4 pb-4 pt-2"
+			className="editor-timeline-panel outline-none flex flex-shrink-0 flex-col"
 			style={{ height: "22%", minHeight: 180, maxHeight: 280 }}
 		>
 			<TimelineEditor

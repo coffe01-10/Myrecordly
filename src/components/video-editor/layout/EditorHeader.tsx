@@ -1,10 +1,13 @@
 import { Separator } from "@heroui/react";
 import type { CSSProperties, FormEvent, RefObject } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 import { FeedbackDialog } from "@/components/feedback/FeedbackDialog";
 import { Button } from "@/components/ui/button";
 import {
 	FilmStrip,
 	House,
+	MoonIcon,
+	SunIcon,
 	ArrowClockwise as Redo2,
 	ArrowCounterClockwise as Undo2,
 } from "@/components/ui/icons";
@@ -62,6 +65,7 @@ type Props = {
 };
 
 export function EditorHeader(props: Props) {
+	const { theme, toggleTheme } = useTheme();
 	const {
 		t,
 		headerLeftControlsPaddingClass,
@@ -223,6 +227,15 @@ export function EditorHeader(props: Props) {
 				</div>
 				{SHOW_PRESETS_BUTTON && <EditorPresetMenu t={t} presets={presets} />}
 				<FeedbackDialog />
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={toggleTheme}
+					aria-label={t(theme === "dark" ? "editor.theme.light" : "editor.theme.dark")}
+					title={t(theme === "dark" ? "editor.theme.light" : "editor.theme.dark")}
+				>
+					{theme === "dark" ? <SunIcon className="size-5" /> : <MoonIcon className="size-5" />}
+				</Button>
 				<EditorExportMenu
 					t={t}
 					exportSettings={exportSettings}

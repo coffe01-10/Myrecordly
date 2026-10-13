@@ -1147,7 +1147,7 @@ export default function TimelineCanvas({
 				minHeight: timelineContentMinHeightPx,
 				overflow: "visible",
 			}}
-			className="select-none bg-editor-bg relative cursor-pointer group flex flex-col"
+			className="select-none bg-editor-panel relative cursor-pointer group flex flex-col"
 			onMouseDown={handleTimelineMouseDown}
 			onClick={handleTimelineClick}
 			onMouseEnter={handleTimelineMouseEnter}

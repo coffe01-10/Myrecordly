@@ -14,19 +14,19 @@ export function EditorLoadingSkeleton() {
 			<span className="sr-only">{t("loading.editorEllipsis", "Loading editor…")}</span>
 			<div
 				aria-hidden="true"
-				className="flex h-14 shrink-0 items-center justify-between px-5"
+				className="flex h-16 shrink-0 items-center justify-between px-5"
 			>
 				<Skeleton className="h-7 w-24 rounded-lg" />
 				<Skeleton className="h-4 w-36" />
 				<Skeleton className="h-8 w-24 rounded-full" />
 			</div>
-			<div aria-hidden="true" className="flex min-h-0 flex-1 pt-3">
-				<div className="flex w-16 shrink-0 flex-col items-center gap-3 py-2.5">
+			<div aria-hidden="true" className="editor-workspace min-h-0 flex-1">
+				<div className="editor-tool-rail flex flex-col items-center gap-3 py-2.5">
 					{Array.from({ length: 6 }, (_, i) => (
 						<Skeleton key={i} className="size-8 rounded-lg" />
 					))}
 				</div>
-				<Card className="mb-3 min-h-0 w-[320px] shrink-0 gap-7 overflow-hidden p-5">
+				<Card className="editor-inspector-card col-start-3 row-start-1 mt-12 min-h-0 gap-7 overflow-hidden p-5">
 					<Skeleton className="h-4 w-24" />
 					<Skeleton className="h-8 w-full rounded-full" />
 					<div className="grid grid-cols-3 gap-2">
@@ -41,14 +41,14 @@ export function EditorLoadingSkeleton() {
 						</div>
 					))}
 				</Card>
-				<div className="flex min-w-0 flex-1 flex-col gap-4 px-6 py-3">
+				<div className="editor-preview-panel flex min-w-0 flex-col gap-4 px-6 py-3">
 					<Skeleton className="min-h-0 w-full flex-1 rounded-xl" />
 					<Skeleton className="mx-auto h-8 w-48 shrink-0 rounded-full" />
 				</div>
 			</div>
 			<div
 				aria-hidden="true"
-				className="flex shrink-0 flex-col gap-3 px-4 pb-4 pt-2"
+				className="editor-timeline-panel flex shrink-0 flex-col gap-3"
 				style={{ height: "22%", minHeight: 180, maxHeight: 280 }}
 			>
 				<Skeleton className="h-7 w-64 rounded-lg" />

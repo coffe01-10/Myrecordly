@@ -32,7 +32,7 @@ export function ChoiceGroup({
 				}
 			}}
 		>
-			<TagGroup.List className={className ?? "flex flex-wrap gap-2"}>
+			<TagGroup.List className={`settings-choice-list ${className ?? "flex flex-wrap gap-2"}`}>
 				{children}
 			</TagGroup.List>
 		</TagGroup>

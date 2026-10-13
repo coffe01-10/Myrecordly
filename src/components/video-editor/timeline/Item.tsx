@@ -373,7 +373,7 @@ export default function Item({
 								"relative z-10 flex max-w-full items-center justify-center gap-1 px-1 text-[11px] font-medium text-black/70 dark:text-white/90 select-none overflow-hidden",
 								isClip &&
 									"rounded bg-black/65 px-2 py-1 text-white dark:text-white",
-								(isZoom || embedded) && "text-white dark:text-white",
+								(isZoom || embedded) && "text-inherit",
 								embedded && "w-full justify-start px-2",
 							)}
 						>

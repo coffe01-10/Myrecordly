@@ -1,4 +1,8 @@
 {
+	"theme": {
+		"light": "淺色",
+		"dark": "深色"
+	},
 	"cloud": {
 		"signInRequired": "建立分享連結前，請先登入 Recordly。",
 		"prepareFailed": "無法準備目前的剪輯以供分享。",

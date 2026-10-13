@@ -76,7 +76,7 @@ export function ProjectCard({
 		});
 	};
 	return (
-		<li className="group min-w-0">
+		<li className="dashboard-project-card group min-w-0">
 			<Button
 				variant="ghost"
 				disabled={busy || (Boolean(webUrl) && !webReady)}
@@ -112,7 +112,7 @@ export function ProjectCard({
 				)}
 				{selecting && (
 					<span
-						className={`absolute right-2 top-2 flex size-5 items-center justify-center rounded-md ${selected.includes(entry.path) ? "bg-accent text-white" : "bg-background/90"}`}
+						className={`absolute right-2 top-2 flex size-5 items-center justify-center rounded-md ${selected.includes(entry.path) ? "bg-accent text-accent-foreground" : "bg-background/90"}`}
 					>
 						{selected.includes(entry.path) && <Check className="size-3.5" />}
 					</span>

@@ -118,10 +118,10 @@ export function EditorPreviewPanel(props: Props) {
 	} = props;
 
 	return (
-		<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+		<div className="editor-preview-panel flex min-h-0 min-w-0 flex-1 flex-col">
 			<div className="flex min-h-0 flex-1 flex-col">
 				<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-					<div className="flex h-10 shrink-0 items-center justify-center gap-3">
+					<div className="editor-canvas-toolbar flex shrink-0 items-center justify-center gap-2">
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button
@@ -144,7 +144,7 @@ export function EditorPreviewPanel(props: Props) {
 									>
 										<span>{getAspectRatioLabel(ratio)}</span>
 										{aspectRatio === ratio ? (
-											<Check className="h-3 w-3 text-[#2563EB]" />
+											<Check className="h-3 w-3 text-accent" />
 										) : null}
 									</DropdownMenuItem>
 								))}
@@ -160,7 +160,7 @@ export function EditorPreviewPanel(props: Props) {
 							<Crop className="h-3.5 w-3.5" />
 							<span className="font-medium">{t("settings.crop.title")}</span>
 							{isCropped ? (
-								<span className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />
+								<span className="h-1.5 w-1.5 rounded-full bg-accent" />
 							) : null}
 						</Button>
 					</div>

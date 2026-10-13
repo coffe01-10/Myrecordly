@@ -254,7 +254,7 @@ export function EditorShell(props: Props) {
 		);
 
 	return (
-		<div className="flex h-screen flex-col overflow-hidden bg-editor-bg text-foreground selection:bg-accent/20">
+		<div className="editor-shell flex h-screen flex-col overflow-hidden bg-editor-bg text-foreground selection:bg-accent/20">
 			<EditorHeader
 				clipsOpen={library.open}
 				onToggleClips={() => library.setOpen((open) => !open)}
@@ -341,7 +341,7 @@ export function EditorShell(props: Props) {
 						void library.addToTimeline(paths, index);
 				}}
 			>
-				<div className="relative z-10 flex min-h-0 flex-1 pt-3">
+				<div className="editor-workspace relative z-10 min-h-0 flex-1">
 					<EditorSidebar
 						accountUser={auth.user}
 						onAccountClick={() => requestSignIn("account")}
