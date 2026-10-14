@@ -78,7 +78,8 @@ test("Clips supports selection, remove all, undo and real timeline drag insertio
 	expect((await videosButton.boundingBox())!.x).toBeGreaterThan(
 		(await page.getByRole("button", { name: "Rename project", exact: true }).boundingBox())!.x,
 	);
-	expect((await panel.boundingBox())!.x).toBeLessThan(100);
+	// The Clips panel docks in the right-hand inspector column.
+	expect((await panel.boundingBox())!.x).toBeGreaterThan(100);
 	await expect(videosButton).toHaveClass(/button--secondary/);
 	await panel
 		.locator('[data-recording-path="/recordings/first.mp4"] [data-slot="checkbox-control"]')

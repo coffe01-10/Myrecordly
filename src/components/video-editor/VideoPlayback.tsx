@@ -434,6 +434,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		const isGap = !findPreviewClipAtTimelineTime(timelineTime * 1000, clipRegions);
 		const clipRegionsRef = useRef(clipRegions);
 		const clipPlaybackRef = useRef<ReturnType<typeof createClipPlayback> | null>(null);
+		const pendingPlayRef = useRef(false);
 		const onPlaybackErrorRef = useRef(onError);
 		const timelineTimeRef = useRef(timelineTime);
 		useEffect(() => {
@@ -1101,16 +1102,29 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			get isPlaying() {
 				return clipPlaybackRef.current?.isPlaying ?? false;
 			},
-			seekTimeline: (time) => clipPlaybackRef.current?.seek(time),
+			// Seeks issued before the transport exists are staged on timelineTimeRef
+			// and applied when it is created below, instead of being dropped.
+			seekTimeline: (time) => {
+				if (clipPlaybackRef.current) {
+					clipPlaybackRef.current.seek(time);
+				} else {
+					timelineTimeRef.current = time;
+				}
+			},
 			video: videoRef.current,
 			app: appRef.current,
 			videoSprite: videoSpriteRef.current,
 			videoContainer: videoContainerRef.current,
 			containerRef,
 			play: async () => {
-				await clipPlaybackRef.current?.play();
+				if (clipPlaybackRef.current) {
+					await clipPlaybackRef.current.play();
+				} else {
+					pendingPlayRef.current = true;
+				}
 			},
 			pause: () => {
+				pendingPlayRef.current = false;
 				clipPlaybackRef.current?.pause();
 			},
 			cancelCaptionEdit,
@@ -1929,8 +1943,10 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			});
 			clipPlaybackRef.current = transport;
 			transport.seek(timelineTimeRef.current);
-			if (autoPlay)
+			if (autoPlay || pendingPlayRef.current) {
+				pendingPlayRef.current = false;
 				void transport.play().catch((error) => onPlaybackErrorRef.current(String(error)));
+			}
 			const handleSeeked = () => {
 				isSeekingRef.current = false;
 				// A source seek at a contiguous cut must not reset the camera springs.
