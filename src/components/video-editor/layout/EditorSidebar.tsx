@@ -9,7 +9,9 @@ import {
 } from "@heroui/react";
 import type { User } from "@supabase/supabase-js";
 import type { ComponentProps, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
+import { LayoutGroup } from "motion/react";
+import { SelectionHighlight } from "@/components/ui/selection-highlight";
 import { AccountAvatar } from "@/components/ui/account-avatar";
 import { Camera, ClosedCaptioning, Cursor, FrameCorners, Gear } from "@/components/ui/icons";
 import type { useI18n } from "@/contexts/I18nContext";
@@ -36,6 +38,7 @@ export function EditorSidebar({
 	panelContent,
 	onAccountClick,
 }: Props) {
+	const motionScope = useId();
 	const [advancedSections, setAdvancedSections] = useState<Record<string, boolean>>({});
 	const advanced = advancedSections[activeSection] ?? false;
 	const hasAdvanced =
@@ -66,114 +69,120 @@ export function EditorSidebar({
 		[t],
 	);
 	return (
-		<div className="editor-sidebar">
-			<nav
-				aria-label={t("settings.sections.title", "Editor tools")}
-				className="editor-tool-rail flex shrink-0 flex-col items-center gap-2"
-			>
-				<ToggleButtonGroup
-					orientation="vertical"
-					isDetached
-					className="w-full items-center gap-1"
-					selectionMode="single"
-					disallowEmptySelection
-					selectedKeys={panelContent ? [] : [activeSection]}
-					onSelectionChange={(keys) => {
-						const key = Array.from(keys)[0];
-						if (key) setActiveSection(key as EditorEffectSection);
-					}}
+		<LayoutGroup id={motionScope}>
+			<div className="editor-sidebar">
+				<nav
+					aria-label={t("settings.sections.title", "Editor tools")}
+					className="editor-tool-rail flex shrink-0 flex-col items-center gap-2"
 				>
-					{sections.map((section) => (
-						<Tooltip key={section.id}>
-							<ToggleButton
-								id={section.id}
-								variant="ghost"
-								className="editor-tool-button"
-								aria-label={section.label}
-							>
-								<section.icon
-									weight={
-										!panelContent && activeSection === section.id
-											? "fill"
-											: "regular"
-									}
-									className="size-5"
-								/>
-								<span className="editor-tool-label">{section.label}</span>
-							</ToggleButton>
-							<Tooltip.Content placement="right">{section.label}</Tooltip.Content>
-						</Tooltip>
-					))}
-				</ToggleButtonGroup>
-				<Tooltip>
-					<Button
-						variant="ghost"
-						isIconOnly
-						className="editor-account-button mt-1"
-						aria-label={t("editor.sidebar.recordlyAccount", "Recordly account")}
-						onPress={onAccountClick}
+					<ToggleButtonGroup
+						orientation="vertical"
+						isDetached
+						className="w-full items-center gap-1"
+						selectionMode="single"
+						disallowEmptySelection
+						selectedKeys={panelContent ? [] : [activeSection]}
+						onSelectionChange={(keys) => {
+							const key = Array.from(keys)[0];
+							if (key) setActiveSection(key as EditorEffectSection);
+						}}
 					>
-						<AccountAvatar user={accountUser} className="!size-7" />
-					</Button>
-					<Tooltip.Content placement="right">
-						{t("editor.account.title", "Account")}
-					</Tooltip.Content>
-				</Tooltip>
-			</nav>
-			<aside
-				aria-label={panelContent ? "Clips" : undefined}
-				className="editor-inspector [--text-sm:0.8125rem] [--text-base:0.8125rem] flex min-w-0 min-h-0 flex-col"
-			>
-				<Card className="editor-inspector-card min-h-0 flex-1 gap-0 overflow-hidden p-0">
-					{panelContent ?? (
-						<>
-							<header className="flex min-h-14 shrink-0 items-center justify-between gap-3 px-5 py-3">
-								<Card.Title className="text-[14px]">
-									{settingsPanelProps.selectedAnnotationId
-										? t("timeline.annotation.label", "Annotation")
-										: (sections.find((section) => section.id === activeSection)
-												?.label ??
-											t(
-												`settings.sections.${activeSection}`,
-												activeSection.charAt(0).toUpperCase() +
-													activeSection.slice(1),
-											))}
-								</Card.Title>
-								{hasAdvanced && (
-									<Switch
-										size="sm"
-										isSelected={advanced}
-										onChange={(value) =>
-											setAdvancedSections((current) => ({
-												...current,
-												[activeSection]: value,
-											}))
+						{sections.map((section) => (
+							<Tooltip key={section.id}>
+								<ToggleButton
+									id={section.id}
+									variant="ghost"
+									className="editor-tool-button"
+									aria-label={section.label}
+								>
+									{!panelContent && activeSection === section.id && (
+										<SelectionHighlight id="editor-tool" />
+									)}
+									<section.icon
+										weight={
+											!panelContent && activeSection === section.id
+												? "fill"
+												: "regular"
 										}
-										aria-label={t(
-											"editor.sidebar.advancedSettings",
-											"Advanced settings",
-										)}
-									>
-										<Switch.Content>
-											<Label className="text-xs">
-												{t("editor.sidebar.advanced", "Advanced")}
-											</Label>
-											<Switch.Control>
-												<Switch.Thumb />
-											</Switch.Control>
-										</Switch.Content>
-									</Switch>
+										className="size-5"
+									/>
+									<span className="editor-tool-label">{section.label}</span>
+								</ToggleButton>
+								<Tooltip.Content placement="right">{section.label}</Tooltip.Content>
+							</Tooltip>
+						))}
+					</ToggleButtonGroup>
+					<Tooltip>
+						<Button
+							variant="ghost"
+							isIconOnly
+							className="editor-account-button mt-1"
+							aria-label={t("editor.sidebar.recordlyAccount", "Recordly account")}
+							onPress={onAccountClick}
+						>
+							<AccountAvatar user={accountUser} className="!size-7" />
+						</Button>
+						<Tooltip.Content placement="right">
+							{t("editor.account.title", "Account")}
+						</Tooltip.Content>
+					</Tooltip>
+				</nav>
+				<aside
+					aria-label={panelContent ? "Clips" : undefined}
+					className="editor-inspector [--text-sm:0.8125rem] [--text-base:0.8125rem] flex min-w-0 min-h-0 flex-col"
+				>
+					<Card className="editor-inspector-card min-h-0 flex-1 gap-0 overflow-hidden p-0">
+						{panelContent ?? (
+							<>
+								<header className="flex min-h-14 shrink-0 items-center justify-between gap-3 px-5 py-3">
+									<Card.Title className="text-[14px]">
+										{settingsPanelProps.selectedAnnotationId
+											? t("timeline.annotation.label", "Annotation")
+											: (sections.find(
+													(section) => section.id === activeSection,
+												)?.label ??
+												t(
+													`settings.sections.${activeSection}`,
+													activeSection.charAt(0).toUpperCase() +
+														activeSection.slice(1),
+												))}
+									</Card.Title>
+									{hasAdvanced && (
+										<Switch
+											size="sm"
+											isSelected={advanced}
+											onChange={(value) =>
+												setAdvancedSections((current) => ({
+													...current,
+													[activeSection]: value,
+												}))
+											}
+											aria-label={t(
+												"editor.sidebar.advancedSettings",
+												"Advanced settings",
+											)}
+										>
+											<Switch.Content>
+												<Label className="text-xs">
+													{t("editor.sidebar.advanced", "Advanced")}
+												</Label>
+												<Switch.Control>
+													<Switch.Thumb />
+												</Switch.Control>
+											</Switch.Content>
+										</Switch>
+									)}
+								</header>
+								{activeSection === "extensions" ? (
+									<ExtensionManager />
+								) : (
+									<SettingsPanel {...settingsPanelProps} advanced={advanced} />
 								)}
-							</header>
-							{activeSection === "extensions" ? (
-								<ExtensionManager />
-							) : (
-								<SettingsPanel {...settingsPanelProps} advanced={advanced} />
-							)}
-						</>
-					)}
-				</Card>
-			</aside>
-		</div>
+							</>
+						)}
+					</Card>
+				</aside>
+			</div>
+		</LayoutGroup>
 	);
 }

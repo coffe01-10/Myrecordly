@@ -12,12 +12,14 @@ import {
 	ipcMain,
 	Menu,
 	nativeImage,
+	nativeTheme,
 	session,
 	shell,
 	systemPreferences,
 	Tray,
 } from "electron";
 import { RECORDINGS_DIR } from "./appPaths";
+import { readAppSetting } from "./appSettingsStore";
 import { createAuthCallbackController } from "./authCallback";
 import { showCursor } from "./cursorHider";
 import { getGpuSwitches } from "./gpuSwitches";
@@ -914,6 +916,10 @@ app.on("second-instance", (_event, commandLine) => {
 
 // Register all IPC handlers when app is ready
 app.whenReady().then(async () => {
+	const themePreference = readAppSetting("recordly.theme");
+	// Apply before creating windows so Windows paints the first title bar correctly.
+	nativeTheme.themeSource =
+		themePreference === "dark" || themePreference === "light" ? themePreference : "system";
 	initializeMainLocale();
 	authCallbacks.startDevServer();
 	if (process.defaultApp && process.argv[1]) {

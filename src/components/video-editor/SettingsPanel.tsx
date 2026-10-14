@@ -3,7 +3,8 @@ import { Card, RadioGroup, Radio, Label, Description } from "@heroui/react";
 import { ProgressBar } from "@heroui/react";
 import { ColorControl, ColorPalette } from "@/components/ui/color-picker";
 import { Palette, Trash as Trash2, UploadSimple as Upload } from "@/components/ui/icons";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { panelSpring } from "@/components/ui/selection-highlight";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import minimalCursorUrl from "@/assets/cursors/custom/minimal-cursor.svg";
@@ -1001,6 +1002,7 @@ export function SettingsPanel({
 	nativeCaptureUnavailableSession = false,
 	onOpenNativeCaptureUnavailableModal,
 }: SettingsPanelProps) {
+	const reducedMotion = useReducedMotion();
 	const tSettings = useScopedT("settings");
 	const { locale, setLocale, t } = useI18n();
 	const { preference: themePreference, setPreference: setThemePreference } = useTheme();
@@ -3304,10 +3306,14 @@ export function SettingsPanel({
 				<AnimatePresence mode="wait" initial={false}>
 					<motion.div
 						key={activeEffectSection}
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.18, ease: "easeOut" }}
+						initial={{ opacity: 0, y: reducedMotion ? 0 : 8 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: reducedMotion ? 0 : -4 }}
+						transition={
+							reducedMotion
+								? { duration: 0 }
+								: { ...panelSpring, opacity: { duration: 0.12 } }
+						}
 					>
 						{effectSectionContent}
 					</motion.div>

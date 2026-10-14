@@ -4,6 +4,9 @@ import { SidebarCards } from "./SidebarCards";
 import { FolderRow } from "./FolderRow";
 import { Cloud, File, GearSix, House, Plus, UserCircle } from "@/components/ui/icons";
 import { useScopedT } from "@/contexts/I18nContext";
+import { useId } from "react";
+import { LayoutGroup } from "motion/react";
+import { SelectionHighlight } from "@/components/ui/selection-highlight";
 
 import { Button } from "@/components/ui/button";
 
@@ -39,8 +42,9 @@ export function DashboardSidebar({
 	| "accountLabel"
 >) {
 	const t = useScopedT("common");
+	const motionScope = useId();
 	return (
-		<>
+		<LayoutGroup id={motionScope}>
 			<aside
 				aria-label={t("dashboard.sidebar.navigation", "Library navigation")}
 				className="dashboard-navigation flex w-48 shrink-0 flex-col bg-transparent px-4 pb-5 pt-12 lg:w-56"
@@ -62,6 +66,7 @@ export function DashboardSidebar({
 						onClick={() => setSection("projects")}
 					>
 						<House weight="fill" className="size-[18px]" />
+						{section === "projects" && <SelectionHighlight id="library-nav" />}
 						{t("dashboard.sidebar.home", "Home")}
 					</Button>
 					<Button
@@ -70,6 +75,7 @@ export function DashboardSidebar({
 						aria-current={section === "shared" ? "page" : undefined}
 						onClick={() => setSection("shared")}
 					>
+						{section === "shared" && <SelectionHighlight id="library-nav" />}
 						<Cloud
 							weight={section === "shared" ? "fill" : "regular"}
 							className="size-[18px]"
@@ -82,6 +88,7 @@ export function DashboardSidebar({
 						aria-current={section === "raw" ? "page" : undefined}
 						onClick={() => setSection("raw")}
 					>
+						{section === "raw" && <SelectionHighlight id="library-nav" />}
 						<File
 							weight={section === "raw" ? "fill" : "regular"}
 							className="size-[18px]"
@@ -149,6 +156,7 @@ export function DashboardSidebar({
 						aria-current={section === "settings" ? "page" : undefined}
 						onClick={() => setSection("settings")}
 					>
+						{section === "settings" && <SelectionHighlight id="library-nav" />}
 						<GearSix
 							weight={section === "settings" ? "fill" : "regular"}
 							className="size-[18px]"
@@ -163,6 +171,6 @@ export function DashboardSidebar({
 					</Button>
 				</div>
 			</aside>
-		</>
+		</LayoutGroup>
 	);
 }

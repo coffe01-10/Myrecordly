@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useScopedT } from "@/contexts/I18nContext";
 import { FolderColors } from "./FolderColors";
+import { SelectionHighlight } from "@/components/ui/selection-highlight";
 import type { ProjectFolder } from "./useProjectFolders";
 
 export function FolderRow({
@@ -36,8 +37,9 @@ export function FolderRow({
 	};
 	return (
 		<div
-			className={`folder-row group flex h-10 items-center gap-1 rounded-lg px-1 ${active ? "bg-default/70" : "hover:bg-default/40"}`}
+			className={`folder-row group relative isolate flex h-10 items-center gap-1 rounded-lg px-1 ${active ? "text-accent-soft-foreground" : "hover:bg-default/40"}`}
 		>
+			{active && <SelectionHighlight id="library-nav" />}
 			<FolderColors
 				value={folder.color}
 				name={folder.name}

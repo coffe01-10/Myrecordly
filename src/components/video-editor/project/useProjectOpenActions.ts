@@ -29,6 +29,7 @@ type UseProjectOpenActionsInput = {
 	applyLoadedProject: (candidate: unknown, path?: string | null) => Promise<boolean>;
 	openUnsavedChangesDialog: (actionLabel: string) => Promise<"save" | "discard" | "cancel">;
 	saveProject: ReturnType<typeof useProjectSaveActions>["saveProject"];
+	deleteProjectFiles: ReturnType<typeof useProjectSaveActions>["deleteProjectFiles"];
 	refreshProjectLibrary: () => Promise<void>;
 	resetSourceScopedEditorState: () => void;
 	applySessionPresentation: (session: null) => void;
@@ -47,6 +48,7 @@ export function useProjectOpenActions({
 	setDuration,
 	applyLoadedProject,
 	saveProject,
+	deleteProjectFiles,
 	refreshProjectLibrary,
 	resetSourceScopedEditorState,
 	applySessionPresentation,
@@ -265,16 +267,44 @@ export function useProjectOpenActions({
 
 	const handleDeleteProjects = useCallback(
 		async (paths: string[]) => {
-			const result = await window.electronAPI.trashProjectFiles(paths);
-			if (project.currentProjectPath && result.deleted.includes(project.currentProjectPath)) {
+			const result = await deleteProjectFiles(paths);
+			if (result.currentProjectDeleted) {
+				videoPlaybackRef.current?.pause();
+				setIsPlaying(false);
+				setCurrentTime(0);
+				setDuration(0);
+				project.setVideoPath(null);
+				project.setVideoSourcePath(null);
 				project.setCurrentProjectPath(null);
 				project.setLastSavedSnapshot(null);
+				project.setError(null);
+				project.setIsEditingProjectName(false);
+				resetSourceScopedEditorState();
+				appearance.setWebcam((previous) => ({
+					...previous,
+					enabled: false,
+					sourcePath: null,
+					visibleRanges: undefined,
+					timeOffsetMs: DEFAULT_WEBCAM_TIME_OFFSET_MS,
+				}));
+				applySessionPresentation(null);
 			}
 			await refreshProjectLibrary();
 			if (result.errors.length) toast.error(result.errors.join("\n"));
 			return result.deleted;
 		},
-		[project, refreshProjectLibrary],
+		[
+			deleteProjectFiles,
+			project,
+			refreshProjectLibrary,
+			videoPlaybackRef,
+			setIsPlaying,
+			setCurrentTime,
+			setDuration,
+			resetSourceScopedEditorState,
+			appearance.setWebcam,
+			applySessionPresentation,
+		],
 	);
 	const handleRenameLibraryProject = useCallback(
 		async (path: string, name: string) => {

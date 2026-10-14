@@ -204,6 +204,7 @@ export function useEditorProjectController(input: Input) {
 		applyLoadedProject: lifecycle.applyLoadedProject,
 		openUnsavedChangesDialog: lifecycle.openUnsavedChangesDialog,
 		saveProject: saveActions.saveProject,
+		deleteProjectFiles: saveActions.deleteProjectFiles,
 		refreshProjectLibrary: input.refreshProjectLibrary,
 		resetSourceScopedEditorState: lifecycle.resetSourceScopedEditorState,
 		applySessionPresentation: input.applySessionPresentation,

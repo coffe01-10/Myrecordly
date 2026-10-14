@@ -1,5 +1,9 @@
 import { Tag, TagGroup } from "@heroui/react";
-import type { ComponentProps, ReactNode } from "react";
+import { createContext, useContext, useId, type ComponentProps, type ReactNode } from "react";
+import { LayoutGroup } from "motion/react";
+import { SelectionHighlight } from "./selection-highlight";
+
+const SelectedChoice = createContext<string | undefined>(undefined);
 
 /** Mutually exclusive settings, with HeroUI's keyboard-accessible tag selection. */
 export function ChoiceGroup({
@@ -18,24 +22,31 @@ export function ChoiceGroup({
 	fullWidth?: boolean;
 	"aria-label"?: string;
 }) {
+	const scope = useId();
 	return (
-		<TagGroup
-			size={props.size ?? "md"}
-			aria-label={props["aria-label"]}
-			selectionMode="single"
-			disallowEmptySelection
-			selectedKeys={value ? [value] : []}
-			onSelectionChange={(keys) => {
-				if (keys !== "all") {
-					const key = Array.from(keys)[0];
-					if (key !== undefined) onValueChange?.(String(key));
-				}
-			}}
-		>
-			<TagGroup.List className={`settings-choice-list ${className ?? "flex flex-wrap gap-2"}`}>
-				{children}
-			</TagGroup.List>
-		</TagGroup>
+		<LayoutGroup id={scope}>
+			<SelectedChoice.Provider value={value}>
+				<TagGroup
+					size={props.size ?? "md"}
+					aria-label={props["aria-label"]}
+					selectionMode="single"
+					disallowEmptySelection
+					selectedKeys={value ? [value] : []}
+					onSelectionChange={(keys) => {
+						if (keys !== "all") {
+							const key = Array.from(keys)[0];
+							if (key !== undefined) onValueChange?.(String(key));
+						}
+					}}
+				>
+					<TagGroup.List
+						className={`settings-choice-list ${className ?? "flex flex-wrap gap-2"}`}
+					>
+						{children}
+					</TagGroup.List>
+				</TagGroup>
+			</SelectedChoice.Provider>
+		</LayoutGroup>
 	);
 }
 export function ChoiceItem({
@@ -49,6 +60,7 @@ export function ChoiceItem({
 	title?: string;
 	"aria-label"?: string;
 }) {
+	const selected = useContext(SelectedChoice) === value;
 	return (
 		<Tag
 			{...props}
@@ -60,7 +72,12 @@ export function ChoiceItem({
 			}
 			className={`min-h-8 justify-center ${className ?? ""}`}
 		>
-			{children}
+			{(state) => (
+				<>
+					{selected && <SelectionHighlight id="choice" />}
+					{typeof children === "function" ? children(state) : children}
+				</>
+			)}
 		</Tag>
 	);
 }

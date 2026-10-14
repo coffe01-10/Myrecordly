@@ -297,3 +297,88 @@
 @media (prefers-reduced-motion: reduce) {
 	.dashboard-project-card { transition: none; }
 }
+
+/* macOS interaction feedback, kept separate from video composition motion. */
+.selection-highlight {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	border-radius: inherit;
+	background: var(--accent-soft);
+	pointer-events: none;
+}
+.editor-tool-button,
+.settings-choice-list .tag,
+.dashboard-navigation .button {
+	position: relative;
+	isolation: isolate;
+}
+.editor-tool-button:is([data-selected="true"], [aria-checked="true"]),
+.dashboard-navigation .button[aria-current="page"] {
+	background: transparent;
+}
+.settings-choice-list .tag[data-selected="true"] {
+	background: transparent;
+	border-color: transparent;
+	box-shadow: none;
+}
+.settings-choice-list .selection-highlight {
+	/* HeroUI renders children in a display:contents gridcell, which has no radius. */
+	border-radius: 10px;
+	border: 1px solid var(--border);
+	background: var(--segment);
+	box-shadow: 0 1px 3px #0000000d;
+}
+.editor-tool-button,
+.settings-choice-list .tag,
+.editor-header .button,
+.editor-playback .button,
+.dashboard-navigation .button {
+	transition: color 120ms ease-out, background-color 120ms ease-out,
+		scale 180ms cubic-bezier(0.2, 0.8, 0.2, 1.2);
+}
+:is(.editor-tool-button, .settings-choice-list .tag, .editor-header .button,
+	.editor-playback .button, .dashboard-navigation .button)[data-pressed="true"] {
+	scale: 0.97;
+}
+.editor-section-enter {
+	animation: studio-section-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes studio-section-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+@keyframes studio-overlay-in {
+	0% { opacity: 0; transform: translateY(var(--studio-overlay-offset, 6px)) scale(0.96); }
+	70% { opacity: 1; transform: translateY(0) scale(1.008); }
+	100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes studio-overlay-out {
+	from { opacity: 1; transform: translateY(0) scale(1); }
+	to { opacity: 0; transform: translateY(var(--studio-overlay-offset, 6px)) scale(0.98); }
+}
+.modal__container:not(.modal__container--full)[data-entering="true"],
+.popover[data-entering="true"],
+.dropdown__popover[data-entering="true"] {
+	animation: studio-overlay-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.modal__container:not(.modal__container--full)[data-exiting="true"],
+.popover[data-exiting="true"],
+.dropdown__popover[data-exiting="true"] {
+	animation: studio-overlay-out 140ms ease-in both;
+}
+:is(.popover, .dropdown__popover)[data-placement="bottom"] { --studio-overlay-offset: -6px; }
+.modal__container { --studio-overlay-offset: 10px; }
+@media (prefers-reduced-motion: reduce) {
+	.editor-section-enter,
+	.modal__container:not(.modal__container--full)[data-entering="true"],
+	.modal__container:not(.modal__container--full)[data-exiting="true"],
+	.popover[data-entering="true"], .popover[data-exiting="true"],
+	.dropdown__popover[data-entering="true"], .dropdown__popover[data-exiting="true"] {
+		animation: none;
+	}
+	.editor-tool-button, .settings-choice-list .tag, .editor-header .button,
+	.editor-playback .button, .dashboard-navigation .button { transition: none; }
+	:is(.editor-tool-button, .settings-choice-list .tag, .editor-header .button,
+		.editor-playback .button, .dashboard-navigation .button)[data-pressed="true"] { scale: 1; }
+}

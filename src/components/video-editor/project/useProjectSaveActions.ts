@@ -78,11 +78,30 @@ export function useProjectSaveActions({
 			autosaveTimeoutRef.current = null;
 		}
 	}, []);
-	const queueSave = useCallback((task: () => Promise<boolean>) => {
+	const queueSave = useCallback(<T>(task: () => Promise<T>) => {
 		const run = saveQueueRef.current.catch(() => undefined).then(task);
 		saveQueueRef.current = run.catch(() => undefined);
 		return run;
 	}, []);
+	const deleteProjectFiles = useCallback(
+		(paths: string[]) => {
+			return queueSave(async () => {
+				// An in-flight save must finish before Trash, or it can recreate the file.
+				const result = await window.electronAPI.trashProjectFiles(paths);
+				const currentProjectDeleted = Boolean(
+					activePathRef.current && result.deleted.includes(activePathRef.current),
+				);
+				if (currentProjectDeleted) {
+					clearPendingAutosave();
+					// Invalidate saves queued with the deleted project's source before React rerenders.
+					activePathRef.current = null;
+					activeSourceRef.current = null;
+				}
+				return { ...result, currentProjectDeleted };
+			});
+		},
+		[clearPendingAutosave, queueSave],
+	);
 
 	const saveProject = useCallback(
 		async (forceSaveAs: boolean, options?: SaveProjectOptions) => {
@@ -390,6 +409,7 @@ export function useProjectSaveActions({
 	}, [saveProject, setProjectBrowserOpen]);
 
 	return {
+		deleteProjectFiles,
 		saveProject,
 		handleSaveProject,
 		handleSaveProjectAs,

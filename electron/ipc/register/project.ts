@@ -744,8 +744,11 @@ export function registerProjectHandlers() {
 				trash: (filePath) => shell.trashItem(filePath),
 				thumbnailPath: getProjectThumbnailPath,
 			});
-			if (currentProjectPath && result.deleted.includes(path.resolve(currentProjectPath)))
+			if (currentProjectPath && result.deleted.includes(path.resolve(currentProjectPath))) {
 				setCurrentProjectPath(null);
+				setCurrentVideoPath(null);
+				setCurrentRecordingSession(null);
+			}
 			const warning = await persistRecentMetadata(async () =>
 				saveRecentProjectPaths(
 					(await loadRecentProjectPaths()).filter(

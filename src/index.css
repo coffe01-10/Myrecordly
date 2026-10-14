@@ -168,23 +168,6 @@
 	}
 }
 
-@keyframes editor-section-enter {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-.editor-section-enter {
-	animation: editor-section-enter 180ms ease-out;
-}
-@media (prefers-reduced-motion: reduce) {
-	.editor-section-enter {
-		animation: none;
-	}
-}
-
 .dashboard-surface .folder-row > button {
   background: transparent;
 }
