@@ -50,11 +50,20 @@ test("filmstrips have persistent handles, conditional speed badges and centered 
 	await expect(clip.locator("img").first()).toBeVisible({ timeout: 20000 });
 	await expect(clip).toHaveText("");
 	await page.mouse.move(1000, 300);
+	// Handles use the themed 55%-foreground wash, resolved from --foreground.
+	const expectedHandleColor = await page.evaluate(() => {
+		const probe = document.createElement("div");
+		probe.style.background = "color-mix(in srgb, var(--foreground) 55%, transparent)";
+		document.body.append(probe);
+		const color = getComputedStyle(probe).backgroundColor;
+		probe.remove();
+		return color;
+	});
 	for (const side of ["left", "right"]) {
 		await expect(clip.getByTitle(`Resize ${side}`)).toHaveCSS("opacity", "1");
 		await expect(clip.getByTitle(`Resize ${side}`)).toHaveCSS(
 			"background-color",
-			"rgba(0, 0, 0, 0.5)",
+			expectedHandleColor,
 		);
 	}
 	await page.getByRole("button", { name: "Add Zoom (Z)", exact: true }).click();
@@ -65,11 +74,11 @@ test("filmstrips have persistent handles, conditional speed badges and centered 
 	expect(Math.abs(clipHeight - zoomHeight)).toBeLessThan(1);
 	const colors = await zoom.evaluate((node) => {
 		const probe = document.createElement("span");
-		probe.style.background = "var(--accent)";
+		probe.style.background = "var(--track-zoom)";
 		document.body.append(probe);
-		const accent = getComputedStyle(probe).backgroundColor;
+		const trackZoom = getComputedStyle(probe).backgroundColor;
 		probe.remove();
-		return [getComputedStyle(node).backgroundColor, accent];
+		return [getComputedStyle(node).backgroundColor, trackZoom];
 	});
 	expect(colors[0]).toBe(colors[1]);
 	for (const width of [1440, 1250, 800]) {
@@ -79,11 +88,11 @@ test("filmstrips have persistent handles, conditional speed badges and centered 
 			(dark) => document.documentElement.classList.toggle("dark", dark),
 			width === 1250,
 		);
-		const panel = (await page.locator("aside").boundingBox())!;
 		const nav = page.getByRole("navigation", { name: "Editor tools" });
+		const navBox = (await nav.boundingBox())!;
 		for (const control of await nav.locator('button, [role="radio"]').all()) {
 			const box = (await control.boundingBox())!;
-			expect(Math.abs(box.x + box.width / 2 - panel.x / 2)).toBeLessThan(1);
+			expect(Math.abs(box.x + box.width / 2 - (navBox.x + navBox.width / 2))).toBeLessThan(1);
 		}
 		await page.screenshot({
 			path: `test-results/clip-rail-${width}.png`,

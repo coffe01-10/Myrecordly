@@ -78,7 +78,9 @@ test("Clips supports selection, remove all, undo and real timeline drag insertio
 	expect((await videosButton.boundingBox())!.x).toBeGreaterThan(
 		(await page.getByRole("button", { name: "Rename project", exact: true }).boundingBox())!.x,
 	);
-	expect((await panel.boundingBox())!.x).toBeLessThan(100);
+	// The Clips panel must stay to the right of the preview, without overlapping it.
+	const preview = (await page.locator(".editor-preview-panel").boundingBox())!;
+	expect((await panel.boundingBox())!.x).toBeGreaterThanOrEqual(preview.x + preview.width);
 	await expect(videosButton).toHaveClass(/button--secondary/);
 	await panel
 		.locator('[data-recording-path="/recordings/first.mp4"] [data-slot="checkbox-control"]')

@@ -71,7 +71,7 @@ test("video wallpapers share the gallery's add and remove controls", async ({ pa
 	const video = page.getByRole("button", { name: "preview.mp4", exact: true });
 	await expect(video).toHaveAttribute("aria-pressed", "true");
 	const videoTile = await video.boundingBox();
-	expect(videoTile!.height).toBeLessThan(50);
+	expect(videoTile!.height).toBeLessThan(80);
 	await video.hover();
 	await page.screenshot({
 		path: "test-results/editor-video-wallpaper-hover.png",

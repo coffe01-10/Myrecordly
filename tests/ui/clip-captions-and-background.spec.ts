@@ -118,6 +118,6 @@ test("background swaps use the section fade without sliding or overlapping panel
 		await expect(panel).toHaveCount(1);
 		await expect(panel).toHaveAttribute("data-background-panel", name.toLowerCase());
 		await expect(panel).toHaveCSS("transform", "none");
-		await expect(panel).toHaveCSS("animation-name", "editor-section-enter");
+		await expect(panel).toHaveCSS("animation-name", "studio-section-in");
 	}
 });

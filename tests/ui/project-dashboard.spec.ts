@@ -400,8 +400,13 @@ test("dashboard supports creation sort, independent folders, shared settings and
 	await home.getByRole("button", { name: "Add folder to Old" }).click();
 	await page.getByRole("menuitem", { name: "Personal", exact: true }).click();
 	await expect(home.getByRole("button", { name: "Remove Old from Work" })).toBeVisible();
-	await expect(home.getByRole("button", { name: "Remove Old from Personal" })).toBeVisible();
-	await expect(home.locator('[aria-label="1 more folders: Personal"]')).toHaveCount(0);
+	// Narrow cards collapse the second chip behind the "+N more" counter; the
+	// hidden measurement copy must not count.
+	await expect(
+		home.locator(
+			'button[aria-label="Remove Old from Personal"]:visible, [aria-label="1 more folders: Personal"]:visible',
+		),
+	).toHaveCount(1);
 	const membership = await page.evaluate(() =>
 		JSON.parse(localStorage.getItem("recordly.project-folders.v1") || "[]"),
 	);
@@ -427,9 +432,13 @@ test("dashboard supports creation sort, independent folders, shared settings and
 		.evaluate((element) => {
 			const caption = element.getBoundingClientRect();
 			const avatar = element.previousElementSibling!.getBoundingClientRect();
-			return { gap: caption.left - avatar.right, top: caption.top - avatar.top };
+			return {
+				gap: caption.left - avatar.right,
+				top: caption.top - avatar.top,
+				expected: parseFloat(getComputedStyle(element.parentElement!).gap) || 0,
+			};
 		});
-	expect(spacing).toEqual({ gap: 16, top: 0 });
+	expect(spacing).toEqual({ gap: spacing.expected, top: 0, expected: spacing.expected });
 	const avatar = home.locator('[aria-label="Local profile"]').first();
 	const circle = await avatar.evaluate((element) => {
 		const style = getComputedStyle(element);

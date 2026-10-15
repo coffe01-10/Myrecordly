@@ -112,6 +112,7 @@ import {
 } from "./videoPlayback/motionSmoothing";
 import { updateOverlayIndicator } from "./videoPlayback/overlayUtils";
 import { supportsPreviewPlaybackRate } from "./videoPlayback/playbackRate";
+import { createPlaybackCommands } from "./videoPlayback/playbackCommands";
 import { PreviewVideoSource } from "./videoPlayback/previewVideoSource";
 import { getSceneEffectMetrics } from "./videoPlayback/sceneEffects";
 import {
@@ -436,6 +437,10 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		const clipPlaybackRef = useRef<ReturnType<typeof createClipPlayback> | null>(null);
 		const onPlaybackErrorRef = useRef(onError);
 		const timelineTimeRef = useRef(timelineTime);
+		const playbackCommands = useMemo(
+			() => createPlaybackCommands(clipPlaybackRef, timelineTimeRef),
+			[],
+		);
 		useEffect(() => {
 			onPlaybackErrorRef.current = onError;
 			timelineTimeRef.current = timelineTime;
@@ -1099,20 +1104,16 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 
 		useImperativeHandle(ref, () => ({
 			get isPlaying() {
-				return clipPlaybackRef.current?.isPlaying ?? false;
+				return playbackCommands.isPlaying;
 			},
-			seekTimeline: (time) => clipPlaybackRef.current?.seek(time),
+			seekTimeline: playbackCommands.seekTimeline,
 			video: videoRef.current,
 			app: appRef.current,
 			videoSprite: videoSpriteRef.current,
 			videoContainer: videoContainerRef.current,
 			containerRef,
-			play: async () => {
-				await clipPlaybackRef.current?.play();
-			},
-			pause: () => {
-				clipPlaybackRef.current?.pause();
-			},
+			play: playbackCommands.play,
+			pause: playbackCommands.pause,
 			cancelCaptionEdit,
 			refreshFrame: async () => {
 				const video = videoRef.current;
@@ -1927,10 +1928,9 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 						error instanceof Error ? error.message : String(error),
 					),
 			});
-			clipPlaybackRef.current = transport;
-			transport.seek(timelineTimeRef.current);
-			if (autoPlay)
-				void transport.play().catch((error) => onPlaybackErrorRef.current(String(error)));
+			void playbackCommands
+				.initialize(transport, autoPlay)
+				.catch((error) => onPlaybackErrorRef.current(String(error)));
 			const handleSeeked = () => {
 				isSeekingRef.current = false;
 				// A source seek at a contiguous cut must not reset the camera springs.
@@ -1961,7 +1961,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 
 				videoSpriteRef.current = null;
 			};
-		}, [autoPlay, onPlayStateChange, onTimeUpdate, pixiReady, videoReady]);
+		}, [autoPlay, onPlayStateChange, onTimeUpdate, pixiReady, videoReady, playbackCommands]);
 
 		useEffect(() => {
 			if (!pixiReady || !videoReady) return;
