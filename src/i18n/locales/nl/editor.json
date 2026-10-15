@@ -57,7 +57,24 @@
 		"createShareLink": "Deellink maken",
 		"done": "Gereed",
 		"addingVideo": "Video toevoegen…",
-		"preparingFootage": "Video en audio voorbereiden voor je tijdlijn."
+		"preparingFootage": "Video en audio voorbereiden voor je tijdlijn.",
+		"loadSharedFailed": "Could not load shared recordings.",
+		"deleteSharedFailed": "Could not delete recording.",
+		"deleteSharedConfirm": "Delete this shared recording? This cannot be undone.",
+		"openLinkFailed": "Could not open link.",
+		"sharedProjects": "Shared projects",
+		"refresh": "Refresh",
+		"refreshRecordings": "Refresh recordings",
+		"hideShared": "Hide shared recordings",
+		"manageShared": "Manage shared recordings",
+		"noSharedRecordings": "No shared recordings yet.",
+		"sharedCountSummary": "{{count}} of {{limit}} recordings · 1 GB each · Free links expire after 14 days",
+		"noMatchingProjects": "No matching projects",
+		"emptyProjects": "It's looking empty in here...",
+		"loadingRecordings": "Loading recordings…",
+		"incompleteUpload": "Incomplete upload",
+		"openRecordingAria": "Open {{title}}",
+		"deleteRecordingAria": "Delete {{title}}"
 	},
 	"signIn": {
 		"welcome": "Welcome to Recordly",
@@ -74,7 +91,16 @@
 		"microsoftUnavailable": "Microsoft sign-in is not available yet.",
 		"githubUnavailable": "GitHub sign-in is not available yet.",
 		"emailUnavailable": "Email sign-in is not available yet.",
-		"checkInbox": "Check your inbox to verify your email and continue to Recordly. Open the link on this computer with Recordly running."
+		"checkInbox": "Check your inbox to verify your email and continue to Recordly. Open the link on this computer with Recordly running.",
+		"errors": {
+			"notConfigured": "Recordly Auth is not configured. Add the Supabase URL and publishable key.",
+			"incorrectCredentials": "Incorrect email or password.",
+			"noUserReturned": "No user was returned after sign-in.",
+			"missingSignInUrl": "The authentication provider did not return a sign-in URL.",
+			"openSignInPageFailed": "Could not open the sign-in page.",
+			"invalidWorkEmail": "Enter a valid work email address.",
+			"requestNewLink": "Request a new sign-in link from Recordly, then open it on this computer."
+		}
 	},
 	"clips": {
 		"title": "Clips",
@@ -173,7 +199,8 @@
 		"noImage": "No image",
 		"noArrowData": "No arrow data",
 		"typeLabel": "Annotation type",
-		"uploadedAlt": "Uploaded annotation"
+		"uploadedAlt": "Uploaded annotation",
+		"customFonts": "Custom Fonts"
 	},
 	"fontStyles": {
 		"classic": "Klassiek",
@@ -270,7 +297,8 @@
 		"fileLoadError": "Could not load file: {{error}}",
 		"mediaError": "Could not load project media",
 		"renameFailed": "Could not rename project",
-		"libraryLoadFailed": "Failed to load project library"
+		"libraryLoadFailed": "Failed to load project library",
+		"openProjects": "Open Projects"
 	},
 	"exportTips": {
 		"autoZooms": "Tip: Schakel automatisch toegepaste zooms uit in de instellingen",

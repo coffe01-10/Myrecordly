@@ -1,20 +1,14 @@
-import { persistRecentMetadata } from "../project/recentMetadata";
-import { renameLibraryProject } from "../project/renameLibraryProject";
-import { createUntitledProject } from "../project/createUntitledProject";
-import { trashLibraryProjects } from "../project/trashProjects";
-import { getRecordingThumbnail } from "../recording/thumbnail";
-import { listRecordings, setRecordingsRemoved } from "../recording/library";
-import { importRecording, discardRecordingImport } from "../recording/importRecording";
 import { randomUUID } from "node:crypto";
 import { constants as fsConstants } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { BrowserWindow, dialog, ipcMain, shell } from "electron";
 import { RECORDINGS_DIR } from "../../appPaths";
+import { t } from "../../i18n";
 import { buildMediaUrl, getMediaServerBaseUrl } from "../../mediaServer";
 import { LEGACY_PROJECT_FILE_EXTENSIONS, PROJECT_FILE_EXTENSION } from "../constants";
-import { t } from "../../i18n";
 import { getProjectBackupPath, writeProjectFileAtomically } from "../project/atomicSave";
+import { createUntitledProject } from "../project/createUntitledProject";
 import {
 	getProjectsDir,
 	getProjectThumbnailPath,
@@ -22,9 +16,9 @@ import {
 	isTrustedProjectPath,
 	listProjectLibraryEntries,
 	loadProjectFromPath,
-	readProjectPreview,
 	loadRecentProjectPaths,
 	persistRecordingsDirectorySetting,
+	readProjectPreview,
 	rememberApprovedLocalReadPath,
 	rememberRecentProject,
 	replaceApprovedSessionLocalReadPaths,
@@ -32,7 +26,13 @@ import {
 	saveProjectThumbnail,
 	saveRecentProjectPaths,
 } from "../project/manager";
+import { persistRecentMetadata } from "../project/recentMetadata";
+import { renameLibraryProject } from "../project/renameLibraryProject";
 import { persistRecordingSessionManifest, resolveRecordingSession } from "../project/session";
+import { trashLibraryProjects } from "../project/trashProjects";
+import { discardRecordingImport, importRecording } from "../recording/importRecording";
+import { listRecordings, setRecordingsRemoved } from "../recording/library";
+import { getRecordingThumbnail } from "../recording/thumbnail";
 import {
 	currentProjectPath,
 	currentRecordingSession,
@@ -46,8 +46,8 @@ import {
 	getRecordingsDir,
 	getTelemetryPathForVideo,
 	isAutoRecordingPath,
-	normalizeVideoSourcePath,
 	normalizePath,
+	normalizeVideoSourcePath,
 	parseJsonWithByteOrderMark,
 } from "../utils";
 
@@ -189,33 +189,42 @@ async function ensureNamedProjectSaveDoesNotOverwriteDifferentProject(
 
 			return {
 				success: false,
-				message: "A different project already uses this name",
+				message: t("error.projectNameInUse", "A different project already uses this name"),
 			};
 		}
 
 		if (existingVideoPath && incomingVideoPath && existingVideoPath !== incomingVideoPath) {
 			return {
 				success: false,
-				message: "A different project already uses this name",
+				message: t("error.projectNameInUse", "A different project already uses this name"),
 			};
 		}
 
 		if (!existingProjectId && !incomingProjectId && existingVideoPath && incomingVideoPath) {
 			return {
 				success: false,
-				message: "Unable to verify project identity for the chosen name",
+				message: t(
+					"error.projectIdentityUnverifiable",
+					"Unable to verify project identity for the chosen name",
+				),
 			};
 		}
 
 		return {
 			success: false,
-			message: "Unable to verify project identity for the chosen name",
+			message: t(
+				"error.projectIdentityUnverifiable",
+				"Unable to verify project identity for the chosen name",
+			),
 		};
 	} catch (error) {
 		console.error("Failed to verify existing named project before overwrite:", error);
 		return {
 			success: false,
-			message: "Unable to verify project identity for the chosen name",
+			message: t(
+				"error.projectIdentityUnverifiable",
+				"Unable to verify project identity for the chosen name",
+			),
 		};
 	}
 }
@@ -363,7 +372,13 @@ export function registerProjectHandlers() {
 					// openPath returned an error message
 					return { success: false, error: openPathResult };
 				}
-				return { success: true, message: "Could not reveal item, but opened directory." };
+				return {
+					success: true,
+					message: t(
+						"error.revealedDirectoryOnly",
+						"Could not reveal item, but opened directory.",
+					),
+				};
 			} catch (openError) {
 				console.error(`Error opening directory: ${path.dirname(filePath)}`, openError);
 				return { success: false, error: String(error) };
@@ -379,7 +394,10 @@ export function registerProjectHandlers() {
 				return {
 					success: false,
 					error: openPathResult,
-					message: t("error.failedToOpenRecordingsFolder", "Failed to open recordings folder."),
+					message: t(
+						"error.failedToOpenRecordingsFolder",
+						"Failed to open recordings folder.",
+					),
 				};
 			}
 
@@ -389,7 +407,10 @@ export function registerProjectHandlers() {
 			return {
 				success: false,
 				error: String(error),
-				message: t("error.failedToOpenRecordingsFolder", "Failed to open recordings folder."),
+				message: t(
+					"error.failedToOpenRecordingsFolder",
+					"Failed to open recordings folder.",
+				),
 			};
 		}
 	});
@@ -484,8 +505,10 @@ export function registerProjectHandlers() {
 				if (existingProjectPath) {
 					return {
 						success: false,
-						message:
+						message: t(
+							"error.projectPathUntrusted",
 							"Project path is no longer trusted. Use Save As to choose a project file.",
+						),
 					};
 				}
 
@@ -695,7 +718,10 @@ export function registerProjectHandlers() {
 			console.error("Failed to load current project file:", error);
 			return {
 				success: false,
-				message: t("error.failedToLoadCurrentProjectFile", "Failed to load current project file"),
+				message: t(
+					"error.failedToLoadCurrentProjectFile",
+					"Failed to load current project file",
+				),
 				error: String(error),
 			};
 		}
@@ -804,7 +830,10 @@ export function registerProjectHandlers() {
 				return {
 					success: false,
 					error: openPathResult,
-					message: t("error.failedToOpenProjectsFolder", "Failed to open projects folder."),
+					message: t(
+						"error.failedToOpenProjectsFolder",
+						"Failed to open projects folder.",
+					),
 				};
 			}
 

@@ -27,6 +27,22 @@ export default function App() {
 	);
 	const { t } = useI18n();
 	const appIconSrc = "/app-icons/recordly-128.png";
+	const hasOverlayTitleBar =
+		windowType === "editor" &&
+		new URLSearchParams(window.location.search).get("titlebar") === "overlay";
+
+	useEffect(() => {
+		if (!hasOverlayTitleBar) return;
+		const updateFullscreen = (fullscreen: boolean) => {
+			document.documentElement.toggleAttribute("data-window-fullscreen", fullscreen);
+		};
+		const unsubscribe = window.electronAPI?.onWindowFullscreenChanged?.(updateFullscreen);
+		void window.electronAPI?.isWindowFullscreen?.().then(updateFullscreen);
+		return () => {
+			unsubscribe?.();
+			document.documentElement.removeAttribute("data-window-fullscreen");
+		};
+	}, [hasOverlayTitleBar]);
 
 	useEffect(() => {
 		document.documentElement.dataset.windowType = windowType;
@@ -101,8 +117,16 @@ export default function App() {
 	}
 
 	return (
-		<Suspense fallback={windowType === "editor" ? <EditorLoadingSkeleton /> : null}>
-			{content}
-		</Suspense>
+		<>
+			{hasOverlayTitleBar && (
+				<div className="native-window-titlebar" aria-hidden="true">
+					<img src={`${import.meta.env.BASE_URL}app-icons/recordly-32.png`} alt="" />
+					<span>{t("app.editorTitle", "Recordly Editor")}</span>
+				</div>
+			)}
+			<Suspense fallback={windowType === "editor" ? <EditorLoadingSkeleton /> : null}>
+				{content}
+			</Suspense>
+		</>
 	);
 }

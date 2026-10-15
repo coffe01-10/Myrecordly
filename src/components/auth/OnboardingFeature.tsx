@@ -16,6 +16,7 @@ const FEATURE_KEYS = ["record", "preview", "share"] as const;
 
 // Decorative product illustrations stay crisp as the image frame changes size.
 function FeatureIllustration({ step }: { step: number }) {
+	const t = useScopedT("launch");
 	return (
 		<div aria-hidden="true" className="flex h-full items-center justify-center p-6 sm:p-10">
 			<div className="relative w-full max-w-[580px] overflow-hidden rounded-2xl border border-white/50 bg-white/85 text-zinc-900 shadow-2xl backdrop-blur-xl">
@@ -24,7 +25,7 @@ function FeatureIllustration({ step }: { step: number }) {
 						<span key={i} className="size-2 rounded-full bg-zinc-300" />
 					))}
 					<span className="ml-3 text-xs font-medium">
-						{step === 2 ? "Your recording" : "Recordly"}
+						{step === 2 ? t("onboarding.mockup.yourRecording") : "Recordly"}
 					</span>
 				</div>
 				<div className="relative mx-5 mb-5 mt-4 flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-200 via-sky-100 to-rose-200">
@@ -37,7 +38,7 @@ function FeatureIllustration({ step }: { step: number }) {
 					{step === 0 && (
 						<div className="absolute bottom-3 flex items-center gap-3 rounded-xl bg-white px-4 py-2 shadow-lg">
 							<Monitor size={20} />
-							<span className="text-xs">Entire screen</span>
+							<span className="text-xs">{t("onboarding.mockup.entireScreen")}</span>
 							<Record size={24} weight="fill" className="text-red-500" />
 						</div>
 					)}
@@ -45,7 +46,7 @@ function FeatureIllustration({ step }: { step: number }) {
 						<div className="absolute bottom-3 flex items-center gap-3 rounded-xl bg-white px-4 py-2 shadow-lg">
 							<SlidersHorizontal size={20} />
 							<div className="h-1.5 w-24 rounded-full bg-blue-500" />
-							<span className="text-xs">Preview</span>
+							<span className="text-xs">{t("onboarding.mockup.preview")}</span>
 						</div>
 					)}
 					{step === 2 && (
@@ -57,7 +58,7 @@ function FeatureIllustration({ step }: { step: number }) {
 				{step === 2 && (
 					<div className="mx-5 mb-5 flex items-center justify-center gap-2 rounded-lg bg-blue-500 p-3 text-sm font-medium text-white">
 						<Link size={18} />
-						Copy link
+						{t("onboarding.mockup.copyLink")}
 						<Check size={16} />
 					</div>
 				)}

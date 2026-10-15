@@ -10,6 +10,10 @@
       // Keep recording overlays transparent during their own startup.
       document.documentElement.dataset.windowType =
         new URLSearchParams(location.search).get("windowType") || "";
+      if (document.documentElement.dataset.windowType === "editor" &&
+          new URLSearchParams(location.search).get("titlebar") === "overlay") {
+        document.documentElement.dataset.windowTitlebar = "overlay";
+      }
       if (document.documentElement.dataset.windowType === "editor") {
         let preference = "system";
         try {
@@ -40,11 +44,12 @@
     </script>
     <style>
       .boot-shell { display: none; }
+      html[data-window-titlebar="overlay"] { --window-titlebar-height: 32px; }
       html[data-window-type="editor"] { background: #f2f3f7; }
       html[data-window-type="editor"][data-theme="dark"] { background: #0b0c0d; }
       html[data-window-type="editor"] .boot-shell {
         --boot-block: #e5e5e9;
-        position: fixed; inset: 0; display: flex; flex-direction: column;
+        position: fixed; inset: var(--window-titlebar-height, 0px) 0 0; display: flex; flex-direction: column;
         padding: 0 20px 20px; gap: 16px; box-sizing: border-box;
         background: #f2f3f7; overflow: hidden;
       }

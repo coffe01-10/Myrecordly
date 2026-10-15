@@ -95,7 +95,8 @@
 		"noReminderReady": "No update reminder is ready yet.",
 		"noUpdateToSkip": "No update is available to skip.",
 		"previewStandardFlow": "This is a development preview of the standard update flow.",
-		"previewNativePrompt": "Development preview of the native update prompt. No real update will be installed."
+		"previewNativePrompt": "Development preview of the native update prompt. No real update will be installed.",
+		"devPreviewDetail": "Development preview: the update is ready to install. No real update will be installed."
 	},
 	"auth": {
 		"returnTitle": "Return to Recordly",
@@ -160,6 +161,22 @@
 		"failedToLoadCursorTelemetry": "Failed to load cursor telemetry",
 		"noVideoPathForCursorTelemetry": "No video path available for cursor telemetry",
 		"failedToSaveCursorTelemetry": "Failed to save cursor telemetry",
-		"whisperRuntimeMissing": "No Whisper runtime was found for {{platform}}/{{arch}}. This Recordly build is missing its bundled caption runtime. Reinstall or update Recordly, or select a whisper-cli executable in Caption settings."
+		"whisperRuntimeMissing": "No Whisper runtime was found for {{platform}}/{{arch}}. This Recordly build is missing its bundled caption runtime. Reinstall or update Recordly, or select a whisper-cli executable in Caption settings.",
+		"projectNameInUse": "A different project already uses this name",
+		"projectIdentityUnverifiable": "Unable to verify project identity for the chosen name",
+		"revealedDirectoryOnly": "Could not reveal item, but opened directory.",
+		"projectPathUntrusted": "Project path is no longer trusted. Use Save As to choose a project file.",
+		"selectedWindowUnavailable": "Selected window is no longer available. Please choose the window again.",
+		"cannotRecordOwnWindows": "Cannot record Recordly windows. Please select another app window.",
+		"nativeRecoveryMacosOnly": "Native screen recording recovery is only available on macOS.",
+		"captionGenerationFailed": "Failed to generate auto captions"
+	},
+	"captions": {
+		"sourceRecording": "recording",
+		"sourceMicAndSystem": "microphone and system audio",
+		"sourceMicrophone": "microphone audio sidecar",
+		"sourceSystem": "system audio sidecar",
+		"generatedCues": "Generated {{count}} caption cues.",
+		"generatedCuesFrom": "Generated {{count}} caption cues from the {{source}}."
 	}
 }

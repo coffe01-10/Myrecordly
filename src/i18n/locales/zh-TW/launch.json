@@ -134,6 +134,12 @@
 		"backToSignIn": "返回登入",
 		"previousFeature": "上一個功能",
 		"getStarted": "開始使用",
-		"next": "下一步"
+		"next": "下一步",
+		"mockup": {
+			"entireScreen": "整個螢幕",
+			"preview": "預覽",
+			"copyLink": "複製連結",
+			"yourRecording": "你的錄影"
+		}
 	}
 }

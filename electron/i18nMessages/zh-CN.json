@@ -95,7 +95,8 @@
 		"noReminderReady": "还没有可用的更新提醒。",
 		"noUpdateToSkip": "没有可跳过的更新。",
 		"previewStandardFlow": "这是标准更新流程的开发预览。",
-		"previewNativePrompt": "这是原生更新提示的开发预览，不会安装任何真实更新。"
+		"previewNativePrompt": "这是原生更新提示的开发预览，不会安装任何真实更新。",
+		"devPreviewDetail": "开发预览：更新已可安装。不会安装真实更新。"
 	},
 	"auth": {
 		"returnTitle": "返回 Recordly",
@@ -160,6 +161,22 @@
 		"failedToLoadCursorTelemetry": "无法加载光标遥测数据",
 		"noVideoPathForCursorTelemetry": "没有可用于光标遥测的视频路径",
 		"failedToSaveCursorTelemetry": "无法保存光标遥测数据",
-		"whisperRuntimeMissing": "未找到适用于 {{platform}}/{{arch}} 的 Whisper 运行时。此 Recordly 版本缺少内置字幕运行时。请重新安装或更新 Recordly，或在字幕设置中选择 whisper-cli 可执行文件。"
+		"whisperRuntimeMissing": "未找到适用于 {{platform}}/{{arch}} 的 Whisper 运行时。此 Recordly 版本缺少内置字幕运行时。请重新安装或更新 Recordly，或在字幕设置中选择 whisper-cli 可执行文件。",
+		"projectNameInUse": "已有其他项目使用该名称",
+		"projectIdentityUnverifiable": "无法验证所选名称对应的项目身份",
+		"revealedDirectoryOnly": "无法定位该项目，但已打开所在文件夹。",
+		"projectPathUntrusted": "项目路径已不再受信任。请使用“另存为”重新选择项目文件。",
+		"selectedWindowUnavailable": "所选窗口已不可用，请重新选择窗口。",
+		"cannotRecordOwnWindows": "无法录制 Recordly 自身的窗口，请选择其他应用窗口。",
+		"nativeRecoveryMacosOnly": "原生屏幕录制恢复功能仅支持 macOS。",
+		"captionGenerationFailed": "生成自动字幕失败"
+	},
+	"captions": {
+		"sourceRecording": "录制",
+		"sourceMicAndSystem": "麦克风与系统音频",
+		"sourceMicrophone": "麦克风音频旁路文件",
+		"sourceSystem": "系统音频旁路文件",
+		"generatedCues": "已生成 {{count}} 条字幕。",
+		"generatedCuesFrom": "已从{{source}}生成 {{count}} 条字幕。"
 	}
 }

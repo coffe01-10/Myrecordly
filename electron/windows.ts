@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import {
 	supportsHudCaptureProtection,
 	shouldProtectHudCapture,
@@ -54,6 +54,7 @@ function getEditorWindowQuery(): Record<string, string> {
 	const query: Record<string, string> = {
 		windowType: "editor",
 	};
+	if (process.platform === "win32") query.titlebar = "overlay";
 
 	if (process.env.RECORDLY_DEV_OPEN_RECORDING_INPUT) {
 		query.devOpenInput = process.env.RECORDLY_DEV_OPEN_RECORDING_INPUT;
@@ -963,6 +964,14 @@ export function createEditorWindow(): BrowserWindow {
 			titleBarStyle: "hiddenInset",
 			trafficLightPosition: { x: 16, y: 20 },
 		}),
+		...(process.platform === "win32" && {
+			titleBarStyle: "hidden",
+			titleBarOverlay: {
+				color: "#00000000",
+				symbolColor: nativeTheme.shouldUseDarkColors ? "#e8e8e6" : "#292929",
+				height: 32,
+			},
+		}),
 		autoHideMenuBar: !isMac,
 		transparent: false,
 		resizable: true,
@@ -987,6 +996,15 @@ export function createEditorWindow(): BrowserWindow {
 		editorWindows.delete(win);
 		notifyEditorMode();
 	});
+	if (process.platform === "win32") {
+		const syncTitleBarTheme = () => {
+			win.setTitleBarOverlay({
+				symbolColor: nativeTheme.shouldUseDarkColors ? "#e8e8e6" : "#292929",
+			});
+		};
+		nativeTheme.on("updated", syncTitleBarTheme);
+		win.once("closed", () => nativeTheme.removeListener("updated", syncTitleBarTheme));
+	}
 
 	const publishWindowChrome = () => {
 		if (!win.isDestroyed())

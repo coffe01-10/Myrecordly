@@ -395,7 +395,10 @@ function simulateDevPreviewDownload(sendToRenderer?: UpdateToastSender) {
 			emitUpdateToastState(sendToRenderer, {
 				...createDownloadedUpdateToastPayload(DEV_UPDATE_PREVIEW_VERSION),
 				isPreview: true,
-				detail: "Development preview: the update is ready to install. No real update will be installed.",
+				detail: t(
+					"update.devPreviewDetail",
+					"Development preview: the update is ready to install. No real update will be installed.",
+				),
 			});
 			return;
 		}
@@ -645,10 +648,7 @@ async function showAvailableUpdateDialog(
 			: isExperimental
 				? experimentalUpdateDescription()
 				: t("update.installAndRestartHint", "Install and restart now, or remind me later."),
-		buttons: [
-			t("update.installAndRestart", "Install & Restart"),
-			t("update.later", "Later"),
-		],
+		buttons: [t("update.installAndRestart", "Install & Restart"), t("update.later", "Later")],
 		defaultId: 0,
 		cancelId: 1,
 		noLink: true,
@@ -690,17 +690,16 @@ async function showDownloadedUpdateDialog(
 		title: t("update.readyTitle", "Update Ready"),
 		message: isPreview
 			? t("update.readyToInstall", "Recordly {{version}} is ready to install.", { version })
-			: t("update.hasBeenDownloaded", "Recordly {{version}} has been downloaded.", { version }),
+			: t("update.hasBeenDownloaded", "Recordly {{version}} has been downloaded.", {
+					version,
+				}),
 		detail: isPreview
 			? t(
 					"update.previewNativePrompt",
 					"Development preview of the native update prompt. No real update will be installed.",
 				)
 			: t("update.installAndRestartHint", "Install and restart now, or remind me later."),
-		buttons: [
-			t("update.installAndRestart", "Install & Restart"),
-			t("update.later", "Later"),
-		],
+		buttons: [t("update.installAndRestart", "Install & Restart"), t("update.later", "Later")],
 		defaultId: 0,
 		cancelId: 1,
 		noLink: true,
@@ -799,7 +798,10 @@ export async function checkForAppUpdates(
 	manualCheckRequested = Boolean(options?.manual);
 	updateCheckInProgress = true;
 	applyExperimentalUpdatesPreference();
-	setUpdateStatusSummary({ status: "checking", detail: "Checking for updates..." });
+	setUpdateStatusSummary({
+		status: "checking",
+		detail: t("update.statusChecking", "Checking for updates..."),
+	});
 	writeUpdaterLog(`Starting ${manualCheckRequested ? "manual" : "automatic"} update check.`);
 
 	try {
@@ -906,8 +908,8 @@ export function setupAutoUpdates(
 			status: "downloading",
 			availableVersion,
 			detail: t("update.statusDownloading", "Downloading Recordly {{version}}", {
-			version: availableVersion,
-		}),
+				version: availableVersion,
+			}),
 		});
 		writeUpdaterLog(
 			`Download progress for ${availableVersion}: ${progress.percent.toFixed(1)}%`,

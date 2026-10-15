@@ -1,5 +1,45 @@
 /* DogSC's neutral surfaces, mint navigation and warm effect tracks.
    These are application chrome tokens; video composition colors stay independent. */
+
+/* Windows caption buttons retain their native behavior over a transparent surface.
+   Keeping the title strip in the page lets every modal backdrop dim it naturally. */
+html[data-window-titlebar="overlay"] #root {
+	box-sizing: border-box;
+	padding-top: var(--window-titlebar-height);
+}
+html[data-window-titlebar="overlay"] .h-screen {
+	height: calc(100dvh - var(--window-titlebar-height));
+}
+.native-window-titlebar {
+	position: fixed;
+	top: 0;
+	left: env(titlebar-area-x, 0px);
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: env(titlebar-area-width, calc(100% - 138px));
+	height: var(--window-titlebar-height);
+	padding-inline: 12px;
+	background: var(--background);
+	color: var(--muted);
+	font-size: 12px;
+	-webkit-app-region: drag;
+}
+.native-window-titlebar img { width: 16px; height: 16px; }
+html[data-window-titlebar="overlay"] .modal__backdrop:has(.dashboard-shell) {
+	top: var(--window-titlebar-height);
+	height: calc(100dvh - var(--window-titlebar-height));
+}
+html[data-window-titlebar="overlay"] .modal__container--full:has(.dashboard-shell) {
+	height: 100%;
+}
+html[data-window-titlebar="overlay"]:has(.modal__backdrop:not(:has(.dashboard-shell))) .native-window-titlebar {
+	-webkit-app-region: no-drag;
+}
+html[data-window-fullscreen] { --window-titlebar-height: 0px; }
+html[data-window-fullscreen] .native-window-titlebar { display: none; }
+
 :root,
 [data-theme="light"] {
 	--background: #f2f3f7;

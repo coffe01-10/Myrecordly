@@ -15,7 +15,7 @@ import {
 import { getHudCaptureExcludedProcessIds } from "../../../src/lib/hudCaptureProtection";
 import { showCursor } from "../../cursorHider";
 import { t } from "../../i18n";
-import { getHudOverlayCaptureProtectionEnabled, beginHudCaptureProtection } from "../../windows";
+import { beginHudCaptureProtection, getHudOverlayCaptureProtectionEnabled } from "../../windows";
 import { ALLOW_RECORDLY_WINDOW_CAPTURE } from "../constants";
 import { startWindowBoundsCapture, stopWindowBoundsCapture } from "../cursor/bounds";
 import { startInteractionCapture, stopInteractionCapture } from "../cursor/interaction";
@@ -415,9 +415,9 @@ export function registerRecordingHandlers(
 					return {
 						success: false,
 						message: t(
-						"error.nativeWindowsCaptureUnavailable",
-						"Native Windows capture is not available on this system.",
-					),
+							"error.nativeWindowsCaptureUnavailable",
+							"Native Windows capture is not available on this system.",
+						),
 					};
 				}
 
@@ -436,9 +436,9 @@ export function registerRecordingHandlers(
 					return {
 						success: false,
 						message: t(
-						"error.nativeWindowsCaptureActive",
-						"A native Windows screen recording is already active.",
-					),
+							"error.nativeWindowsCaptureActive",
+							"A native Windows screen recording is already active.",
+						),
 					};
 				}
 
@@ -480,8 +480,10 @@ export function registerRecordingHandlers(
 					if (captureTarget.kind === "invalid-window") {
 						return {
 							success: false,
-							message:
+							message: t(
+								"error.selectedWindowUnavailable",
 								"Selected window is no longer available. Please choose the window again.",
+							),
 						};
 					}
 
@@ -656,7 +658,10 @@ export function registerRecordingHandlers(
 					setWindowsCapturePaused(false);
 					return {
 						success: false,
-						message: t("error.failedToStartNativeWindowsCapture", "Failed to start native Windows capture"),
+						message: t(
+							"error.failedToStartNativeWindowsCapture",
+							"Failed to start native Windows capture",
+						),
 						error: String(error),
 					};
 				}
@@ -666,9 +671,9 @@ export function registerRecordingHandlers(
 				return {
 					success: false,
 					message: t(
-					"error.nativeOnlyMacos",
-					"Native screen recording is only available on macOS.",
-				),
+						"error.nativeOnlyMacos",
+						"Native screen recording is only available on macOS.",
+					),
 				};
 			}
 
@@ -684,7 +689,13 @@ export function registerRecordingHandlers(
 			}
 
 			if (nativeCaptureProcess) {
-				return { success: false, message: t("error.nativeScreenRecordingActive", "A native screen recording is already active.") };
+				return {
+					success: false,
+					message: t(
+						"error.nativeScreenRecordingActive",
+						"A native screen recording is already active.",
+					),
+				};
 			}
 
 			let captProc: ChildProcessWithoutNullStreams | null = null;
@@ -722,8 +733,10 @@ export function registerRecordingHandlers(
 				) {
 					return {
 						success: false,
-						message:
+						message: t(
+							"error.cannotRecordOwnWindows",
 							"Cannot record Recordly windows. Please select another app window.",
+						),
 					};
 				}
 
@@ -848,10 +861,7 @@ export function registerRecordingHandlers(
 				) {
 					const { response } = await dialog.showMessageBox({
 						type: "warning",
-						title: t(
-							"permission.screenTitle",
-							"Screen Recording Permission Required",
-						),
+						title: t("permission.screenTitle", "Screen Recording Permission Required"),
 						message: t(
 							"permission.screenMessage",
 							"Recordly needs screen recording permission to capture your screen.",
@@ -884,11 +894,10 @@ export function registerRecordingHandlers(
 					setNativeCapturePaused(false);
 					return {
 						success: false,
-						message:
-							t(
-								"error.screenPermissionNotGranted",
-								"Screen recording permission not granted. Please allow access in System Settings and restart the app.",
-							),
+						message: t(
+							"error.screenPermissionNotGranted",
+							"Screen recording permission not granted. Please allow access in System Settings and restart the app.",
+						),
 						userNotified: true,
 					};
 				}
@@ -929,11 +938,10 @@ export function registerRecordingHandlers(
 					setNativeCapturePaused(false);
 					return {
 						success: false,
-						message:
-							t(
-								"error.microphonePermissionNotGranted",
-								"Microphone permission not granted. Please allow access in System Settings.",
-							),
+						message: t(
+							"error.microphonePermissionNotGranted",
+							"Microphone permission not granted. Please allow access in System Settings.",
+						),
 						userNotified: true,
 					};
 				}
@@ -965,7 +973,10 @@ export function registerRecordingHandlers(
 				setNativeCapturePaused(false);
 				return {
 					success: false,
-					message: t("error.failedToStartScreenCaptureKit", "Failed to start native ScreenCaptureKit recording"),
+					message: t(
+						"error.failedToStartScreenCaptureKit",
+						"Failed to start native ScreenCaptureKit recording",
+					),
 					error: String(error),
 				};
 			}
@@ -1164,7 +1175,10 @@ export function registerRecordingHandlers(
 
 					return {
 						success: false,
-						message: t("error.failedToStopNativeWindowsCapture", "Failed to stop native Windows capture"),
+						message: t(
+							"error.failedToStopNativeWindowsCapture",
+							"Failed to stop native Windows capture",
+						),
 						error: String(error),
 					};
 				}
@@ -1174,9 +1188,9 @@ export function registerRecordingHandlers(
 				return {
 					success: false,
 					message: t(
-					"error.nativeOnlyMacos",
-					"Native screen recording is only available on macOS.",
-				),
+						"error.nativeOnlyMacos",
+						"Native screen recording is only available on macOS.",
+					),
 				};
 			}
 
@@ -1186,7 +1200,13 @@ export function registerRecordingHandlers(
 					return recovered;
 				}
 
-				return { success: false, message: t("error.noNativeScreenRecordingActive", "No native screen recording is active.") };
+				return {
+					success: false,
+					message: t(
+						"error.noNativeScreenRecordingActive",
+						"No native screen recording is active.",
+					),
+				};
 			}
 
 			try {
@@ -1313,7 +1333,10 @@ export function registerRecordingHandlers(
 
 				return {
 					success: false,
-					message: t("error.failedToStopScreenCaptureKit", "Failed to stop native ScreenCaptureKit recording"),
+					message: t(
+						"error.failedToStopScreenCaptureKit",
+						"Failed to stop native ScreenCaptureKit recording",
+					),
 					error: String(error),
 				};
 			}
@@ -1328,7 +1351,10 @@ export function registerRecordingHandlers(
 		if (process.platform !== "darwin") {
 			return {
 				success: false,
-				message: "Native screen recording recovery is only available on macOS.",
+				message: t(
+					"error.nativeRecoveryMacosOnly",
+					"Native screen recording recovery is only available on macOS.",
+				),
 			};
 		}
 
@@ -1339,14 +1365,23 @@ export function registerRecordingHandlers(
 
 		return {
 			success: false,
-			message: t("error.noRecoverableNativeOutput", "No recoverable native macOS recording output was found."),
+			message: t(
+				"error.noRecoverableNativeOutput",
+				"No recoverable native macOS recording output was found.",
+			),
 		};
 	});
 
 	ipcMain.handle("pause-native-screen-recording", async () => {
 		if (process.platform === "win32") {
 			if (!windowsNativeCaptureActive || !windowsCaptureProcess) {
-				return { success: false, message: t("error.noNativeWindowsScreenRecordingActive", "No native Windows screen recording is active.") };
+				return {
+					success: false,
+					message: t(
+						"error.noNativeWindowsScreenRecordingActive",
+						"No native Windows screen recording is active.",
+					),
+				};
 			}
 
 			if (windowsCapturePaused) {
@@ -1360,7 +1395,10 @@ export function registerRecordingHandlers(
 			} catch (error) {
 				return {
 					success: false,
-					message: t("error.failedToPauseNativeWindowsCapture", "Failed to pause native Windows capture"),
+					message: t(
+						"error.failedToPauseNativeWindowsCapture",
+						"Failed to pause native Windows capture",
+					),
 					error: String(error),
 				};
 			}
@@ -1377,7 +1415,13 @@ export function registerRecordingHandlers(
 		}
 
 		if (!nativeScreenRecordingActive || !nativeCaptureProcess) {
-			return { success: false, message: t("error.noNativeScreenRecordingActive", "No native screen recording is active.") };
+			return {
+				success: false,
+				message: t(
+					"error.noNativeScreenRecordingActive",
+					"No native screen recording is active.",
+				),
+			};
 		}
 
 		if (nativeCapturePaused) {
@@ -1396,7 +1440,10 @@ export function registerRecordingHandlers(
 		} catch (error) {
 			return {
 				success: false,
-				message: t("error.failedToPauseNativeScreenRecording", "Failed to pause native screen recording"),
+				message: t(
+					"error.failedToPauseNativeScreenRecording",
+					"Failed to pause native screen recording",
+				),
 				error: String(error),
 			};
 		}
@@ -1405,7 +1452,13 @@ export function registerRecordingHandlers(
 	ipcMain.handle("resume-native-screen-recording", async () => {
 		if (process.platform === "win32") {
 			if (!windowsNativeCaptureActive || !windowsCaptureProcess) {
-				return { success: false, message: t("error.noNativeWindowsScreenRecordingActive", "No native Windows screen recording is active.") };
+				return {
+					success: false,
+					message: t(
+						"error.noNativeWindowsScreenRecordingActive",
+						"No native Windows screen recording is active.",
+					),
+				};
 			}
 
 			if (!windowsCapturePaused) {
@@ -1419,7 +1472,10 @@ export function registerRecordingHandlers(
 			} catch (error) {
 				return {
 					success: false,
-					message: t("error.failedToResumeNativeWindowsCapture", "Failed to resume native Windows capture"),
+					message: t(
+						"error.failedToResumeNativeWindowsCapture",
+						"Failed to resume native Windows capture",
+					),
 					error: String(error),
 				};
 			}
@@ -1436,7 +1492,13 @@ export function registerRecordingHandlers(
 		}
 
 		if (!nativeScreenRecordingActive || !nativeCaptureProcess) {
-			return { success: false, message: t("error.noNativeScreenRecordingActive", "No native screen recording is active.") };
+			return {
+				success: false,
+				message: t(
+					"error.noNativeScreenRecordingActive",
+					"No native screen recording is active.",
+				),
+			};
 		}
 
 		if (!nativeCapturePaused) {
@@ -1455,7 +1517,10 @@ export function registerRecordingHandlers(
 		} catch (error) {
 			return {
 				success: false,
-				message: t("error.failedToResumeNativeScreenRecording", "Failed to resume native screen recording"),
+				message: t(
+					"error.failedToResumeNativeScreenRecording",
+					"Failed to resume native screen recording",
+				),
 				error: String(error),
 			};
 		}
@@ -1508,7 +1573,13 @@ export function registerRecordingHandlers(
 			setWindowsOrphanedMicAudioPath(null);
 
 			if (!videoPath) {
-				return { success: false, message: t("error.noNativeWindowsVideoPendingForMux", "No native Windows video pending for mux") };
+				return {
+					success: false,
+					message: t(
+						"error.noNativeWindowsVideoPendingForMux",
+						"No native Windows video pending for mux",
+					),
+				};
 			}
 
 			try {
@@ -1589,7 +1660,10 @@ export function registerRecordingHandlers(
 						return {
 							success: false,
 							path: videoPath,
-							message: t("error.failedToMuxNativeWindowsRecording", "Failed to mux native Windows recording"),
+							message: t(
+								"error.failedToMuxNativeWindowsRecording",
+								"Failed to mux native Windows recording",
+							),
 							error: String(error),
 						};
 					} catch {
@@ -1598,7 +1672,10 @@ export function registerRecordingHandlers(
 
 					return {
 						success: false,
-						message: t("error.failedToMuxNativeWindowsRecording", "Failed to mux native Windows recording"),
+						message: t(
+							"error.failedToMuxNativeWindowsRecording",
+							"Failed to mux native Windows recording",
+						),
 						error: String(error),
 					};
 				}
@@ -1612,7 +1689,10 @@ export function registerRecordingHandlers(
 
 	ipcMain.handle("start-ffmpeg-recording", async (_, source: SelectedSource) => {
 		if (ffmpegCaptureProcess) {
-			return { success: false, message: t("error.ffmpegRecordingActive", "An FFmpeg recording is already active.") };
+			return {
+				success: false,
+				message: t("error.ffmpegRecordingActive", "An FFmpeg recording is already active."),
+			};
 		}
 
 		try {
@@ -1646,7 +1726,10 @@ export function registerRecordingHandlers(
 			setFfmpegCaptureTargetPath(null);
 			return {
 				success: false,
-				message: t("error.failedToStartFfmpegRecording", "Failed to start FFmpeg recording"),
+				message: t(
+					"error.failedToStartFfmpegRecording",
+					"Failed to start FFmpeg recording",
+				),
 				error: String(error),
 			};
 		}
@@ -1654,7 +1737,10 @@ export function registerRecordingHandlers(
 
 	ipcMain.handle("stop-ffmpeg-recording", async () => {
 		if (!ffmpegScreenRecordingActive) {
-			return { success: false, message: t("error.noFfmpegRecordingActive", "No FFmpeg recording is active.") };
+			return {
+				success: false,
+				message: t("error.noFfmpegRecordingActive", "No FFmpeg recording is active."),
+			};
 		}
 
 		try {
@@ -1894,13 +1980,23 @@ export function registerRecordingHandlers(
 			}
 
 			if (sortedCandidates.length === 0) {
-				return { success: false, message: t("error.noRecordedVideoFound", "No recorded video found") };
+				return {
+					success: false,
+					message: t("error.noRecordedVideoFound", "No recorded video found"),
+				};
 			}
 
-			return { success: false, message: t("error.noUsableRecordedVideoFound", "No usable recorded video found") };
+			return {
+				success: false,
+				message: t("error.noUsableRecordedVideoFound", "No usable recorded video found"),
+			};
 		} catch (error) {
 			console.error("Failed to get video path:", error);
-			return { success: false, message: t("error.failedToGetVideoPath", "Failed to get video path"), error: String(error) };
+			return {
+				success: false,
+				message: t("error.failedToGetVideoPath", "Failed to get video path"),
+				error: String(error),
+			};
 		}
 	});
 
@@ -1995,7 +2091,10 @@ export function registerRecordingHandlers(
 				return {
 					success: false,
 					samples: [],
-					message: t("error.noVideoPathForCursorTelemetry", "No video path available for cursor telemetry"),
+					message: t(
+						"error.noVideoPathForCursorTelemetry",
+						"No video path available for cursor telemetry",
+					),
 					error: "Missing video path",
 				};
 			}
@@ -2008,7 +2107,10 @@ export function registerRecordingHandlers(
 				return {
 					success: false,
 					samples: [],
-					message: t("error.failedToSaveCursorTelemetry", "Failed to save cursor telemetry"),
+					message: t(
+						"error.failedToSaveCursorTelemetry",
+						"Failed to save cursor telemetry",
+					),
 					error: String(error),
 				};
 			}

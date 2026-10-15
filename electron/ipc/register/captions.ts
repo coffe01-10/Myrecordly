@@ -1,5 +1,6 @@
 import path from "node:path";
 import { dialog, ipcMain } from "electron";
+import { t } from "../../i18n";
 import { generateAutoCaptionsFromVideo } from "../captions/generate";
 import {
 	deleteWhisperSmallModel,
@@ -8,7 +9,6 @@ import {
 	sendWhisperModelDownloadProgress,
 } from "../captions/whisper";
 import { LEGACY_PROJECT_FILE_EXTENSIONS, PROJECT_FILE_EXTENSION } from "../constants";
-import { t } from "../../i18n";
 import { hasProjectFileExtension, loadProjectFromPath } from "../project/manager";
 import { setCurrentProjectPath } from "../state";
 import { approveUserPath, getRecordingsDir } from "../utils";
@@ -19,6 +19,23 @@ const PROJECT_FILE_EXTENSIONS = [PROJECT_FILE_EXTENSION, ...LEGACY_PROJECT_FILE_
 type OpenVideoFilePickerOptions = {
 	includeProjects?: boolean;
 };
+
+// Caption audio sources use stable English labels as internal identifiers, so
+// translate them only for display.
+function captionAudioSourceLabel(label: string): string {
+	switch (label) {
+		case "recording":
+			return t("captions.sourceRecording", "recording");
+		case "microphone and system audio":
+			return t("captions.sourceMicAndSystem", "microphone and system audio");
+		case "microphone audio sidecar":
+			return t("captions.sourceMicrophone", "microphone audio sidecar");
+		case "system audio sidecar":
+			return t("captions.sourceSystem", "system audio sidecar");
+		default:
+			return label;
+	}
+}
 
 export function registerCaptionHandlers() {
 	ipcMain.handle("open-video-file-picker", async (_, options?: OpenVideoFilePickerOptions) => {
@@ -42,14 +59,17 @@ export function registerCaptionHandlers() {
 								},
 							]
 						: []),
-					{ name: t("filter.videoFiles", "Video Files"), extensions: VIDEO_FILE_EXTENSIONS },
+					{
+						name: t("filter.videoFiles", "Video Files"),
+						extensions: VIDEO_FILE_EXTENSIONS,
+					},
 					...(includeProjects
 						? [
-							{
-								name: t("filter.recordlyProjects", "Recordly Projects"),
-								extensions: PROJECT_FILE_EXTENSIONS,
-							},
-						]
+								{
+									name: t("filter.recordlyProjects", "Recordly Projects"),
+									extensions: PROJECT_FILE_EXTENSIONS,
+								},
+							]
 						: []),
 					{ name: t("filter.allFiles", "All Files"), extensions: ["*"] },
 				],
@@ -247,8 +267,17 @@ export function registerCaptionHandlers() {
 					cues: result.cues,
 					message:
 						result.audioSourceLabel === "recording"
-							? `Generated ${result.cues.length} caption cues.`
-							: `Generated ${result.cues.length} caption cues from the ${result.audioSourceLabel}.`,
+							? t("captions.generatedCues", "Generated {{count}} caption cues.", {
+									count: result.cues.length,
+								})
+							: t(
+									"captions.generatedCuesFrom",
+									"Generated {{count}} caption cues from the {{source}}.",
+									{
+										count: result.cues.length,
+										source: captionAudioSourceLabel(result.audioSourceLabel),
+									},
+								),
 				};
 			} catch (error) {
 				console.error("Failed to generate auto captions:", error);
@@ -256,7 +285,12 @@ export function registerCaptionHandlers() {
 					success: false,
 					error: String(error),
 					message:
-						error instanceof Error ? error.message : "Failed to generate auto captions",
+						error instanceof Error
+							? error.message
+							: t(
+									"error.captionGenerationFailed",
+									"Failed to generate auto captions",
+								),
 				};
 			}
 		},

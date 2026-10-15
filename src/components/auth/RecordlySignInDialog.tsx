@@ -41,12 +41,27 @@ type Props = {
 	onAuthenticated: () => void;
 };
 
+// Auth failures originate in the non-React auth module, so they carry stable
+// English messages. Map the known ones to localized copy before display.
+const AUTH_ERROR_KEYS: Array<[RegExp, string]> = [
+	[/Recordly Auth is not configured/i, "editor.signIn.errors.notConfigured"],
+	[/Incorrect email or password/i, "editor.signIn.errors.incorrectCredentials"],
+	[/No user was returned after sign-in/i, "editor.signIn.errors.noUserReturned"],
+	[/did not return a sign-in URL/i, "editor.signIn.errors.missingSignInUrl"],
+	[/Could not open the sign-in page/i, "editor.signIn.errors.openSignInPageFailed"],
+	[/Enter a valid work email address/i, "editor.signIn.errors.invalidWorkEmail"],
+	[/Request a new sign-in link from Recordly/i, "editor.signIn.errors.requestNewLink"],
+];
+
 function friendlyAuthError(
 	error: unknown,
 	action: string,
 	t: ReturnType<typeof useI18n>["t"],
 ): string {
 	const message = error instanceof Error ? error.message : String(error);
+	for (const [pattern, key] of AUTH_ERROR_KEYS) {
+		if (pattern.test(message)) return t(key, message);
+	}
 	if (/unsupported provider|provider is not enabled/i.test(message)) {
 		if (action === "google") {
 			return t("editor.cloud.googleUnavailable");

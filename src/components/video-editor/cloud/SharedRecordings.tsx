@@ -7,6 +7,7 @@ import { DashboardFilters } from "../dashboard/DashboardFilters";
 import { DashboardAnnouncements } from "../dashboard/DashboardAnnouncements";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Button } from "@heroui/react";
+import { useScopedT } from "@/contexts/I18nContext";
 import { ArrowClockwise, ArrowSquareOut, Trash } from "@/components/ui/icons";
 
 type Recording = {
@@ -31,6 +32,7 @@ export function SharedRecordings({
 	standalone?: boolean;
 	accountLabel?: string;
 }) {
+	const t = useScopedT("editor");
 	const [query, setQuery] = useState("");
 	const [period, setPeriod] = useState("all");
 	const [sort, setSort] = useState("recent");
@@ -54,8 +56,7 @@ export function SharedRecordings({
 				action: "list",
 			});
 			if (generation !== loadGeneration.current) return;
-			if (!result.success)
-				throw new Error(result.error || "Could not load shared recordings.");
+			if (!result.success) throw new Error(result.error || t("cloud.loadSharedFailed"));
 			setRecordings(result.videos || []);
 		} catch (cause) {
 			if (generation === loadGeneration.current)
@@ -63,7 +64,7 @@ export function SharedRecordings({
 		} finally {
 			if (generation === loadGeneration.current) setLoading(false);
 		}
-	}, [token, endpoint]);
+	}, [token, endpoint, t]);
 	// biome-ignore lint/correctness/useExhaustiveDependencies: A new share URL must refresh this library.
 	useEffect(() => {
 		if (expanded) void load();
@@ -72,7 +73,7 @@ export function SharedRecordings({
 		};
 	}, [expanded, load, refreshKey]);
 	const remove = async (code: string) => {
-		if (!window.confirm("Delete this shared recording? This cannot be undone.")) return;
+		if (!window.confirm(t("cloud.deleteSharedConfirm"))) return;
 		setDeleting(code);
 		setError(undefined);
 		try {
@@ -82,7 +83,7 @@ export function SharedRecordings({
 				action: "delete",
 				shareCode: code,
 			});
-			if (!result.success) throw new Error(result.error || "Could not delete recording.");
+			if (!result.success) throw new Error(result.error || t("cloud.deleteSharedFailed"));
 			notifyShareCapacityChanged();
 			setRecordings((current) => current.filter((recording) => recording.code !== code));
 		} catch (cause) {
@@ -130,7 +131,7 @@ export function SharedRecordings({
 					onImportFile={load}
 					run={run}
 					busy={loading || Boolean(deleting)}
-					actionLabel="Refresh"
+					actionLabel={t("cloud.refresh")}
 					action="refresh"
 				/>
 				<DashboardFilters
@@ -158,7 +159,7 @@ export function SharedRecordings({
 						<LibrarySkeleton />
 					) : entries.length ? (
 						<ul
-							aria-label="Shared projects"
+							aria-label={t("cloud.sharedProjects")}
 							className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-x-7 gap-y-10 lg:gap-x-9"
 						>
 							{entries.map((entry) => (
@@ -180,7 +181,7 @@ export function SharedRecordings({
 													);
 												if (!result.success)
 													throw new Error(
-														result.error || "Could not open link.",
+														result.error || t("cloud.openLinkFailed"),
 													);
 											})
 										}
@@ -202,8 +203,8 @@ export function SharedRecordings({
 							</span>
 							<p>
 								{query || period !== "all"
-									? "No matching projects"
-									: "It's looking empty in here..."}
+									? t("cloud.noMatchingProjects")
+									: t("cloud.emptyProjects")}
 							</p>
 						</div>
 					)}
@@ -221,14 +222,14 @@ export function SharedRecordings({
 					onPress={() => setExpanded((value) => !value)}
 					aria-expanded={expanded}
 				>
-					{expanded ? "Hide shared recordings" : "Manage shared recordings"}
+					{expanded ? t("cloud.hideShared") : t("cloud.manageShared")}
 				</Button>
 				{expanded && (
 					<Button
 						variant="ghost"
 						size="sm"
 						isIconOnly
-						aria-label="Refresh recordings"
+						aria-label={t("cloud.refreshRecordings")}
 						isDisabled={loading || Boolean(deleting)}
 						onPress={() => void load()}
 					>
@@ -240,8 +241,11 @@ export function SharedRecordings({
 				<>
 					<p className="text-xs text-muted">
 						{loading
-							? "Loading recordings…"
-							: `${recordings.length} of ${FREE_RECORDING_LIMIT} recordings · 1 GB each · Free links expire after 14 days`}
+							? t("cloud.loadingRecordings")
+							: t("cloud.sharedCountSummary", undefined, {
+									count: recordings.length,
+									limit: FREE_RECORDING_LIMIT,
+								})}
 					</p>
 					{loading ? (
 						<LibrarySkeleton />
@@ -259,7 +263,8 @@ export function SharedRecordings({
 											</p>
 											<p className="text-xs text-muted">
 												{(recording.size / 1024 / 1024).toFixed(1)} MB
-												{!recording.ready && " · Incomplete upload"}
+												{!recording.ready &&
+													` · ${t("cloud.incompleteUpload")}`}
 											</p>
 										</div>
 										{recording.ready && (
@@ -267,7 +272,13 @@ export function SharedRecordings({
 												variant="ghost"
 												size="sm"
 												isIconOnly
-												aria-label={`Open ${recording.title}`}
+												aria-label={t(
+													"cloud.openRecordingAria",
+													undefined,
+													{
+														title: recording.title,
+													},
+												)}
 												onPress={() =>
 													void window.electronAPI.openExternalUrl(
 														recording.url,
@@ -281,7 +292,9 @@ export function SharedRecordings({
 											variant="ghost"
 											size="sm"
 											isIconOnly
-											aria-label={`Delete ${recording.title}`}
+											aria-label={t("cloud.deleteRecordingAria", undefined, {
+												title: recording.title,
+											})}
 											isDisabled={Boolean(deleting)}
 											className="text-danger"
 											onPress={() => void remove(recording.code)}
@@ -292,7 +305,9 @@ export function SharedRecordings({
 								</li>
 							))}
 							{!recordings.length && !error && (
-								<li className="text-sm text-muted">No shared recordings yet.</li>
+								<li className="text-sm text-muted">
+									{t("cloud.noSharedRecordings")}
+								</li>
 							)}
 						</ul>
 					)}

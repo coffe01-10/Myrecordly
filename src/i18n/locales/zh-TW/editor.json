@@ -57,7 +57,24 @@
 		"createShareLink": "建立分享連結",
 		"done": "完成",
 		"addingVideo": "正在新增影片…",
-		"preparingFootage": "正在為時間軸準備影片與音訊。"
+		"preparingFootage": "正在為時間軸準備影片與音訊。",
+		"loadSharedFailed": "無法載入共享錄影。",
+		"deleteSharedFailed": "無法刪除錄影。",
+		"deleteSharedConfirm": "要刪除此共享錄影嗎？此操作無法復原。",
+		"openLinkFailed": "無法開啟連結。",
+		"sharedProjects": "共享專案",
+		"refresh": "重新整理",
+		"refreshRecordings": "重新整理錄影",
+		"hideShared": "隱藏共享錄影",
+		"manageShared": "管理共享錄影",
+		"noSharedRecordings": "還沒有共享錄影。",
+		"sharedCountSummary": "{{count}} / {{limit}} 個錄影 · 每個 1 GB · 免費連結 14 天後過期",
+		"noMatchingProjects": "沒有符合的專案",
+		"emptyProjects": "這裡空空如也……",
+		"loadingRecordings": "正在載入錄影…",
+		"incompleteUpload": "上傳未完成",
+		"openRecordingAria": "開啟 {{title}}",
+		"deleteRecordingAria": "刪除 {{title}}"
 	},
 	"signIn": {
 		"welcome": "歡迎使用 Recordly",
@@ -74,7 +91,16 @@
 		"microsoftUnavailable": "暫不支援 Microsoft 登入。",
 		"githubUnavailable": "暫不支援 GitHub 登入。",
 		"emailUnavailable": "暫不支援電子郵件登入。",
-		"checkInbox": "請查收郵件以驗證電子郵件並繼續使用 Recordly。請在此電腦上開啟連結，並保持 Recordly 執行。"
+		"checkInbox": "請查收郵件以驗證電子郵件並繼續使用 Recordly。請在此電腦上開啟連結，並保持 Recordly 執行。",
+		"errors": {
+			"notConfigured": "Recordly 登入尚未設定。請新增 Supabase URL 與可發布金鑰。",
+			"incorrectCredentials": "電子郵件或密碼不正確。",
+			"noUserReturned": "登入後未回傳使用者資訊。",
+			"missingSignInUrl": "身分驗證服務未回傳登入連結。",
+			"openSignInPageFailed": "無法開啟登入頁面。",
+			"invalidWorkEmail": "請輸入有效的工作電子郵件地址。",
+			"requestNewLink": "請向 Recordly 重新申請登入連結，然後在此電腦上開啟。"
+		}
 	},
 	"clips": {
 		"title": "片段",
@@ -173,7 +199,8 @@
 		"noImage": "無圖片",
 		"noArrowData": "無箭頭資料",
 		"typeLabel": "註解類型",
-		"uploadedAlt": "已上傳的註解"
+		"uploadedAlt": "已上傳的註解",
+		"customFonts": "自訂字型"
 	},
 	"fontStyles": {
 		"classic": "經典",
@@ -270,7 +297,8 @@
 		"fileLoadError": "無法載入檔案：{{error}}",
 		"mediaError": "無法載入專案媒體",
 		"renameFailed": "無法重新命名專案",
-		"libraryLoadFailed": "無法載入專案庫"
+		"libraryLoadFailed": "無法載入專案庫",
+		"openProjects": "開啟專案"
 	},
 	"exportTips": {
 		"autoZooms": "提示：可在設定中關閉自動套用的縮放",

@@ -57,7 +57,24 @@
 		"createShareLink": "创建共享链接",
 		"done": "完成",
 		"addingVideo": "正在添加视频…",
-		"preparingFootage": "正在为时间轴准备视频和音频。"
+		"preparingFootage": "正在为时间轴准备视频和音频。",
+		"loadSharedFailed": "无法加载共享录制。",
+		"deleteSharedFailed": "无法删除录制。",
+		"deleteSharedConfirm": "要删除此共享录制吗？此操作无法撤销。",
+		"openLinkFailed": "无法打开链接。",
+		"sharedProjects": "共享项目",
+		"refresh": "刷新",
+		"refreshRecordings": "刷新录制",
+		"hideShared": "隐藏共享录制",
+		"manageShared": "管理共享录制",
+		"noSharedRecordings": "还没有共享录制。",
+		"sharedCountSummary": "{{count}} / {{limit}} 个录制 · 每个 1 GB · 免费链接 14 天后过期",
+		"noMatchingProjects": "没有匹配的项目",
+		"emptyProjects": "这里空空如也……",
+		"loadingRecordings": "正在加载录制…",
+		"incompleteUpload": "上传未完成",
+		"openRecordingAria": "打开 {{title}}",
+		"deleteRecordingAria": "删除 {{title}}"
 	},
 	"signIn": {
 		"welcome": "欢迎使用 Recordly",
@@ -74,7 +91,16 @@
 		"microsoftUnavailable": "暂不支持 Microsoft 登录。",
 		"githubUnavailable": "暂不支持 GitHub 登录。",
 		"emailUnavailable": "暂不支持邮箱登录。",
-		"checkInbox": "请查收邮件以验证邮箱并继续使用 Recordly。请在此电脑上打开链接，并保持 Recordly 运行。"
+		"checkInbox": "请查收邮件以验证邮箱并继续使用 Recordly。请在此电脑上打开链接，并保持 Recordly 运行。",
+		"errors": {
+			"notConfigured": "Recordly 登录尚未配置。请添加 Supabase URL 和可发布密钥。",
+			"incorrectCredentials": "邮箱或密码不正确。",
+			"noUserReturned": "登录后未返回用户信息。",
+			"missingSignInUrl": "身份验证服务未返回登录链接。",
+			"openSignInPageFailed": "无法打开登录页面。",
+			"invalidWorkEmail": "请输入有效的工作邮箱地址。",
+			"requestNewLink": "请向 Recordly 重新申请登录链接，然后在此电脑上打开。"
+		}
 	},
 	"clips": {
 		"title": "片段",
@@ -173,7 +199,8 @@
 		"noImage": "无图片",
 		"noArrowData": "无箭头数据",
 		"typeLabel": "注释类型",
-		"uploadedAlt": "已上传的注释"
+		"uploadedAlt": "已上传的注释",
+		"customFonts": "自定义字体"
 	},
 	"fontStyles": {
 		"classic": "经典",
@@ -270,7 +297,8 @@
 		"fileLoadError": "无法加载文件：{{error}}",
 		"mediaError": "无法加载项目媒体",
 		"renameFailed": "无法重命名项目",
-		"libraryLoadFailed": "无法加载项目库"
+		"libraryLoadFailed": "无法加载项目库",
+		"openProjects": "打开项目"
 	},
 	"exportTips": {
 		"autoZooms": "提示：可在设置中关闭自动应用的缩放",

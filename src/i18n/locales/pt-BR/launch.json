@@ -134,6 +134,12 @@
 		"backToSignIn": "Back to sign in",
 		"previousFeature": "Previous feature",
 		"getStarted": "Get started",
-		"next": "Next"
+		"next": "Next",
+		"mockup": {
+			"entireScreen": "Entire screen",
+			"preview": "Preview",
+			"copyLink": "Copy link",
+			"yourRecording": "Your recording"
+		}
 	}
 }
