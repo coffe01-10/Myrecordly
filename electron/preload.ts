@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { RecordingSessionData } from "./ipc/types";
+import type { DriveTransfer } from "../src/types/googleDrive";
 
 type NativeVideoExportWriteResult = { success: boolean; error?: string };
 type NativeVideoAudioMuxMetrics = {
@@ -1029,6 +1030,20 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		shareCode?: string;
 	}) => ipcRenderer.invoke("cloud-share-manage", input),
 	cloudShareCancel: (uploadId: string) => ipcRenderer.invoke("cloud-share-cancel", uploadId),
+	drivePickUpload: () => ipcRenderer.invoke("google-drive-pick-upload"),
+	driveFileInfo: (filePath: string) => ipcRenderer.invoke("google-drive-file-info", filePath),
+	driveTransfer: (input: DriveTransfer) => ipcRenderer.invoke("google-drive-transfer", input),
+	driveCancel: (id: string) => ipcRenderer.invoke("google-drive-cancel", id),
+	onDriveProgress: (
+		callback: (progress: { id: string; transferred: number; total: number }) => void,
+	) => {
+		const listener = (
+			_event: Electron.IpcRendererEvent,
+			progress: { id: string; transferred: number; total: number },
+		) => callback(progress);
+		ipcRenderer.on("google-drive-progress", listener);
+		return () => ipcRenderer.removeListener("google-drive-progress", listener);
+	},
 	onCloudShareProgress: (
 		callback: (progress: {
 			uploadId: string;

@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const emailOtp = vi.hoisted(() => vi.fn(async (_options: unknown) => ({ error: null })));
+const connectDrive = vi.hoisted(() => vi.fn(async (_session: unknown) => {}));
+vi.mock("../drive/googleDrive", () => ({ connectDriveSession: connectDrive }));
 const exchange = vi.hoisted(() => vi.fn(async (_code: string) => ({ error: null })));
 const oauth = vi.hoisted(() =>
 	vi.fn(async (_options: unknown) => ({
@@ -14,10 +16,19 @@ vi.mock("@supabase/supabase-js", () => ({
 	}),
 }));
 beforeEach(() => {
+	const values = new Map<string, string>();
+	vi.stubGlobal("localStorage", {
+		getItem: (key: string) => values.get(key) ?? null,
+		setItem: (key: string, value: string) => values.set(key, value),
+		removeItem: (key: string) => values.delete(key),
+	});
+	vi.stubGlobal("sessionStorage", { getItem: () => null, removeItem: () => {} });
+	vi.stubGlobal("window", { dispatchEvent: vi.fn() });
 	vi.resetModules();
 	exchange.mockClear();
 	oauth.mockClear();
 	emailOtp.mockClear();
+	connectDrive.mockClear();
 	vi.stubEnv("VITE_SUPABASE_URL", "https://auth.example.test");
 	vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "test-key");
 });
@@ -44,6 +55,39 @@ it("shows provider errors without attempting a code exchange", async () => {
 	expect(exchange).not.toHaveBeenCalled();
 });
 
+it("connects Drive once after completing a Google login callback", async () => {
+	const session = {
+		provider_token: "google-access",
+		provider_refresh_token: "google-refresh",
+		user: { id: "owner" },
+	};
+	localStorage.setItem("recordly.oauth-provider", "google");
+	exchange.mockImplementationOnce(async () => ({ error: null, data: { session } }));
+	const { completeAuthCallback } = await import("./recordlyAuth");
+	await Promise.all([
+		completeAuthCallback("recordly://auth/callback?code=google"),
+		completeAuthCallback("recordly://auth/callback?code=google"),
+	]);
+	expect(connectDrive).toHaveBeenCalledExactlyOnceWith(session);
+	expect(localStorage.getItem("recordly.oauth-provider")).toBeNull();
+});
+
+it("does not mistake a linked account's GitHub token for a Google Drive token", async () => {
+	localStorage.setItem("recordly.oauth-provider", "github");
+	exchange.mockImplementationOnce(async () => ({
+		error: null,
+		data: {
+			session: {
+				provider_token: "github-token",
+				user: { app_metadata: { provider: "google" } },
+			},
+		},
+	}));
+	const { completeAuthCallback } = await import("./recordlyAuth");
+	await completeAuthCallback("recordly://auth/callback?code=github");
+	expect(connectDrive).not.toHaveBeenCalled();
+});
+
 it("requests Microsoft's email scope and opens its OAuth URL externally", async () => {
 	const openExternalUrl = vi.fn(async () => ({ success: true }));
 	vi.stubGlobal("window", { electronAPI: { openExternalUrl } });
@@ -56,6 +100,22 @@ it("requests Microsoft's email scope and opens its OAuth URL externally", async 
 		}),
 	);
 	expect(openExternalUrl).toHaveBeenCalledExactlyOnceWith("https://auth.example.test/oauth");
+});
+
+it("requests offline Drive file access when signing in with Google", async () => {
+	vi.stubGlobal("window", { electronAPI: { openExternalUrl: async () => ({ success: true }) } });
+	const { signInWithSocial } = await import("./recordlyAuth");
+	await signInWithSocial("google");
+	expect(oauth).toHaveBeenCalledWith(
+		expect.objectContaining({
+			provider: "google",
+			options: expect.objectContaining({
+				scopes: "https://www.googleapis.com/auth/drive.file",
+				queryParams: { access_type: "offline", prompt: "consent" },
+			}),
+		}),
+	);
+	expect(localStorage.getItem("recordly.oauth-provider")).toBe("google");
 });
 
 for (const dev of [true, false]) {

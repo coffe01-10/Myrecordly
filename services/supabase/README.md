@@ -1,5 +1,8 @@
 # Desktop feedback
 
+Google Drive storage has its own authenticated Edge Function and migration; see
+[Google Drive setup (简中)](../../docs/google-drive.zh-CN.md).
+
 Before releasing feedback submission:
 
 1. Apply `migrations/202609230001_feedback.sql` and then `migrations/202609230002_feedback_limits.sql` in the configured Supabase project. Apply `migrations/202610030001_feedback_access.sql` after both, including on existing deployments; it revokes inherited client table privileges while preserving owner reads and server inserts.

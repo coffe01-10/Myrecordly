@@ -1,24 +1,12 @@
 import { demoLoginEnabled, demoUser, hasDemoSession, setDemoSession } from "./demoSession";
-import { createClient, type Provider, type User } from "@supabase/supabase-js";
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
-const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
+import { type Provider, type User } from "@supabase/supabase-js";
+import { recordlyAuth } from "./client";
+import { connectDriveSession } from "../drive/googleDrive";
+export { recordlyAuth, recordlyAuthConfigured } from "./client";
 const callbackUrl = import.meta.env.DEV
 	? "http://127.0.0.1:43821/auth/callback"
 	: "recordly://auth/callback";
-
-export const recordlyAuthConfigured = Boolean(supabaseUrl && supabasePublishableKey);
-
-export const recordlyAuth = recordlyAuthConfigured
-	? createClient(supabaseUrl!, supabasePublishableKey!, {
-			auth: {
-				flowType: "pkce",
-				persistSession: true,
-				autoRefreshToken: true,
-				detectSessionInUrl: false,
-			},
-		})
-	: null;
+const oauthProviderKey = "recordly.oauth-provider";
 
 function requireAuth() {
 	if (!recordlyAuth) {
@@ -70,10 +58,18 @@ export async function signInWithSocial(provider: "google" | "azure" | "github"):
 		options: {
 			redirectTo: callbackUrl,
 			skipBrowserRedirect: true,
-			scopes: provider === "azure" ? "email" : undefined,
+			scopes:
+				provider === "google"
+					? "https://www.googleapis.com/auth/drive.file"
+					: provider === "azure"
+						? "email"
+						: undefined,
+			queryParams:
+				provider === "google" ? { access_type: "offline", prompt: "consent" } : undefined,
 		},
 	});
 	if (error) throw error;
+	localStorage.setItem(oauthProviderKey, provider);
 	await openAuthUrl(data.url);
 }
 
@@ -98,8 +94,14 @@ async function exchangeAuthCallback(url: string): Promise<void> {
 		throw new Error("Request a new sign-in link from Recordly, then open it on this computer.");
 	}
 	const client = requireAuth();
-	const { error } = await client.auth.exchangeCodeForSession(code);
+	const { data, error } = await client.auth.exchangeCodeForSession(code);
 	if (error) throw error;
+	if (data?.session) setDemoSession(false);
+	const provider = localStorage.getItem(oauthProviderKey);
+	localStorage.removeItem(oauthProviderKey);
+	if (data?.session?.provider_token && provider === "google") {
+		await connectDriveSession(data.session);
+	}
 }
 
 export async function signOutRecordly(): Promise<void> {

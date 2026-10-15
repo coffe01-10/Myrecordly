@@ -938,6 +938,23 @@ interface Window {
 		revealInFolder: (
 			filePath: string,
 		) => Promise<{ success: boolean; error?: string; message?: string }>;
+		drivePickUpload: () => Promise<{
+			canceled?: boolean;
+			filePath?: string;
+			name?: string;
+			size?: number;
+			mimeType?: string;
+		}>;
+		driveFileInfo: (
+			filePath: string,
+		) => Promise<{ filePath: string; name: string; size: number; mimeType: string }>;
+		driveTransfer: (
+			input: import("../src/types/googleDrive").DriveTransfer,
+		) => Promise<import("../src/types/googleDrive").DriveTransferResult>;
+		driveCancel: (id: string) => Promise<void>;
+		onDriveProgress: (
+			callback: (progress: { id: string; transferred: number; total: number }) => void,
+		) => () => void;
 		cloudShareUpload: (input: {
 			filePath: string;
 			endpoint: string;

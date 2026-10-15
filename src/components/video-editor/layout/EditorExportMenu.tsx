@@ -1,5 +1,5 @@
 import { Card, ProgressBar, Tag, TagGroup } from "@heroui/react";
-import { Export, HardDrive, LinkSimple } from "@phosphor-icons/react";
+import { Export, HardDrive, LinkSimple, GoogleDriveLogo } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ExportErrorReportButton } from "@/components/feedback/ExportErrorReportButton";
@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { toast } from "@/components/ui/toast";
 import type { useI18n } from "@/contexts/I18nContext";
 import { CloudShareButton } from "../cloud/CloudShareButton";
+import { DriveExportButton } from "../cloud/DriveExportButton";
 import { ExportSettingsMenu } from "../ExportSettingsMenu";
 import type { useExportDimensions } from "../export/useExportDimensions";
 import type { useExportSession } from "../export/useExportSession";
@@ -219,10 +220,24 @@ export function EditorExportMenu(props: Props) {
 											!isExporting &&
 											!shareBusy
 										)
-											setDestination(keys.has("link") ? "link" : "local");
+											setDestination(
+												keys.has("drive")
+													? "drive"
+													: keys.has("link")
+														? "link"
+														: "local",
+											);
 									}}
 								>
 									<TagGroup.List className="flex gap-2">
+										<Tag
+											id="drive"
+											isDisabled={isExporting || shareBusy}
+											className="h-24 flex-1 flex-col justify-center gap-2 rounded-xl border border-foreground/10"
+										>
+											<GoogleDriveLogo className="size-6" />
+											Google Drive
+										</Tag>
 										<Tag
 											id="link"
 											isDisabled={isExporting || shareBusy}
@@ -243,7 +258,17 @@ export function EditorExportMenu(props: Props) {
 								</TagGroup>
 							</div>
 							<div>
-								{destination === "link" ? (
+								{destination === "drive" ? (
+									<div className="px-5 pb-5">
+										<DriveExportButton
+											prepareFile={props.prepareExportForShare}
+											projectTitle={props.projectTitle}
+											preparationProgress={exportProgress?.percentage ?? 0}
+											onCancelPrepare={handleCancelExport}
+											onBusyChange={setShareBusy}
+										/>
+									</div>
+								) : destination === "link" ? (
 									<div className="px-5 pb-5">
 										<CloudShareButton
 											inline

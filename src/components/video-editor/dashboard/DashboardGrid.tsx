@@ -1,9 +1,8 @@
 import { LibrarySkeleton } from "./LibrarySkeleton";
-import { SharedRecordings } from "../cloud/SharedRecordings";
-import { CLOUD_SHARE_ENDPOINT } from "../cloud/endpoint";
+import { CloudLibrary } from "../cloud/CloudLibrary";
 import { RecordNewButton } from "./RecordNewButton";
 import { RawPreview } from "./RawRecordings";
-import { Cloud, ImageSquare } from "@/components/ui/icons";
+import { ImageSquare } from "@/components/ui/icons";
 import { useScopedT } from "@/contexts/I18nContext";
 
 import { Button } from "@/components/ui/button";
@@ -89,37 +88,11 @@ export function DashboardGrid({
 				{section === "settings" ? (
 					<DashboardSettings onImportFile={onImportFile} />
 				) : section === "shared" ? (
-					authToken && CLOUD_SHARE_ENDPOINT ? (
-						<div>
-							<SharedRecordings
-								key={authToken}
-								token={authToken}
-								endpoint={CLOUD_SHARE_ENDPOINT}
-								accountLabel={accountLabel}
-								standalone
-							/>
-						</div>
-					) : (
-						<div className="flex h-64 flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
-							<Cloud weight="fill" className="size-8 opacity-40" />
-							<p>
-								{authToken
-									? t(
-											"dashboard.grid.cloudSharingUnavailable",
-											"Cloud sharing is not available in this build yet.",
-										)
-									: t(
-											"dashboard.grid.signInToManage",
-											"Sign in to manage shared videos.",
-										)}
-							</p>
-							{!authToken && (
-								<Button variant="secondary" onClick={onSignIn}>
-									{t("dashboard.signIn", "Sign in")}
-								</Button>
-							)}
-						</div>
-					)
+					<CloudLibrary
+						token={authToken}
+						accountLabel={accountLabel}
+						onSignIn={onSignIn}
+					/>
 				) : (isRaw ? rawLoading : loading) ? (
 					<LibrarySkeleton />
 				) : visible.length ? (

@@ -18,7 +18,7 @@ Email/password works once email authentication is enabled and a user has been cr
 1. Create a Web OAuth client in Google Auth Platform.
 2. Add Supabase's callback URL, `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`, as an authorized redirect URI.
 3. Enable Google under **Supabase → Authentication → Sign In / Providers** and paste the Google client ID and secret.
-4. Keep the requested scopes to `openid`, email, and profile unless Recordly genuinely needs more.
+4. Google sign-in also requests `drive.file` and offline access for the Recordly folder. Follow the [Google Drive setup guide (简中)](google-drive.zh-CN.md) to enable the Drive API, apply the connection migration, and deploy the authenticated `google-drive` function with server-side OAuth secrets.
 
 ## 3. X
 

@@ -20,7 +20,7 @@ export interface ExportPreferences {
 	gifFrameRate: GifFrameRate;
 	gifLoop: boolean;
 	gifSizePreset: GifSizePreset;
-	publishDestination: "link" | "local";
+	publishDestination: "link" | "local" | "drive";
 	includeCaptionSidecar: boolean;
 }
 
@@ -78,7 +78,10 @@ export function normalizeExportPreferences(raw: Partial<ExportPreferences>): Exp
 			raw.gifSizePreset === "original"
 				? raw.gifSizePreset
 				: "medium",
-		publishDestination: raw.publishDestination === "local" ? "local" : "link",
+		publishDestination:
+			raw.publishDestination === "local" || raw.publishDestination === "drive"
+				? raw.publishDestination
+				: "link",
 		includeCaptionSidecar: raw.includeCaptionSidecar === true,
 	};
 }

@@ -24,6 +24,7 @@ import {
 	signOutRecordly,
 } from "@/lib/auth/recordlyAuth";
 import { OnboardingFeature } from "./OnboardingFeature";
+import { AuthSetupNotice } from "./AuthSetupNotice";
 
 const MotionDialog = motion.create(Modal.Dialog);
 
@@ -137,7 +138,7 @@ export function RecordlySignInDialog({
 
 	const submitEmail = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if ((!configured && !demoLoginEnabled) || busy) return;
+		if (busy) return;
 		if (!demoEmail) {
 			emailSignInLink();
 			return;
@@ -286,6 +287,22 @@ export function RecordlySignInDialog({
 										</Button>
 									) : (
 										<>
+											{!configured && (
+												<AuthSetupNotice
+													busy={disabled}
+													onUseDemo={
+														demoLoginEnabled
+															? () =>
+																	void run("demo", () =>
+																		signInWithEmail(
+																			"test@email.com",
+																			"1234",
+																		),
+																	)
+															: undefined
+													}
+												/>
+											)}
 											<motion.div
 												{...reveal}
 												transition={{
@@ -322,7 +339,7 @@ export function RecordlySignInDialog({
 															{ provider: label },
 														)}
 														className="h-11 w-full min-w-0 gap-2 rounded-xl px-2 text-xs font-medium text-foreground @[360px]:text-sm"
-														isDisabled={disabled || !configured}
+														isDisabled={disabled}
 														onPress={() =>
 															void run(provider, () =>
 																signInWithSocial(provider),
@@ -346,6 +363,12 @@ export function RecordlySignInDialog({
 													</Button>
 												))}
 											</motion.div>
+											<p className="text-xs leading-5 text-muted">
+												{t(
+													"editor.drive.googleNotice",
+													"Google sign-in also connects Drive for file storage and sharing.",
+												)}
+											</p>
 											<div className="flex items-center gap-4">
 												<Separator className="flex-1" />
 												<span className="text-xs text-muted">
@@ -386,7 +409,7 @@ export function RecordlySignInDialog({
 														type="submit"
 														variant="primary"
 														className="mt-3 h-12 w-full"
-														isDisabled={disabled || !configured}
+														isDisabled={disabled}
 													>
 														{busy === "link"
 															? t(
@@ -485,11 +508,6 @@ export function RecordlySignInDialog({
 											</Alert.Content>
 										</Alert>
 									) : null}
-									{!configured && !demoLoginEnabled && !user && (
-										<Description role="status">
-											{t("editor.cloud.unavailable")}
-										</Description>
-									)}
 								</div>
 							</motion.div>
 						)}

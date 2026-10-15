@@ -18,7 +18,7 @@ Recordly 使用 Supabase Auth，为邮箱/密码和 Google 提供单一共享会
 1. 在 Google Auth Platform 中创建一个 Web OAuth 客户端。
 2. 将 Supabase 的回调 URL `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback` 添加为授权重定向 URI。
 3. 在 **Supabase → Authentication → Sign In / Providers** 下启用 Google，并粘贴 Google 客户端 ID 和密钥。
-4. 除非 Recordly 确实需要更多，否则请求的作用域保持为 `openid`、email 和 profile。
+4. 现在 Google 登录还会请求 `drive.file` 和离线访问，用于专用文件夹与授权续期。完整配置见 [Google Drive 存储](google-drive.zh-CN.md)，包括 Drive API、服务端 Secrets、数据库迁移和 Edge Function 部署。
 
 ## 3. X
 
