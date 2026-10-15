@@ -1,8 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { installDesktopBridge } from "./bridge";
 
-test("editor paints a wireframe before JavaScript loads", async ({ page }) => {
+test.beforeEach(async ({ page }) => {
 	await page.addInitScript(() => localStorage.setItem("recordly.locale", "en"));
+});
+
+test("editor paints a wireframe before JavaScript loads", async ({ page }) => {
 	await page.route("**/src/main.tsx*", (route) => route.abort());
 	await page.goto("/?windowType=editor");
 	await expect(page.getByRole("status", { name: "Loading editor" })).toBeVisible();
