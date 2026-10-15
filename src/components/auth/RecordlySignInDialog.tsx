@@ -25,6 +25,8 @@ import {
 } from "@/lib/auth/recordlyAuth";
 import { OnboardingFeature } from "./OnboardingFeature";
 import { AuthSetupNotice } from "./AuthSetupNotice";
+import { useGoogleDesktopAuth } from "./useGoogleDesktopAuth";
+import { importGoogleClient, GoogleDesktopError } from "@/lib/auth/googleDesktop";
 
 const MotionDialog = motion.create(Modal.Dialog);
 
@@ -60,6 +62,8 @@ function friendlyAuthError(
 	t: ReturnType<typeof useI18n>["t"],
 ): string {
 	const message = error instanceof Error ? error.message : String(error);
+	if (error instanceof GoogleDesktopError)
+		return t(`editor.signIn.googleErrors.${error.code}`, message);
 	for (const [pattern, key] of AUTH_ERROR_KEYS) {
 		if (pattern.test(message)) return t(key, message);
 	}
@@ -90,6 +94,7 @@ export function RecordlySignInDialog({
 	onAuthenticated,
 }: Props) {
 	const { t } = useI18n();
+	const google = useGoogleDesktopAuth();
 	const awaitingSignIn = useRef(false);
 	const wide = onboarding || variant === "wide";
 	const [featureStep, setFeatureStep] = useState(-1);
@@ -265,6 +270,32 @@ export function RecordlySignInDialog({
 											</Description>
 										</Modal.Header>
 									</motion.div>
+									{user && busy === "google" && (
+										<Button
+											variant="ghost"
+											onPress={() =>
+												void window.electronAPI.googleAuthCancel()
+											}
+										>
+											{t(
+												"editor.signIn.cancelGoogle",
+												"Cancel browser sign-in",
+											)}
+										</Button>
+									)}
+									{user && google.reconnect && (
+										<Button
+											isDisabled={disabled}
+											onPress={() =>
+												void run("google", () => signInWithSocial("google"))
+											}
+										>
+											{t(
+												"editor.drive.connect",
+												"Sign in with Google and connect Drive",
+											)}
+										</Button>
+									)}
 									{user && onboarding ? (
 										<Button
 											variant="primary"
@@ -287,11 +318,11 @@ export function RecordlySignInDialog({
 										</Button>
 									) : (
 										<>
-											{!configured && (
+											{!google.configured && (
 												<AuthSetupNotice
 													busy={disabled}
 													onUseDemo={
-														demoLoginEnabled
+														demoLoginEnabled && !configured
 															? () =>
 																	void run("demo", () =>
 																		signInWithEmail(
@@ -363,6 +394,34 @@ export function RecordlySignInDialog({
 													</Button>
 												))}
 											</motion.div>
+											{busy === "google" && (
+												<Button
+													variant="ghost"
+													onPress={() =>
+														void window.electronAPI.googleAuthCancel()
+													}
+												>
+													{t(
+														"editor.signIn.cancelGoogle",
+														"Cancel browser sign-in",
+													)}
+												</Button>
+											)}
+											{google.configured && (
+												<Button
+													variant="ghost"
+													size="sm"
+													isDisabled={disabled}
+													onPress={() =>
+														void run("import", importGoogleClient)
+													}
+												>
+													{t(
+														"editor.signIn.replaceClient",
+														"Change Google client configuration",
+													)}
+												</Button>
+											)}
 											<p className="text-xs leading-5 text-muted">
 												{t(
 													"editor.drive.googleNotice",

@@ -166,20 +166,26 @@ export function DriveLibrary() {
 			setPermissionsLoading(false);
 		}
 	};
-	const connect = () =>
-		run(async () => {
-			if (!drive.configured)
-				throw new Error(
-					t(
-						"editor.signIn.setupDescription",
-						"Real Google and email sign-in require Google OAuth and Supabase configuration. Google Drive is not connected yet.",
-					),
-				);
-			await signInWithSocial("google");
-		});
+	const connect = () => run(() => signInWithSocial("google"));
 	const visible = files.filter((file) => file.name.toLowerCase().includes(query.toLowerCase()));
 	return (
 		<section className="py-6" aria-label="Google Drive">
+			{drive.status.reconnect && (
+				<p role="status" className="mb-4 text-sm text-muted">
+					{t(
+						"editor.signIn.googleErrors.RECONNECT_REQUIRED",
+						"Google authorization expired or was revoked. Sign in again.",
+					)}
+				</p>
+			)}
+			{drive.sessionOnly && (
+				<p role="status" className="mb-4 text-xs text-muted">
+					{t(
+						"editor.signIn.sessionOnly",
+						"This device cannot encrypt saved credentials. Sign-in lasts for this app session only.",
+					)}
+				</p>
+			)}
 			<div className="mb-7 flex flex-wrap items-start justify-between gap-4">
 				<div className="flex items-center gap-3">
 					<div className="grid size-12 place-items-center rounded-2xl bg-foreground/5">
@@ -246,6 +252,14 @@ export function DriveLibrary() {
 							: t("editor.drive.connect", "Sign in with Google and connect Drive")}
 					</Button>
 					{!drive.configured && <AuthSetupNotice />}
+					{drive.authorizing && (
+						<Button
+							variant="ghost"
+							onClick={() => void window.electronAPI.googleAuthCancel()}
+						>
+							{t("editor.signIn.cancelGoogle", "Cancel browser sign-in")}
+						</Button>
+					)}
 					{drive.driveError && (
 						<Button variant="ghost" onClick={() => void drive.refresh()}>
 							<ArrowClockwise />

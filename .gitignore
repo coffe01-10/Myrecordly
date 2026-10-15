@@ -12,6 +12,7 @@ dist
 dist-electron
 dist-ssr
 *.local
+public/google-oauth-desktop.json
 
 # Editor directories and files
 .vscode/*

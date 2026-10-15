@@ -938,6 +938,35 @@ interface Window {
 		revealInFolder: (
 			filePath: string,
 		) => Promise<{ success: boolean; error?: string; message?: string }>;
+		googleAuthState: () => Promise<
+			import("../src/types/googleDrive").GoogleResult<
+				import("../src/types/googleDrive").GoogleAuthState
+			>
+		>;
+		googleAuthSignIn: () => Promise<
+			import("../src/types/googleDrive").GoogleResult<
+				import("../src/types/googleDrive").GoogleAuthState
+			>
+		>;
+		googleAuthSignOut: () => Promise<
+			import("../src/types/googleDrive").GoogleResult<
+				import("../src/types/googleDrive").GoogleAuthState
+			>
+		>;
+		googleAuthImportClient: () => Promise<
+			import("../src/types/googleDrive").GoogleResult<
+				import("../src/types/googleDrive").GoogleAuthState
+			>
+		>;
+		googleAuthCancel: () => Promise<void>;
+		onGoogleAuthChanged: (
+			callback: (state: import("../src/types/googleDrive").GoogleAuthState) => void,
+		) => () => void;
+		driveRequest: (
+			action: string,
+			input: Record<string, unknown>,
+			accountId?: string,
+		) => Promise<import("../src/types/googleDrive").GoogleResult<unknown>>;
 		drivePickUpload: () => Promise<{
 			canceled?: boolean;
 			filePath?: string;

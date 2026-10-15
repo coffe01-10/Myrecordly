@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { DriveTransferResult } from "../../../src/types/googleDrive";
+import type { DriveTicket } from "../../googleDrive/api";
 type Handler = (...args: unknown[]) => Promise<DriveTransferResult>;
 const state = vi.hoisted(() => ({
 	handlers: new Map<string, Handler>(),
@@ -25,7 +26,18 @@ beforeEach(async () => {
 	state.handlers.clear();
 	state.allowed = true;
 	state.save.mockReset();
-	registerGoogleDriveHandlers();
+	registerGoogleDriveHandlers({
+		consumeTicket: () =>
+			({
+				token: "token",
+				accountId: "google:alice",
+				version: 0,
+				uploadUrl: "https://www.googleapis.com/upload/drive/v3/files?upload_id=1",
+				file: { id: "video", name: "demo.mp4", mimeType: "video/mp4" },
+			}) satisfies DriveTicket,
+		assertTicket: () => {},
+		cancelTicket: () => {},
+	});
 });
 afterEach(async () => {
 	vi.unstubAllGlobals();
@@ -57,7 +69,7 @@ it("streams an approved export without loading the entire video into memory", as
 		id: "one",
 		direction: "upload",
 		filePath,
-		accessToken: "token",
+		ticketId: "ticket",
 		uploadUrl: "https://www.googleapis.com/upload/drive/v3/files?upload_id=1",
 	});
 	expect(result).toMatchObject({ success: true, file: { id: "drive-file" } });
@@ -72,7 +84,7 @@ it("rejects an arbitrary local file that the user did not approve", async () => 
 		id: "two",
 		direction: "upload",
 		filePath,
-		accessToken: "token",
+		ticketId: "ticket",
 	});
 	expect(result.success).toBe(false);
 	expect(fetch).not.toHaveBeenCalled();
@@ -97,7 +109,7 @@ it("preserves an existing destination and removes partial data after a failed do
 		id: "three",
 		direction: "download",
 		file: { id: "video", name: "demo.mp4" },
-		accessToken: "token",
+		ticketId: "ticket",
 	});
 	expect(result.success).toBe(false);
 	expect(await fs.readFile(destination, "utf8")).toBe("original-video");
@@ -111,7 +123,7 @@ it("downloads the remote file to the destination chosen by the user", async () =
 		id: "four",
 		direction: "download",
 		file: { id: "video", name: "demo.mp4" },
-		accessToken: "token",
+		ticketId: "ticket",
 	});
 	expect(result).toMatchObject({ success: true, filePath: destination });
 	expect(await fs.readFile(destination, "utf8")).toBe("downloaded-video");

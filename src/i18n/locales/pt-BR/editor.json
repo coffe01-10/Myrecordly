@@ -125,8 +125,26 @@
 		"deleteRecordingAria": "Delete {{title}}"
 	},
 	"signIn": {
-		"setupTitle": "Sign-in service is not connected yet",
-		"setupDescription": "Real Google and email sign-in require Google OAuth and Supabase configuration. Google Drive is not connected yet.",
+		"openGoogleConsole": "Open Google Cloud configuration",
+		"importClient": "Import Google Desktop client JSON",
+		"importClientFailed": "Choose a valid Google Desktop app OAuth client JSON, then try again.",
+		"cancelGoogle": "Cancel browser sign-in",
+		"replaceClient": "Change Google client configuration",
+		"sessionOnly": "This device cannot encrypt saved credentials. Sign-in lasts for this app session only.",
+		"googleErrors": {
+			"NOT_CONFIGURED": "Import a Google Desktop app OAuth client JSON first.",
+			"INVALID_CLIENT": "Choose the JSON for a Desktop app OAuth client, not a Web client or API key.",
+			"AUTH_CANCELED": "Google sign-in was canceled.",
+			"AUTH_TIMEOUT": "Browser sign-in timed out. Click Google to try again.",
+			"DRIVE_PERMISSION_REQUIRED": "Allow Recordly access to its Drive files, then sign in again.",
+			"ACCOUNT_CHANGED": "Your Google account changed. Start this operation again.",
+			"RECONNECT_REQUIRED": "Google authorization expired or was revoked. Sign in again.",
+			"DESKTOP_REQUIRED": "Open the latest Recordly desktop app to use Google sign-in.",
+			"SIGN_IN_REQUIRED": "Sign in with Google to connect Drive.",
+			"GOOGLE_ERROR": "Could not complete Google sign-in. Check your connection and Desktop client configuration."
+		},
+		"setupTitle": "Set up Google desktop sign-in",
+		"setupDescription": "Import the JSON for a Google Desktop app OAuth client once. Then sign in in your browser; no Supabase server is needed.",
 		"tryLocal": "Use local demo (no Drive access)",
 		"welcome": "Welcome to Recordly",
 		"yourAccount": "Your account",

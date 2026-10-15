@@ -6,7 +6,3 @@ verify_jwt = false
 
 [functions.submit-export-error]
 verify_jwt = false
-
-[functions.google-drive]
-# google-drive verifies the caller with auth.getUser; credentials stay server-side.
-verify_jwt = false

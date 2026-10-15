@@ -2,7 +2,7 @@ Language: EN | [简中](authentication.zh-CN.md)
 
 # Recordly authentication setup
 
-Recordly uses Supabase Auth for one shared session across email/password and Google. The desktop application uses PKCE and returns from the system browser through a loopback callback in development and `recordly://auth/callback` in production. X is shown in the sign-in dialog and requires its provider to be enabled in Supabase. SAML is intentionally hidden until configured.
+Google sign-in and Drive use desktop OAuth directly, without Supabase. Import a Google Desktop app client JSON in Recordly; see [desktop Google setup (简中)](google-drive.zh-CN.md). The Supabase instructions below apply only to optional email, Microsoft, GitHub and legacy cloud services. Their session is separate from the native Google account.
 
 ## 1. Create the project
 
@@ -15,10 +15,7 @@ Email/password works once email authentication is enabled and a user has been cr
 
 ## 2. Google
 
-1. Create a Web OAuth client in Google Auth Platform.
-2. Add Supabase's callback URL, `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`, as an authorized redirect URI.
-3. Enable Google under **Supabase → Authentication → Sign In / Providers** and paste the Google client ID and secret.
-4. Google sign-in also requests `drive.file` and offline access for the Recordly folder. Follow the [Google Drive setup guide (简中)](google-drive.zh-CN.md) to enable the Drive API, apply the connection migration, and deploy the authenticated `google-drive` function with server-side OAuth secrets.
+Create a **Desktop app** OAuth client, enable Drive API and add your test email to the test audience. Import the downloaded JSON in Recordly. Follow the [desktop setup guide (简中)](google-drive.zh-CN.md); no Supabase callback, Edge Function, server-side OAuth secret or connection migration is required.
 
 ## 3. X
 

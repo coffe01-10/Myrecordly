@@ -106,7 +106,20 @@ export function DriveExportButton({
 	};
 	return (
 		<div className="space-y-4">
+			{drive.status.reconnect && (
+				<p role="status" className="text-sm text-muted">
+					{t(
+						"editor.signIn.googleErrors.RECONNECT_REQUIRED",
+						"Google authorization expired or was revoked. Sign in again.",
+					)}
+				</p>
+			)}
 			{!drive.configured && <AuthSetupNotice />}
+			{drive.authorizing && (
+				<Button variant="ghost" onClick={() => void window.electronAPI.googleAuthCancel()}>
+					{t("editor.signIn.cancelGoogle", "Cancel browser sign-in")}
+				</Button>
+			)}
 			<div className="flex items-center gap-3 rounded-xl bg-foreground/5 p-4">
 				<GoogleDriveLogo className="size-7" />
 				<div>
@@ -178,16 +191,7 @@ export function DriveExportButton({
 					className="w-full"
 					disabled={drive.driveLoading}
 					onClick={() =>
-						!drive.configured
-							? setError(
-									t(
-										"editor.signIn.setupDescription",
-										"Real Google and email sign-in require Google OAuth and Supabase configuration. Google Drive is not connected yet.",
-									),
-								)
-							: void signInWithSocial("google").catch((cause) =>
-									setError(String(cause)),
-								)
+						void signInWithSocial("google").catch((cause) => setError(String(cause)))
 					}
 				>
 					{drive.driveLoading

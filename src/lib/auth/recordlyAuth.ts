@@ -1,12 +1,11 @@
 import { demoLoginEnabled, demoUser, hasDemoSession, setDemoSession } from "./demoSession";
 import { type Provider, type User } from "@supabase/supabase-js";
 import { recordlyAuth } from "./client";
-import { connectDriveSession } from "../drive/googleDrive";
+import { signInGoogleDesktop, signOutGoogleDesktop } from "./googleDesktop";
 export { recordlyAuth, recordlyAuthConfigured } from "./client";
 const callbackUrl = import.meta.env.DEV
 	? "http://127.0.0.1:43821/auth/callback"
 	: "recordly://auth/callback";
-const oauthProviderKey = "recordly.oauth-provider";
 
 function requireAuth() {
 	if (!recordlyAuth) {
@@ -52,24 +51,21 @@ async function openAuthUrl(url: string | null) {
 }
 
 export async function signInWithSocial(provider: "google" | "azure" | "github"): Promise<void> {
+	if (provider === "google") {
+		await signInGoogleDesktop();
+		setDemoSession(false);
+		return;
+	}
 	const client = requireAuth();
 	const { data, error } = await client.auth.signInWithOAuth({
 		provider: provider as Provider,
 		options: {
 			redirectTo: callbackUrl,
 			skipBrowserRedirect: true,
-			scopes:
-				provider === "google"
-					? "https://www.googleapis.com/auth/drive.file"
-					: provider === "azure"
-						? "email"
-						: undefined,
-			queryParams:
-				provider === "google" ? { access_type: "offline", prompt: "consent" } : undefined,
+			scopes: provider === "azure" ? "email" : undefined,
 		},
 	});
 	if (error) throw error;
-	localStorage.setItem(oauthProviderKey, provider);
 	await openAuthUrl(data.url);
 }
 
@@ -97,20 +93,16 @@ async function exchangeAuthCallback(url: string): Promise<void> {
 	const { data, error } = await client.auth.exchangeCodeForSession(code);
 	if (error) throw error;
 	if (data?.session) setDemoSession(false);
-	const provider = localStorage.getItem(oauthProviderKey);
-	localStorage.removeItem(oauthProviderKey);
-	if (data?.session?.provider_token && provider === "google") {
-		await connectDriveSession(data.session);
-	}
 }
 
 export async function signOutRecordly(): Promise<void> {
+	await signOutGoogleDesktop();
 	if (hasDemoSession()) {
 		setDemoSession(false);
 		return;
 	}
-	const client = requireAuth();
-	const { error } = await client.auth.signOut();
+	if (!recordlyAuth) return;
+	const { error } = await recordlyAuth.auth.signOut();
 	if (error) throw error;
 }
 

@@ -2,7 +2,7 @@
 
 # Recordly 身份验证设置
 
-Recordly 使用 Supabase Auth，为邮箱/密码和 Google 提供单一共享会话。桌面应用使用 PKCE，并通过系统浏览器返回：开发环境使用 loopback 回调，生产环境使用 `recordly://auth/callback`。登录对话框中会显示 X，需要先在 Supabase 中启用其提供方。SAML 在配置之前被有意隐藏。
+Google 登录与 Drive 使用桌面 OAuth 直连，无需 Supabase，首次在应用里导入 Desktop app 客户端 JSON 即可。参见 [Google 桌面登录配置](google-drive.zh-CN.md)。以下 Supabase 设置仅用于可选的邮箱、Microsoft、GitHub 和旧云端服务，其会话与 Google 桌面会话分开。
 
 ## 1. 创建项目
 
@@ -15,10 +15,7 @@ Recordly 使用 Supabase Auth，为邮箱/密码和 Google 提供单一共享会
 
 ## 2. Google
 
-1. 在 Google Auth Platform 中创建一个 Web OAuth 客户端。
-2. 将 Supabase 的回调 URL `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback` 添加为授权重定向 URI。
-3. 在 **Supabase → Authentication → Sign In / Providers** 下启用 Google，并粘贴 Google 客户端 ID 和密钥。
-4. 现在 Google 登录还会请求 `drive.file` 和离线访问，用于专用文件夹与授权续期。完整配置见 [Google Drive 存储](google-drive.zh-CN.md)，包括 Drive API、服务端 Secrets、数据库迁移和 Edge Function 部署。
+创建 **Desktop app** OAuth 客户端，启用 Drive API，并把测试邮箱加入测试用户，然后在 Recordly 中导入下载的 JSON。完整步骤见 [Google 桌面登录与 Drive](google-drive.zh-CN.md)，不再使用 Supabase 回调、服务端 Secrets、数据库或 Edge Function。
 
 ## 3. X
 

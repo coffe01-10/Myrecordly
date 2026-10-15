@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/components/ui/toast";
 import type { useI18n } from "@/contexts/I18nContext";
+import { recordlyAuthConfigured } from "@/lib/auth/client";
 import { CloudShareButton } from "../cloud/CloudShareButton";
 import { DriveExportButton } from "../cloud/DriveExportButton";
 import { ExportSettingsMenu } from "../ExportSettingsMenu";
@@ -42,8 +43,10 @@ type Props = {
 };
 
 export function EditorExportMenu(props: Props) {
-	const { publishDestination: destination, setPublishDestination: setDestination } =
+	const { publishDestination: storedDestination, setPublishDestination: setDestination } =
 		props.exportSettings;
+	const destination =
+		storedDestination === "link" && !recordlyAuthConfigured ? "drive" : storedDestination;
 	const [shareBusy, setShareBusy] = useState(false);
 	const reducedMotion = useReducedMotion();
 	const handledShareRequest = useRef(0);
@@ -238,14 +241,16 @@ export function EditorExportMenu(props: Props) {
 											<GoogleDriveLogo className="size-6" />
 											Google Drive
 										</Tag>
-										<Tag
-											id="link"
-											isDisabled={isExporting || shareBusy}
-											className="h-24 flex-1 flex-col justify-center gap-2 rounded-xl border border-foreground/10"
-										>
-											<LinkSimple className="size-6" />
-											{t("editor.cloud.link", "Link")}
-										</Tag>
+										{recordlyAuthConfigured && (
+											<Tag
+												id="link"
+												isDisabled={isExporting || shareBusy}
+												className="h-24 flex-1 flex-col justify-center gap-2 rounded-xl border border-foreground/10"
+											>
+												<LinkSimple className="size-6" />
+												{t("editor.cloud.link", "Link")}
+											</Tag>
+										)}
 										<Tag
 											id="local"
 											isDisabled={isExporting || shareBusy}

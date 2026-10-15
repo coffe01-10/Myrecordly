@@ -1,6 +1,6 @@
 # Desktop feedback
 
-Google Drive storage has its own authenticated Edge Function and migration; see
+Google Drive uses desktop OAuth and does not need Supabase; see
 [Google Drive setup (简中)](../../docs/google-drive.zh-CN.md).
 
 Before releasing feedback submission:

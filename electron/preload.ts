@@ -1031,6 +1031,23 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	}) => ipcRenderer.invoke("cloud-share-manage", input),
 	cloudShareCancel: (uploadId: string) => ipcRenderer.invoke("cloud-share-cancel", uploadId),
 	drivePickUpload: () => ipcRenderer.invoke("google-drive-pick-upload"),
+	googleAuthState: () => ipcRenderer.invoke("google-auth-state"),
+	googleAuthSignIn: () => ipcRenderer.invoke("google-auth-sign-in"),
+	googleAuthSignOut: () => ipcRenderer.invoke("google-auth-sign-out"),
+	googleAuthImportClient: () => ipcRenderer.invoke("google-auth-import-client"),
+	googleAuthCancel: () => ipcRenderer.invoke("google-auth-cancel"),
+	onGoogleAuthChanged: (
+		callback: (state: import("../src/types/googleDrive").GoogleAuthState) => void,
+	) => {
+		const listener = (
+			_event: Electron.IpcRendererEvent,
+			state: import("../src/types/googleDrive").GoogleAuthState,
+		) => callback(state);
+		ipcRenderer.on("google-auth-changed", listener);
+		return () => ipcRenderer.removeListener("google-auth-changed", listener);
+	},
+	driveRequest: (action: string, input: Record<string, unknown>, accountId?: string) =>
+		ipcRenderer.invoke("google-drive-request", action, input, accountId),
 	driveFileInfo: (filePath: string) => ipcRenderer.invoke("google-drive-file-info", filePath),
 	driveTransfer: (input: DriveTransfer) => ipcRenderer.invoke("google-drive-transfer", input),
 	driveCancel: (id: string) => ipcRenderer.invoke("google-drive-cancel", id),

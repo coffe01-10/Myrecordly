@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRecordlyAuth } from "@/components/auth/useRecordlyAuth";
 import { driveApi, GoogleDriveError, subscribeDriveChanges } from "@/lib/drive/googleDrive";
 import type { DriveStatus } from "@/types/googleDrive";
+import { useGoogleDesktopAuth } from "@/components/auth/useGoogleDesktopAuth";
 
 export function useGoogleDrive() {
 	const auth = useRecordlyAuth();
+	const google = useGoogleDesktopAuth();
 	const [status, setStatus] = useState<DriveStatus>({ connected: false });
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string>();
@@ -12,8 +14,8 @@ export function useGoogleDrive() {
 	const refresh = useCallback(async () => {
 		const request = ++generation.current;
 		setError(undefined);
-		if (!auth.accessToken) {
-			setStatus({ connected: false });
+		if (!google.user || google.reconnect) {
+			setStatus({ connected: false, reconnect: google.reconnect, email: google.user?.email });
 			setLoading(false);
 			return;
 		}
@@ -31,7 +33,7 @@ export function useGoogleDrive() {
 		} finally {
 			if (request === generation.current) setLoading(false);
 		}
-	}, [auth.accessToken]);
+	}, [google.user, google.reconnect]);
 	useEffect(() => {
 		void refresh();
 		const changed = () => void refresh();
@@ -41,5 +43,14 @@ export function useGoogleDrive() {
 			unsubscribe();
 		};
 	}, [refresh]);
-	return { ...auth, status, driveLoading: loading, driveError: error, refresh };
+	return {
+		...auth,
+		configured: google.configured,
+		authorizing: google.authorizing,
+		sessionOnly: google.sessionOnly,
+		status,
+		driveLoading: loading || google.loading || google.authorizing,
+		driveError: error || google.error,
+		refresh,
+	};
 }

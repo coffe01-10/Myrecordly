@@ -125,8 +125,26 @@
 		"deleteRecordingAria": "删除 {{title}}"
 	},
 	"signIn": {
-		"setupTitle": "登录服务尚未连接",
-		"setupDescription": "真实 Google 和邮箱登录需要先配置 Google OAuth 与 Supabase，目前尚未连接 Google Drive。",
+		"openGoogleConsole": "打开 Google Cloud 配置",
+		"importClient": "导入 Google 桌面客户端 JSON",
+		"importClientFailed": "请选择有效的 Google“桌面应用”OAuth 客户端 JSON，然后重试。",
+		"cancelGoogle": "取消浏览器登录",
+		"replaceClient": "更换 Google 客户端配置",
+		"sessionOnly": "本机暂时无法加密保存凭据，本次登录仅在应用运行期间有效，重启后需重新登录。",
+		"googleErrors": {
+			"NOT_CONFIGURED": "请先导入 Google“桌面应用”OAuth 客户端 JSON。",
+			"INVALID_CLIENT": "请选择“桌面应用”类型的 OAuth 客户端 JSON，不能使用 Web 客户端或 API 密钥。",
+			"AUTH_CANCELED": "已取消 Google 登录。",
+			"AUTH_TIMEOUT": "浏览器登录等待超时，请重新点击 Google。",
+			"DRIVE_PERMISSION_REQUIRED": "请在 Google 授权页允许访问 Recordly 使用的 Drive 文件，然后重新登录。",
+			"ACCOUNT_CHANGED": "Google 账号已切换，请重新发起操作。",
+			"RECONNECT_REQUIRED": "Google 授权已过期或被撤销，请重新登录。",
+			"DESKTOP_REQUIRED": "请打开最新的 Recordly 桌面应用来使用 Google 登录。",
+			"SIGN_IN_REQUIRED": "请先使用 Google 登录以连接 Drive。",
+			"GOOGLE_ERROR": "无法完成 Google 登录，请检查网络和桌面客户端配置。"
+		},
+		"setupTitle": "首次配置 Google 桌面登录",
+		"setupDescription": "只需导入一次 Google“桌面应用”OAuth 客户端 JSON，之后即可在浏览器登录，无需 Supabase 或部署服务器。",
 		"tryLocal": "使用本地体验账号（无 Drive 权限）",
 		"welcome": "欢迎使用 Recordly",
 		"yourAccount": "你的账户",

@@ -125,8 +125,26 @@
 		"deleteRecordingAria": "刪除 {{title}}"
 	},
 	"signIn": {
-		"setupTitle": "尚未連結登入服務",
-		"setupDescription": "真實 Google 和電子郵件登入需先設定 Google OAuth 與 Supabase，目前尚未連結 Google Drive。",
+		"openGoogleConsole": "開啟 Google Cloud 設定",
+		"importClient": "匯入 Google 桌面用戶端 JSON",
+		"importClientFailed": "請選擇有效的 Google 桌面 OAuth 用戶端 JSON，然後重試。",
+		"cancelGoogle": "取消瀏覽器登入",
+		"replaceClient": "更換 Google 用戶端設定",
+		"sessionOnly": "本機暫時無法加密儲存憑證，本次登入僅在應用程式執行期間有效，重新啟動後需再次登入。",
+		"googleErrors": {
+			"NOT_CONFIGURED": "請先匯入 Google 桌面 OAuth 用戶端 JSON。",
+			"INVALID_CLIENT": "請選擇桌面應用程式的 OAuth 用戶端 JSON，不能使用 Web 用戶端或 API 金鑰。",
+			"AUTH_CANCELED": "已取消 Google 登入。",
+			"AUTH_TIMEOUT": "瀏覽器登入等候逾時，請重新點選 Google。",
+			"DRIVE_PERMISSION_REQUIRED": "請在 Google 授權頁允許存取 Recordly 使用的 Drive 檔案，然後重新登入。",
+			"ACCOUNT_CHANGED": "Google 帳號已切換，請重新發起操作。",
+			"RECONNECT_REQUIRED": "Google 授權已過期或遭撤銷，請重新登入。",
+			"DESKTOP_REQUIRED": "請開啟最新的 Recordly 桌面應用程式以使用 Google 登入。",
+			"SIGN_IN_REQUIRED": "請先使用 Google 登入以連結 Drive。",
+			"GOOGLE_ERROR": "無法完成 Google 登入，請檢查網路與桌面用戶端設定。"
+		},
+		"setupTitle": "首次設定 Google 桌面登入",
+		"setupDescription": "只需匯入一次 Google「電腦版應用程式」OAuth 用戶端 JSON，之後即可在瀏覽器登入，不需 Supabase 或部署伺服器。",
 		"tryLocal": "使用本機體驗帳號（無 Drive 存取權）",
 		"welcome": "歡迎使用 Recordly",
 		"yourAccount": "你的帳戶",

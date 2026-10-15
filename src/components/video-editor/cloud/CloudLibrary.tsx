@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DriveLibrary } from "./DriveLibrary";
 import { SharedRecordings } from "./SharedRecordings";
 import { CLOUD_SHARE_ENDPOINT } from "./endpoint";
+import { recordlyAuthConfigured } from "@/lib/auth/client";
 
 export function CloudLibrary({
 	token,
@@ -31,14 +32,16 @@ export function CloudLibrary({
 				>
 					Google Drive
 				</Button>
-				<Button
-					role="tab"
-					aria-selected={tab === "share"}
-					variant={tab === "share" ? "secondary" : "ghost"}
-					onClick={() => setTab("share")}
-				>
-					Recordly Share
-				</Button>
+				{recordlyAuthConfigured && (
+					<Button
+						role="tab"
+						aria-selected={tab === "share"}
+						variant={tab === "share" ? "secondary" : "ghost"}
+						onClick={() => setTab("share")}
+					>
+						Recordly Share
+					</Button>
+				)}
 			</div>
 			{tab === "drive" ? (
 				<DriveLibrary />

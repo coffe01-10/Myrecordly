@@ -6,8 +6,11 @@ import {
 	recordlyAuth,
 	recordlyAuthConfigured,
 } from "@/lib/auth/recordlyAuth";
+import { useGoogleDesktopAuth } from "./useGoogleDesktopAuth";
+import { googleAccountUser } from "@/lib/auth/googleDesktop";
 
 export function useRecordlyAuth() {
+	const google = useGoogleDesktopAuth();
 	const demo = useSyncExternalStore(subscribeDemoSession, hasDemoSession, () => false);
 	const [user, setUser] = useState<User | null>(null);
 	const [accessToken, setAccessToken] = useState<string>();
@@ -70,10 +73,10 @@ export function useRecordlyAuth() {
 	}, []);
 
 	return {
-		user: demo ? demoUser : user,
-		accessToken: demo ? undefined : accessToken,
-		loading,
+		user: googleAccountUser(google) ?? (demo ? demoUser : user),
+		accessToken: google.user || demo ? undefined : accessToken,
+		loading: loading || google.loading,
 		configured: recordlyAuthConfigured,
-		callbackError,
+		callbackError: callbackError || google.error,
 	};
 }

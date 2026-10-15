@@ -1,15 +1,6 @@
-import type { Session } from "@supabase/supabase-js";
 import type { DriveFile, DrivePermission, DriveStatus } from "@/types/googleDrive";
-import { recordlyAuth } from "../auth/client";
-
-export class GoogleDriveError extends Error {
-	constructor(
-		message: string,
-		public code?: string,
-	) {
-		super(message);
-	}
-}
+import { GoogleDesktopError, unwrapGoogle } from "../auth/googleDesktop";
+export { GoogleDesktopError as GoogleDriveError } from "../auth/googleDesktop";
 export type DriveOperation = { id: string; accountId?: string; canceled: boolean };
 const driveChangeKey = "recordly.drive.changed";
 export function notifyDriveChanged() {
@@ -33,40 +24,14 @@ export async function driveRequest<T>(
 	input: Record<string, unknown> = {},
 	expectedAccountId?: string,
 ): Promise<T> {
-	if (!recordlyAuth)
-		throw new GoogleDriveError(
-			"Google Drive needs the Recordly authentication service to be configured.",
-			"NOT_CONFIGURED",
+	if (!window.electronAPI?.driveRequest)
+		throw new GoogleDesktopError(
+			"Open the latest Recordly desktop app to use Drive.",
+			"DESKTOP_REQUIRED",
 		);
-	const { data: auth } = await recordlyAuth.auth.getSession();
-	if (!auth.session || (expectedAccountId && auth.session.user.id !== expectedAccountId))
-		throw new GoogleDriveError(
-			"Your account changed. Start this operation again.",
-			"ACCOUNT_CHANGED",
-		);
-	const { data, error } = await recordlyAuth.functions.invoke("google-drive", {
-		body: { ...input, action },
-		headers: { Authorization: `Bearer ${auth.session.access_token}` },
-	});
-	if (error) {
-		const detail =
-			error.context instanceof Response ? await error.context.json().catch(() => null) : null;
-		throw new GoogleDriveError(
-			detail?.error ||
-				"Google Drive is unavailable. Check that the Drive service is deployed.",
-			detail?.code,
-		);
-	}
-	return data as T;
-}
-
-export async function connectDriveSession(session: Session) {
-	if (!session.provider_token) return;
-	await driveRequest<DriveStatus>("connect", {
-		accessToken: session.provider_token,
-		refreshToken: session.provider_refresh_token,
-	});
-	notifyDriveChanged();
+	return unwrapGoogle(
+		await window.electronAPI.driveRequest(action, input, expectedAccountId),
+	) as T;
 }
 export const driveApi = {
 	status: () => driveRequest<DriveStatus>("status"),
@@ -84,12 +49,15 @@ export const driveApi = {
 	async upload(filePath: string, operation: DriveOperation, parentId?: string, name?: string) {
 		const info = await window.electronAPI.driveFileInfo(filePath);
 		if (operation.canceled) return { success: false, canceled: true };
-		const session = await driveRequest<{ accessToken: string; uploadUrl: string }>(
+		const session = await driveRequest<{ ticketId: string }>(
 			"start-upload",
-			{ ...info, name: name || info.name, parentId },
+			{ ...info, name: name || info.name, parentId, transferId: operation.id },
 			operation.accountId,
 		);
-		if (operation.canceled) return { success: false, canceled: true };
+		if (operation.canceled) {
+			await window.electronAPI.driveCancel(operation.id);
+			return { success: false, canceled: true };
+		}
 		return window.electronAPI.driveTransfer({
 			id: operation.id,
 			direction: "upload",
@@ -98,12 +66,15 @@ export const driveApi = {
 		});
 	},
 	async download(fileId: string, operation: DriveOperation) {
-		const session = await driveRequest<{ accessToken: string; file: DriveFile }>(
+		const session = await driveRequest<{ ticketId: string; file: DriveFile }>(
 			"download",
-			{ fileId },
+			{ fileId, transferId: operation.id },
 			operation.accountId,
 		);
-		if (operation.canceled) return { success: false, canceled: true };
+		if (operation.canceled) {
+			await window.electronAPI.driveCancel(operation.id);
+			return { success: false, canceled: true };
+		}
 		return window.electronAPI.driveTransfer({
 			id: operation.id,
 			direction: "download",

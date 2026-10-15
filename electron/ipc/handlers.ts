@@ -4,6 +4,7 @@ import { registerAssetHandlers } from "./register/assets";
 import { registerCaptionHandlers } from "./register/captions";
 import { registerCloudShareHandlers } from "./register/cloudShare";
 import { registerGoogleDriveHandlers } from "./register/googleDrive";
+import { registerGoogleDesktopHandlers } from "./register/googleDesktop";
 import { registerExportHandlers } from "./register/export";
 import { registerPermissionHandlers } from "./register/permissions";
 import { registerProjectHandlers } from "./register/project";
@@ -72,7 +73,7 @@ export function registerIpcHandlers(
 	registerExportHandlers();
 	registerCaptionHandlers();
 	registerCloudShareHandlers();
-	registerGoogleDriveHandlers();
+	registerGoogleDriveHandlers(registerGoogleDesktopHandlers());
 	registerProjectHandlers();
 	registerSettingsHandlers();
 }

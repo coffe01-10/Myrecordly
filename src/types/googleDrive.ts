@@ -24,6 +24,8 @@ export type DrivePermission = {
 
 export type DriveStatus = {
 	connected: boolean;
+	configured?: boolean;
+	accountId?: string;
 	email?: string;
 	folderId?: string;
 	reconnect?: boolean;
@@ -32,11 +34,30 @@ export type DriveStatus = {
 export type DriveTransfer = {
 	id: string;
 	direction: "upload" | "download";
-	accessToken: string;
-	uploadUrl?: string;
+	ticketId: string;
 	filePath?: string;
 	file?: DriveFile;
 };
+
+export type GoogleProfile = {
+	id: string;
+	email: string;
+	name?: string;
+	picture?: string;
+};
+
+export type GoogleAuthState = {
+	revision?: number;
+	configured: boolean;
+	user: GoogleProfile | null;
+	authorizing: boolean;
+	reconnect?: boolean;
+	sessionOnly?: boolean;
+};
+
+export type GoogleResult<T> =
+	| { success: true; data: T }
+	| { success: false; error: string; code: string; canceled?: boolean };
 
 export type DriveTransferResult = {
 	success: boolean;

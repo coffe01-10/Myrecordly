@@ -7,6 +7,7 @@ import { dialog, ipcMain } from "electron";
 import type { DriveTransfer, DriveTransferResult } from "../../../src/types/googleDrive";
 import { isOwnedExportPath } from "../export/exportStream";
 import { isAllowedLocalReadPath } from "../project/manager";
+import type { DriveTicket } from "../../googleDrive/api";
 
 const transfers = new Map<string, AbortController>();
 const mimeTypes: Record<string, string> = {
@@ -25,7 +26,14 @@ export function validateDriveUploadUrl(raw: string) {
 	return url.href;
 }
 
-export function registerGoogleDriveHandlers() {
+export function cancelAllDriveTransfers() {
+	for (const controller of transfers.values()) controller.abort();
+}
+export function registerGoogleDriveHandlers(tickets: {
+	consumeTicket(id: string): DriveTicket;
+	assertTicket(ticket: DriveTicket): void;
+	cancelTicket(id: string): void;
+}) {
 	ipcMain.handle("google-drive-pick-upload", async () => {
 		const selected = await dialog.showOpenDialog({
 			properties: ["openFile"],
@@ -63,8 +71,7 @@ export function registerGoogleDriveHandlers() {
 			let incompletePath: string | undefined;
 			let source: Readable | undefined;
 			try {
-				if (!input.accessToken)
-					throw new Error("Connect Google Drive before transferring files.");
+				const ticket = tickets.consumeTicket(input.ticketId);
 				if (input.direction === "upload") {
 					const filePath = await fs.realpath(input.filePath!);
 					if (!isOwnedExportPath(filePath) && !isAllowedLocalReadPath(filePath))
@@ -94,10 +101,11 @@ export function registerGoogleDriveHandlers() {
 					source.on("error", (error) => progress.destroy(error));
 					source.pipe(progress);
 					try {
-						const response = await fetch(validateDriveUploadUrl(input.uploadUrl!), {
+						tickets.assertTicket(ticket);
+						const response = await fetch(validateDriveUploadUrl(ticket.uploadUrl!), {
 							method: "PUT",
 							headers: {
-								authorization: `Bearer ${input.accessToken}`,
+								authorization: `Bearer ${ticket.token}`,
 								"content-length": String(size),
 							},
 							body: progress as unknown as BodyInit,
@@ -114,18 +122,19 @@ export function registerGoogleDriveHandlers() {
 						progress.destroy();
 					}
 				}
-				const file = input.file;
+				const file = ticket.file;
 				if (!file || !/^[\w-]+$/.test(file.id))
 					throw new Error("Invalid Google Drive file.");
 				const save = await dialog.showSaveDialog({ defaultPath: path.basename(file.name) });
 				if (save.canceled || !save.filePath) return { success: false, canceled: true };
+				tickets.assertTicket(ticket);
 				// Download beside the destination and rename only after success, so a failed
 				// download cannot truncate an existing user file.
 				incompletePath = `${save.filePath}.${crypto.randomUUID()}.partial`;
 				const response = await fetch(
 					`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
 					{
-						headers: { authorization: `Bearer ${input.accessToken}` },
+						headers: { authorization: `Bearer ${ticket.token}` },
 						signal: controller.signal,
 					},
 				);
@@ -152,5 +161,8 @@ export function registerGoogleDriveHandlers() {
 			}
 		},
 	);
-	ipcMain.handle("google-drive-cancel", (_event, id: string) => transfers.get(id)?.abort());
+	ipcMain.handle("google-drive-cancel", (_event, id: string) => {
+		tickets.cancelTicket(id);
+		transfers.get(id)?.abort();
+	});
 }
