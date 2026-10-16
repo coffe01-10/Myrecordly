@@ -17,6 +17,28 @@ const mimeTypes: Record<string, string> = {
 	".gif": "image/gif",
 	".recordly": "application/octet-stream",
 };
+async function resolveDriveUploadPath(filePath: string) {
+	// Check the registered path before resolving directory aliases. Export ownership
+	// is recorded using that path, while local-read approval also checks its target.
+	if (!isOwnedExportPath(filePath) && !isAllowedLocalReadPath(filePath))
+		throw new Error("This file is not an approved Recordly file.");
+	return fs.realpath(filePath);
+}
+function createProgressStream(total: number, report: (transferred: number, total: number) => void) {
+	let transferred = 0;
+	let lastProgressAt = 0;
+	return new Transform({
+		transform(chunk, _encoding, callback) {
+			transferred += chunk.length;
+			const now = Date.now();
+			if (now - lastProgressAt >= 100 || (total > 0 && transferred === total)) {
+				lastProgressAt = now;
+				report(transferred, total);
+			}
+			callback(null, chunk);
+		},
+	});
+}
 export function validateDriveUploadUrl(raw: string) {
 	const url = new URL(raw);
 	// Resumable URLs carry credentials. Never forward them to a caller-supplied host.
@@ -40,7 +62,7 @@ export function registerGoogleDriveHandlers(tickets: {
 			filters: [{ name: "Recordly media", extensions: ["mp4", "webm", "mov", "gif"] }],
 		});
 		if (selected.canceled) return { canceled: true };
-		const filePath = selected.filePaths[0];
+		const filePath = await fs.realpath(selected.filePaths[0]);
 		const { approveUserPath } = await import("../utils");
 		approveUserPath(filePath);
 		const stat = await fs.stat(filePath);
@@ -52,12 +74,10 @@ export function registerGoogleDriveHandlers(tickets: {
 		};
 	});
 	ipcMain.handle("google-drive-file-info", async (_event, filePath: string) => {
-		const resolved = await fs.realpath(filePath);
-		if (!isOwnedExportPath(resolved) && !isAllowedLocalReadPath(resolved))
-			throw new Error("This file is not an approved Recordly file.");
+		const resolved = await resolveDriveUploadPath(filePath);
 		const stat = await fs.stat(resolved);
 		return {
-			filePath: resolved,
+			filePath,
 			name: path.basename(resolved),
 			size: stat.size,
 			mimeType: mimeTypes[path.extname(resolved).toLowerCase()] || "application/octet-stream",
@@ -68,36 +88,23 @@ export function registerGoogleDriveHandlers(tickets: {
 		async (event, input: DriveTransfer): Promise<DriveTransferResult> => {
 			const controller = new AbortController();
 			transfers.set(input.id, controller);
+			const reportProgress = (transferred: number, total: number) => {
+				if (!event.sender.isDestroyed())
+					event.sender.send("google-drive-progress", {
+						id: input.id,
+						transferred,
+						total,
+					});
+			};
 			let incompletePath: string | undefined;
 			let source: Readable | undefined;
 			try {
 				const ticket = tickets.consumeTicket(input.ticketId);
 				if (input.direction === "upload") {
-					const filePath = await fs.realpath(input.filePath!);
-					if (!isOwnedExportPath(filePath) && !isAllowedLocalReadPath(filePath))
-						throw new Error("This file is not an approved Recordly file.");
+					const filePath = await resolveDriveUploadPath(input.filePath!);
 					const { size } = await fs.stat(filePath);
-					let uploaded = 0;
-					let lastProgressAt = 0;
 					source = createReadStream(filePath);
-					const progress = new Transform({
-						transform(chunk, _encoding, callback) {
-							uploaded += chunk.length;
-							const now = Date.now();
-							if (
-								!event.sender.isDestroyed() &&
-								(now - lastProgressAt >= 100 || uploaded === size)
-							) {
-								lastProgressAt = now;
-								event.sender.send("google-drive-progress", {
-									id: input.id,
-									transferred: uploaded,
-									total: size,
-								});
-							}
-							callback(null, chunk);
-						},
-					});
+					const progress = createProgressStream(size, reportProgress);
 					source.on("error", (error) => progress.destroy(error));
 					source.pipe(progress);
 					try {
@@ -140,11 +147,20 @@ export function registerGoogleDriveHandlers(tickets: {
 				);
 				if (!response.ok || !response.body)
 					throw new Error(`Google Drive download failed (${response.status}).`);
+				const total = Number(response.headers.get("content-length") || file.size) || 0;
 				const handle = await fs.open(incompletePath, "wx");
 				source = Readable.fromWeb(
 					response.body as import("node:stream/web").ReadableStream,
 				);
-				await pipeline(source, handle.createWriteStream(), { signal: controller.signal });
+				await pipeline(
+					source,
+					createProgressStream(total, reportProgress),
+					handle.createWriteStream(),
+					{
+						signal: controller.signal,
+					},
+				);
+				controller.signal.throwIfAborted();
 				await fs.rename(incompletePath, save.filePath);
 				incompletePath = undefined;
 				return { success: true, filePath: save.filePath };

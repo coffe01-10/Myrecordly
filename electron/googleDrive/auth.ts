@@ -275,6 +275,12 @@ export class GoogleDesktopAuth {
 				folderId: previous?.folderId,
 			};
 			await this.persist(nextSession, version);
+			if (signal.aborted) {
+				// A disk write cannot be aborted. Restore the prior session after it finishes;
+				// a concurrent sign-out has its own newer, queued persistence operation.
+				await this.persist(this.session, version);
+				throw new GoogleError("Google authorization was canceled.", "AUTH_CANCELED");
+			}
 			if (version !== this.version)
 				throw new GoogleError("Your account changed. Sign in again.", "ACCOUNT_CHANGED");
 			this.session = nextSession;

@@ -42,6 +42,7 @@ export function DriveLibrary() {
 	const [nextPage, setNextPage] = useState<string>();
 	const [query, setQuery] = useState("");
 	const [busy, setBusy] = useState(false);
+	const [transferring, setTransferring] = useState(false);
 	const [error, setError] = useState<string>();
 	const [progress, setProgress] = useState<number>();
 	const [edit, setEdit] = useState<{ action: "rename" | "mkdir"; file?: DriveFile }>();
@@ -110,7 +111,11 @@ export function DriveLibrary() {
 		() =>
 			window.electronAPI.onDriveProgress?.((event) => {
 				if (event.id === transfer.current?.id)
-					setProgress(Math.min(99, Math.round((event.transferred / event.total) * 100)));
+					setProgress(
+						event.total > 0
+							? Math.min(99, Math.round((event.transferred / event.total) * 100))
+							: undefined,
+					);
 			}),
 		[],
 	);
@@ -123,6 +128,7 @@ export function DriveLibrary() {
 			setError(cause instanceof Error ? cause.message : String(cause));
 		} finally {
 			setBusy(false);
+			setTransferring(false);
 			setProgress(undefined);
 			transfer.current = undefined;
 		}
@@ -132,6 +138,7 @@ export function DriveLibrary() {
 			const picked = await window.electronAPI.drivePickUpload();
 			if (picked.canceled || !picked.filePath) return;
 			transfer.current = { id: crypto.randomUUID(), accountId, canceled: false };
+			setTransferring(true);
 			setProgress(0);
 			const result = await driveApi.upload(picked.filePath, transfer.current, parentId);
 			if (!result.success && !result.canceled) throw new Error(result.error);
@@ -330,10 +337,12 @@ export function DriveLibrary() {
 							</Button>
 						</div>
 					</div>
-					{progress !== undefined && (
+					{transferring && (
 						<div role="status" className="mb-4 flex items-center gap-3 text-sm">
 							<progress className="flex-1" max={100} value={progress} />
-							{progress}%
+							{progress === undefined
+								? t("editor.drive.loading", "Loading…")
+								: `${progress}%`}
 							<Button
 								size="sm"
 								variant="ghost"
@@ -427,6 +436,8 @@ export function DriveLibrary() {
 																	accountId,
 																	canceled: false,
 																};
+																setTransferring(true);
+																setProgress(undefined);
 																const result =
 																	await driveApi.download(
 																		file.id,
