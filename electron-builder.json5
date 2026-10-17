@@ -35,6 +35,8 @@
     "!node_modules/ffprobe-static/bin/darwin/**",
     "!node_modules/ffprobe-static/bin/linux/**",
     "!node_modules/ffprobe-static/bin/win32/ia32/**",
+    "!node_modules/@phosphor-icons/**",
+    "!node_modules/@solar-icons/**",
     "!electron/native/**/build/**",
     "!*.png",
     "!preview*.png",
