@@ -52,8 +52,8 @@
   "publish": [
     {
       "provider": "github",
-      "owner": "webadderall",
-      "repo": "Recordly",
+      "owner": "coffe01-10",
+      "repo": "Myrecordly",
       "tagNamePrefix": "v",
       "publishAutoUpdate": true
     }
@@ -118,9 +118,11 @@
     ],
     "icon": "icons/icons/win/icon.ico",
     "executableName": "Recordly",
-    "artifactName": "${productName}-windows-${arch}.${ext}"
+    "artifactName": "${productName}-${version}-windows-${arch}.${ext}"
   },
   "nsis": {
+    "language": "2052",
+    "installerLanguages": ["zh_CN"],
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,

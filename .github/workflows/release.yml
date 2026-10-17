@@ -32,6 +32,8 @@ concurrency:
 jobs:
   prepare-release:
     name: Prepare release
+    # Releases with uploaded local builds do not need the multi-platform rebuild.
+    if: github.event_name != 'release' || !contains(github.event.release.body, '<!-- release-built-locally -->')
     runs-on: ubuntu-latest
     outputs:
       tag_name: ${{ steps.prepare.outputs.tag_name }}
