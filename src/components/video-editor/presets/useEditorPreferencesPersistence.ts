@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { AspectRatio } from "@/utils/aspectRatioUtils";
 import { saveEditorPreferences } from "../editorPreferences";
 import type { useAppearanceState } from "../state/useAppearanceState";
+import { createPreferenceSaveQueue } from "./preferenceSaveQueue";
 
 type Input = {
 	appearance: ReturnType<typeof useAppearanceState>;
@@ -16,8 +17,16 @@ export function useEditorPreferencesPersistence({
 	whisperExecutablePath,
 	whisperModelPath,
 }: Input) {
+	const saves = useMemo(() => createPreferenceSaveQueue(saveEditorPreferences), []);
 	useEffect(() => {
-		saveEditorPreferences({
+		window.addEventListener("pagehide", saves.flush);
+		return () => {
+			window.removeEventListener("pagehide", saves.flush);
+			saves.flush();
+		};
+	}, [saves]);
+	useEffect(() => {
+		saves.schedule({
 			wallpaper: appearance.wallpaper,
 			shadowIntensity: appearance.shadowIntensity,
 			backgroundBlur: appearance.backgroundBlur,
@@ -61,6 +70,7 @@ export function useEditorPreferencesPersistence({
 			whisperModelPath,
 		});
 	}, [
+		saves,
 		appearance.wallpaper,
 		appearance.shadowIntensity,
 		appearance.backgroundBlur,

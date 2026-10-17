@@ -1,5 +1,8 @@
 import {
 	createContext,
+	Suspense,
+	startTransition,
+	use,
 	type ReactNode,
 	useCallback,
 	useContext,
@@ -16,173 +19,9 @@ import {
 	SUPPORTED_LOCALES,
 } from "@/i18n/config";
 import { loadAppSetting, saveAppSetting } from "@/lib/appSettings";
-import enCommon from "@/i18n/locales/en/common.json";
-import enDialogs from "@/i18n/locales/en/dialogs.json";
-import enEditor from "@/i18n/locales/en/editor.json";
-import enLaunch from "@/i18n/locales/en/launch.json";
-import enSettings from "@/i18n/locales/en/settings.json";
-import enShortcuts from "@/i18n/locales/en/shortcuts.json";
-import enTimeline from "@/i18n/locales/en/timeline.json";
-import esCommon from "@/i18n/locales/es/common.json";
-import esDialogs from "@/i18n/locales/es/dialogs.json";
-import esEditor from "@/i18n/locales/es/editor.json";
-import esLaunch from "@/i18n/locales/es/launch.json";
-import esSettings from "@/i18n/locales/es/settings.json";
-import esShortcuts from "@/i18n/locales/es/shortcuts.json";
-import esTimeline from "@/i18n/locales/es/timeline.json";
-import frCommon from "@/i18n/locales/fr/common.json";
-import frDialogs from "@/i18n/locales/fr/dialogs.json";
-import frEditor from "@/i18n/locales/fr/editor.json";
-import frLaunch from "@/i18n/locales/fr/launch.json";
-import frSettings from "@/i18n/locales/fr/settings.json";
-import frShortcuts from "@/i18n/locales/fr/shortcuts.json";
-import frTimeline from "@/i18n/locales/fr/timeline.json";
-import deCommon from "@/i18n/locales/de/common.json";
-import deDialogs from "@/i18n/locales/de/dialogs.json";
-import deEditor from "@/i18n/locales/de/editor.json";
-import deLaunch from "@/i18n/locales/de/launch.json";
-import deSettings from "@/i18n/locales/de/settings.json";
-import deShortcuts from "@/i18n/locales/de/shortcuts.json";
-import deTimeline from "@/i18n/locales/de/timeline.json";
-import itCommon from "@/i18n/locales/it/common.json";
-import itDialogs from "@/i18n/locales/it/dialogs.json";
-import itEditor from "@/i18n/locales/it/editor.json";
-import itLaunch from "@/i18n/locales/it/launch.json";
-import itSettings from "@/i18n/locales/it/settings.json";
-import itShortcuts from "@/i18n/locales/it/shortcuts.json";
-import itTimeline from "@/i18n/locales/it/timeline.json";
-import koCommon from "@/i18n/locales/ko/common.json";
-import koDialogs from "@/i18n/locales/ko/dialogs.json";
-import koEditor from "@/i18n/locales/ko/editor.json";
-import koLaunch from "@/i18n/locales/ko/launch.json";
-import koSettings from "@/i18n/locales/ko/settings.json";
-import koShortcuts from "@/i18n/locales/ko/shortcuts.json";
-import koTimeline from "@/i18n/locales/ko/timeline.json";
-import nlCommon from "@/i18n/locales/nl/common.json";
-import nlDialogs from "@/i18n/locales/nl/dialogs.json";
-import nlEditor from "@/i18n/locales/nl/editor.json";
-import nlLaunch from "@/i18n/locales/nl/launch.json";
-import nlSettings from "@/i18n/locales/nl/settings.json";
-import nlShortcuts from "@/i18n/locales/nl/shortcuts.json";
-import nlTimeline from "@/i18n/locales/nl/timeline.json";
-import ptBRCommon from "@/i18n/locales/pt-BR/common.json";
-import ptBRDialogs from "@/i18n/locales/pt-BR/dialogs.json";
-import ptBREditor from "@/i18n/locales/pt-BR/editor.json";
-import ptBRLaunch from "@/i18n/locales/pt-BR/launch.json";
-import ptBRSettings from "@/i18n/locales/pt-BR/settings.json";
-import ptBRShortcuts from "@/i18n/locales/pt-BR/shortcuts.json";
-import ptBRTimeline from "@/i18n/locales/pt-BR/timeline.json";
-import zhCNCommon from "@/i18n/locales/zh-CN/common.json";
-import zhCNDialogs from "@/i18n/locales/zh-CN/dialogs.json";
-import zhCNEditor from "@/i18n/locales/zh-CN/editor.json";
-import zhCNLaunch from "@/i18n/locales/zh-CN/launch.json";
-import zhCNSettings from "@/i18n/locales/zh-CN/settings.json";
-import zhCNShortcuts from "@/i18n/locales/zh-CN/shortcuts.json";
-import zhCNTimeline from "@/i18n/locales/zh-CN/timeline.json";
-import zhTWCommon from "@/i18n/locales/zh-TW/common.json";
-import zhTWDialogs from "@/i18n/locales/zh-TW/dialogs.json";
-import zhTWEditor from "@/i18n/locales/zh-TW/editor.json";
-import zhTWLaunch from "@/i18n/locales/zh-TW/launch.json";
-import zhTWSettings from "@/i18n/locales/zh-TW/settings.json";
-import zhTWShortcuts from "@/i18n/locales/zh-TW/shortcuts.json";
-import zhTWTimeline from "@/i18n/locales/zh-TW/timeline.json";
+import { getLocaleMessages, loadLocaleMessages } from "@/i18n/messages";
 
 const LOCALE_STORAGE_KEY = "recordly.locale";
-
-type LocaleBundle = Record<I18nNamespace, Record<string, unknown>>;
-
-const messages: Record<AppLocale, LocaleBundle> = {
-	en: {
-		common: enCommon,
-		launch: enLaunch,
-		editor: enEditor,
-		timeline: enTimeline,
-		settings: enSettings,
-		dialogs: enDialogs,
-		shortcuts: enShortcuts,
-	},
-	es: {
-		common: esCommon,
-		launch: esLaunch,
-		editor: esEditor,
-		timeline: esTimeline,
-		settings: esSettings,
-		dialogs: esDialogs,
-		shortcuts: esShortcuts,
-	},
-	fr: {
-		common: frCommon,
-		launch: frLaunch,
-		editor: frEditor,
-		timeline: frTimeline,
-		settings: frSettings,
-		dialogs: frDialogs,
-		shortcuts: frShortcuts,
-	},
-	de: {
-		common: deCommon,
-		launch: deLaunch,
-		editor: deEditor,
-		timeline: deTimeline,
-		settings: deSettings,
-		dialogs: deDialogs,
-		shortcuts: deShortcuts,
-	},
-	it: {
-		common: itCommon,
-		launch: itLaunch,
-		editor: itEditor,
-		timeline: itTimeline,
-		settings: itSettings,
-		dialogs: itDialogs,
-		shortcuts: itShortcuts,
-	},
-	nl: {
-		common: nlCommon,
-		launch: nlLaunch,
-		editor: nlEditor,
-		timeline: nlTimeline,
-		settings: nlSettings,
-		dialogs: nlDialogs,
-		shortcuts: nlShortcuts,
-	},
-	ko: {
-		common: koCommon,
-		launch: koLaunch,
-		editor: koEditor,
-		timeline: koTimeline,
-		settings: koSettings,
-		dialogs: koDialogs,
-		shortcuts: koShortcuts,
-	},
-	"pt-BR": {
-		common: ptBRCommon,
-		launch: ptBRLaunch,
-		editor: ptBREditor,
-		timeline: ptBRTimeline,
-		settings: ptBRSettings,
-		dialogs: ptBRDialogs,
-		shortcuts: ptBRShortcuts,
-	},
-	"zh-CN": {
-		common: zhCNCommon,
-		launch: zhCNLaunch,
-		editor: zhCNEditor,
-		timeline: zhCNTimeline,
-		settings: zhCNSettings,
-		dialogs: zhCNDialogs,
-		shortcuts: zhCNShortcuts,
-	},
-	"zh-TW": {
-		common: zhTWCommon,
-		launch: zhTWLaunch,
-		editor: zhTWEditor,
-		timeline: zhTWTimeline,
-		settings: zhTWSettings,
-		dialogs: zhTWDialogs,
-		shortcuts: zhTWShortcuts,
-	},
-} as const;
 
 interface I18nContextValue {
 	locale: AppLocale;
@@ -295,8 +134,8 @@ function translateForLocale(
 	const { namespace, path } = parseKey(key);
 
 	const rawValue =
-		getMessageValue(messages[locale][namespace], path) ??
-		getMessageValue(messages[DEFAULT_LOCALE][namespace], path) ??
+		getMessageValue(getLocaleMessages(locale)?.[namespace], path) ??
+		getMessageValue(getLocaleMessages(DEFAULT_LOCALE)?.[namespace], path) ??
 		fallback ??
 		key;
 
@@ -304,10 +143,28 @@ function translateForLocale(
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
+	return (
+		<Suspense
+			fallback={
+				<div
+					className="flex h-screen items-center justify-center bg-editor-bg text-foreground"
+					role="status"
+				>
+					正在加载语言…
+				</div>
+			}
+		>
+			<I18nProviderContent>{children}</I18nProviderContent>
+		</Suspense>
+	);
+}
+
+function I18nProviderContent({ children }: { children: ReactNode }) {
 	const [locale, setLocaleState] = useState<AppLocale>(getInitialLocale);
+	if (!getLocaleMessages(locale)) use(loadLocaleMessages(locale));
 
 	const setLocale = useCallback((nextLocale: AppLocale) => {
-		setLocaleState(nextLocale);
+		startTransition(() => setLocaleState(nextLocale));
 		if (typeof window !== "undefined") {
 			window.localStorage.setItem(LOCALE_STORAGE_KEY, nextLocale);
 		}

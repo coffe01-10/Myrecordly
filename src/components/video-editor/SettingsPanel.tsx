@@ -3,8 +3,7 @@ import { Card, RadioGroup, Radio, Label, Description } from "@heroui/react";
 import { ProgressBar } from "@heroui/react";
 import { ColorControl, ColorPalette } from "@/components/ui/color-picker";
 import { Palette, Trash as Trash2, UploadSimple as Upload } from "@/components/ui/icons";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { panelSpring } from "@/components/ui/selection-highlight";
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import minimalCursorUrl from "@/assets/cursors/custom/minimal-cursor.svg";
@@ -1609,7 +1608,7 @@ export function SettingsPanel({
 		? annotationRegions.find((a) => a.id === selectedAnnotationId)
 		: null;
 
-	const backgroundSettingsContent = (
+	const renderBackgroundSettings = () => (
 		<div className="space-y-5">
 			<section className="flex flex-col gap-4">
 				<div className="flex items-center justify-between gap-3">
@@ -1825,13 +1824,13 @@ export function SettingsPanel({
 							{tSettings("background.title")}
 						</span>
 					</div>
-					{backgroundSettingsContent}
+					{renderBackgroundSettings()}
 				</div>
 			</Card>
 		);
 	}
 
-	const frameSectionContent = (
+	const renderFrameSection = () => (
 		<section className="flex flex-col gap-4">
 			<div className="flex items-center justify-between gap-3">
 				<SectionLabel>{tSettings("sections.frame", "Frame")}</SectionLabel>
@@ -1946,7 +1945,7 @@ export function SettingsPanel({
 		</section>
 	);
 
-	const cropSectionContent = (
+	const renderCropSection = () => (
 		<section className="flex flex-col gap-4">
 			<div className="flex items-center justify-between gap-3">
 				<SectionLabel>{tSettings("sections.crop", "Crop")}</SectionLabel>
@@ -2003,7 +2002,7 @@ export function SettingsPanel({
 		</section>
 	);
 
-	const captionsSectionContent = (
+	const renderCaptionsSection = () => (
 		<section className="flex flex-col gap-4">
 			<div className="flex items-center justify-between gap-3">
 				<div className="flex items-center gap-3">
@@ -2274,7 +2273,7 @@ export function SettingsPanel({
 	);
 
 	const effectSectionContent = (() => {
-		const settingsSectionContent = (
+		const renderSettingsSection = () => (
 			<SettingsSections
 				categories={advanced ? ["general", "motion", "advanced"] : ["general", "motion"]}
 			>
@@ -2589,15 +2588,15 @@ export function SettingsPanel({
 			</SettingsSections>
 		);
 
-		const sceneSectionContent = (
+		const renderSceneSection = () => (
 			<div className="space-y-5">
-				{backgroundSettingsContent}
-				{frameSectionContent}
-				{advanced && cropSectionContent}
+				{renderBackgroundSettings()}
+				{renderFrameSection()}
+				{advanced && renderCropSection()}
 			</div>
 		);
 
-		const zoomItemSectionContent = (
+		const renderZoomItemSection = () => (
 			<section className="flex flex-col gap-4">
 				{selectedZoomId && (
 					<>
@@ -2684,7 +2683,7 @@ export function SettingsPanel({
 			</section>
 		);
 
-		const audioSectionContent = (
+		const renderAudioSection = () => (
 			<section className="flex flex-col gap-3">
 				<div className="flex items-center justify-between gap-3">
 					<SectionLabel>{tSettings("audio.volumeTitle", "Audio")}</SectionLabel>
@@ -2723,7 +2722,7 @@ export function SettingsPanel({
 			</section>
 		);
 
-		const clipSectionContent = (
+		const renderClipSection = () => (
 			<section className="flex flex-col gap-3">
 				<SliderControl
 					label={tSettings("speed.label", "Speed")}
@@ -2766,7 +2765,7 @@ export function SettingsPanel({
 			</section>
 		);
 
-		const captionSectionContent = (
+		const renderCaptionSection = () => (
 			<section className="flex flex-col gap-4">
 				{selectedCaptionId !== null ? (
 					<CaptionListPanel
@@ -2795,23 +2794,23 @@ export function SettingsPanel({
 
 		switch (activeEffectSection) {
 			case "settings":
-				return settingsSectionContent;
+				return renderSettingsSection();
 			case "scene":
-				return sceneSectionContent;
+				return renderSceneSection();
 			case "zoom":
-				return zoomItemSectionContent;
+				return renderZoomItemSection();
 			case "clip":
-				return clipSectionContent;
+				return renderClipSection();
 			case "audio":
-				return audioSectionContent;
+				return renderAudioSection();
 			case "frame":
-				return sceneSectionContent;
+				return renderSceneSection();
 			case "crop":
-				return sceneSectionContent;
+				return renderSceneSection();
 			case "captions":
-				return captionsSectionContent;
+				return renderCaptionsSection();
 			case "caption":
-				return captionSectionContent;
+				return renderCaptionSection();
 			case "cursor":
 				return (
 					<section className="flex flex-col gap-4">
@@ -3314,7 +3313,7 @@ export function SettingsPanel({
 					</section>
 				);
 			default: {
-				return sceneSectionContent;
+				return renderSceneSection();
 			}
 		}
 	})();
@@ -3325,21 +3324,14 @@ export function SettingsPanel({
 				className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-5 pb-6 pt-1"
 				style={{ scrollbarGutter: "stable" }}
 			>
-				<AnimatePresence mode="wait" initial={false}>
-					<motion.div
-						key={activeEffectSection}
-						initial={{ opacity: 0, y: reducedMotion ? 0 : 8 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: reducedMotion ? 0 : -4 }}
-						transition={
-							reducedMotion
-								? { duration: 0 }
-								: { ...panelSpring, opacity: { duration: 0.12 } }
-						}
-					>
-						{effectSectionContent}
-					</motion.div>
-				</AnimatePresence>
+				<motion.div
+					key={activeEffectSection}
+					initial={{ opacity: 0, y: reducedMotion ? 0 : 4 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={reducedMotion ? { duration: 0 } : { duration: 0.1 }}
+				>
+					{effectSectionContent}
+				</motion.div>
 			</div>
 
 			<div
