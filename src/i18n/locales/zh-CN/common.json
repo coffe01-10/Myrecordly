@@ -4,7 +4,8 @@
 		"editorTitle": "Recordly 编辑器",
 		"subtitle": "屏幕录制与编辑",
 		"language": "语言",
-		"manageRecordings": "打开录制文件夹"
+		"manageRecordings": "打开录制文件夹",
+		"discord": "加入 Discord 社区"
 	},
 	"actions": {
 		"cancel": "取消",
@@ -162,5 +163,28 @@
 	},
 	"dropdownMenu": {
 		"actions": "操作"
+	},
+	"announcements": {
+		"openFailed": "无法打开链接。",
+		"carousel": "公告",
+		"previous": "上一条公告",
+		"show": "查看公告",
+		"next": "下一条公告",
+		"dismiss": "关闭"
+	},
+	"account": {
+		"localProfile": "本地用户"
+	},
+	"toast": {
+		"copy": "复制",
+		"errorCopied": "已复制错误信息",
+		"copyFailed": "无法复制错误信息"
+	},
+	"select": {
+		"option": "选择选项",
+		"placeholder": "请选择"
+	},
+	"popover": {
+		"options": "选项"
 	}
 }

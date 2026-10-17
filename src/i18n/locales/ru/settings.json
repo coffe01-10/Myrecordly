@@ -13,7 +13,10 @@
 		"modeManual": "Вручную",
 		"modeManualDescription": "Установить фиксированную точку фокусировки",
 		"modeAutoDescription": "Камера выравнивается по центру, когда курсор приближается к краю увеличенного изображения",
-		"modeAria": "Zoom mode"
+		"modeAria": "Zoom mode",
+		"mode": "Mode",
+		"amount": "Amount",
+		"globalSettings": "Animation"
 	},
 	"trim": {
 		"deleteRegion": "Удалить"
@@ -22,7 +25,8 @@
 		"playbackSpeed": "Скорость воспроизведения",
 		"selectRegion": "Диапазон скорости",
 		"deleteRegion": "Удалить",
-		"label": "Скорость"
+		"label": "Скорость",
+		"unsupported": "Not supported for preview on this device"
 	},
 	"clip": {
 		"title": "Клип",
@@ -160,7 +164,31 @@
 		"paddingRight": "Справа",
 		"linkPaddingSides": "Link padding sides",
 		"customEffectColor": "Custom effect color",
-		"removeBackground": "Удалить фон"
+		"removeBackground": "Удалить фон",
+		"devSection": "Dev",
+		"devBadge": "DEV",
+		"devSectionHint": "Temporary testing controls for native capture and motion tuning.",
+		"nativeCaptureWarningTester": "Native capture warning",
+		"nativeCaptureWarningTesterUnavailable": "This project is currently marked as native capture unavailable.",
+		"nativeCaptureWarningTesterAvailable": "This project is not marked as unsupported, but you can still open the modal for UI testing.",
+		"openNativeCaptureWarning": "Open warning",
+		"cameraDebugTuning": "Camera Debug Tuning",
+		"cameraDebugTuningHint": "Development-only spring tuning controls for camera motion.",
+		"cameraSpringStiffnessMultiplier": "Camera stiffness",
+		"cameraSpringDampingMultiplier": "Camera damping",
+		"cameraSpringMassMultiplier": "Camera mass",
+		"cursorDebugTuning": "Cursor Debug Tuning",
+		"cursorDebugTuningHint": "Development-only spring tuning controls.",
+		"cursorSpringStiffnessMultiplier": "Spring stiffness",
+		"cursorSpringDampingMultiplier": "Spring damping",
+		"cursorSpringMassMultiplier": "Spring mass",
+		"classicZoom": "Classic Animation",
+		"cursorDebugMovedToDev": "Cursor spring tuning is available in Settings > Dev.",
+		"webcamPosition": "Position",
+		"webcamCustomPosition": "Custom position",
+		"webcamHorizontal": "Horizontal",
+		"webcamVertical": "Vertical",
+		"webcamMargin": "Margin"
 	},
 	"sections": {
 		"scene": "Сцена",
@@ -170,7 +198,9 @@
 		"cursor": "Курсор",
 		"webcam": "Веб-камера",
 		"frame": "Рамка",
-		"crop": "Обрезать видео"
+		"crop": "Обрезать видео",
+		"title": "Editor tools",
+		"appearance": "Appearance"
 	},
 	"captions": {
 		"selectOnTimeline": "Выберите субтитры на таймлайне, чтобы отредактировать их.",
@@ -229,7 +259,10 @@
 			"split": "Split",
 			"merge": "Merge",
 			"delete": "Delete"
-		}
+		},
+		"generation": "Generation",
+		"useCustomModel": "Use custom",
+		"generatingStatus": "Generating captions. This can take a moment."
 	},
 	"crop": {
 		"title": "Обрезка видео",
@@ -254,7 +287,14 @@
 		"videoUnsupportedFormat": "Unsupported format",
 		"videoUnsupportedFormatDescription": "Please select a video file (mp4, webm, mov, etc.)",
 		"videoAdded": "Video background added",
-		"videoImportFailed": "Failed to import video background"
+		"videoImportFailed": "Failed to import video background",
+		"video": "Video",
+		"addWallpaper": "Add wallpaper",
+		"addVideoWallpaper": "Add video wallpaper",
+		"customWallpaper": "Custom wallpaper",
+		"removeWallpaper": "Remove {{name}}",
+		"gradientOption": "Gradient {{number}}",
+		"wallpaperNumber": "Wallpaper {{number}}"
 	},
 	"export": {
 		"title": "Экспорт",
@@ -276,7 +316,29 @@
 		"saveProject": "Сохранить проект",
 		"exportVideo": "Экспортировать {{format}}",
 		"reportBug": "Сообщить об ошибке",
-		"starOnGithub": "Оценить на GitHub"
+		"starOnGithub": "Оценить на GitHub",
+		"format": "Format",
+		"qualityTitle": "Quality",
+		"encodingTitle": "Encoding",
+		"nvidiaCuda": {
+			"title": "NVIDIA CUDA"
+		},
+		"captionSidecar": {
+			"title": "Export captions file",
+			"hint": "Save .srt and .vtt files next to your exported video."
+		},
+		"size": "Size",
+		"encoding": {
+			"fast": "Fast",
+			"balanced": "Balanced",
+			"quality": "Quality"
+		},
+		"sizePresets": {
+			"medium": "Medium (720p)",
+			"large": "Large (1080p)",
+			"original": "Original"
+		},
+		"video": "Video"
 	},
 	"audio": {
 		"title": "Аудио",
@@ -320,5 +382,53 @@
 		"openProjectsFolderFailed": "Could not open projects folder",
 		"showFolder": "Show folder",
 		"projectsNote": "Named projects save automatically. Previews refresh when you return to Projects."
+	},
+	"annotation": {
+		"delete": "Delete Annotation"
+	},
+	"webcamCrop": {
+		"move": "Move webcam crop",
+		"nw": "Resize webcam crop from top left",
+		"ne": "Resize webcam crop from top right",
+		"sw": "Resize webcam crop from bottom left",
+		"se": "Resize webcam crop from bottom right"
+	},
+	"webcamPositions": {
+		"top-left": "Top left",
+		"top-center": "Top center",
+		"top-right": "Top right",
+		"center-left": "Center left",
+		"center": "Center",
+		"center-right": "Center right",
+		"bottom-left": "Bottom left",
+		"bottom-center": "Bottom center",
+		"bottom-right": "Bottom right"
+	},
+	"wallpapers": {
+		"tahoe-light": "Tahoe Light",
+		"tahoe-dark": "Tahoe Dark",
+		"midnight-8": "Midnight 8",
+		"ipad-17-dark": "iPad 17 Dark",
+		"ipad-17-light": "iPad 17 Light",
+		"sequoia-blue": "Sequoia Blue",
+		"sequoia-blue-orange": "Sequoia Blue Orange",
+		"ventura": "Ventura",
+		"sonoma-clouds": "Sonoma Clouds",
+		"sonoma-light": "Sonoma Light",
+		"sonoma-dark": "Sonoma Dark",
+		"glassmorphism-3": "Glassmorphism 3",
+		"glassmorphism-4": "Glassmorphism 4",
+		"energy-19": "Energy 19",
+		"wallpaper3": "Wallpaper 3",
+		"wallpaper4": "Wallpaper 4",
+		"cityscape": "Cityscape",
+		"levels": "Levels",
+		"wallpaper10": "Wallpaper 10",
+		"ventura-dark": "Ventura Dark",
+		"sonoma-evening": "Sonoma Evening",
+		"sonoma-horizon": "Sonoma Horizon",
+		"iridescent-9": "Iridescent 9",
+		"energy-17": "Energy 17",
+		"wispysky": "Wispy Sky"
 	}
 }

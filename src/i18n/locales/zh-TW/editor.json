@@ -49,7 +49,9 @@
 	},
 	"theme": {
 		"light": "淺色",
-		"dark": "深色"
+		"dark": "深色",
+		"appearance": "Appearance",
+		"system": "System"
 	},
 	"cloud": {
 		"signInRequired": "建立分享連結前，請先登入 Recordly。",
@@ -208,7 +210,8 @@
 		"finalizeFailed": "無法完成匯入的媒體",
 		"thumbnailPreview": "{{name}} 的預覽",
 		"thumbnailUnavailable": "預覽無法使用",
-		"thumbnailLoading": "正在載入預覽圖"
+		"thumbnailLoading": "正在載入預覽圖",
+		"clearSearch": "Clear search"
 	},
 	"library": {
 		"videos": "影片"
@@ -225,7 +228,8 @@
 		"videoErrorFormat": "格式不受支援",
 		"videoErrorNetwork": "網路錯誤",
 		"videoErrorDecode": "解碼錯誤",
-		"videoErrorCode": "錯誤碼 {{code}}"
+		"videoErrorCode": "錯誤碼 {{code}}",
+		"seek": "Playback position"
 	},
 	"annotations": {
 		"settings": "註釋設定",
@@ -269,7 +273,22 @@
 		"noArrowData": "無箭頭資料",
 		"typeLabel": "註解類型",
 		"uploadedAlt": "已上傳的註解",
-		"customFonts": "自訂字型"
+		"customFonts": "自訂字型",
+		"arrowDirectionOption": "Arrow direction: {{direction}}",
+		"customColor": "Custom color",
+		"imageUploadErrorDescription": "Choose a JPG, PNG, GIF, or WebP image.",
+		"imageUploadFailed": "Could not upload image",
+		"imageUploadFailedDescription": "Could not read the image. Please choose another file.",
+		"directions": {
+			"up": "Up",
+			"down": "Down",
+			"left": "Left",
+			"right": "Right",
+			"up-right": "Up right",
+			"up-left": "Up left",
+			"down-right": "Down right",
+			"down-left": "Down left"
+		}
 	},
 	"fontStyles": {
 		"classic": "經典",
@@ -285,7 +304,8 @@
 		"mp4Video": "MP4 視訊",
 		"mp4Description": "高品質視訊檔案",
 		"gifAnimation": "GIF 動畫",
-		"gifDescription": "可分享的動態圖片"
+		"gifDescription": "可分享的動態圖片",
+		"title": "Export format"
 	},
 	"gifOptions": {
 		"frameRate": "影格率",
@@ -367,7 +387,11 @@
 		"mediaError": "無法載入專案媒體",
 		"renameFailed": "無法重新命名專案",
 		"libraryLoadFailed": "無法載入專案庫",
-		"openProjects": "開啟專案"
+		"openProjects": "開啟專案",
+		"saveTitle": "Save Project",
+		"saveDescription": "Name this project. It will be saved in your Recordly Projects folder.",
+		"saveNameLabel": "Project name",
+		"saving": "Saving..."
 	},
 	"exportTips": {
 		"autoZooms": "提示：可在設定中關閉自動套用的縮放",
@@ -402,7 +426,18 @@
 		"namePlaceholder": "預設集名稱",
 		"savedList": "已儲存的預設集",
 		"empty": "尚無預設集。",
-		"deleteAriaLabel": "刪除預設集 {{name}}"
+		"deleteAriaLabel": "刪除預設集 {{name}}",
+		"toasts": {
+			"applied": "Applied preset \"{{name}}\"",
+			"saved": "Saved preset \"{{name}}\"",
+			"deleted": "Deleted preset \"{{name}}\""
+		},
+		"errors": {
+			"nameRequired": "Enter a preset name.",
+			"duplicateName": "A preset with that name already exists.",
+			"saveFailed": "Could not save that preset. Check your browser storage settings and try again.",
+			"deleteFailed": "Could not delete that preset. Check your browser storage settings and try again."
+		}
 	},
 	"audio": {
 		"sourceLoadFailed": "無法載入伴隨音訊來源：{{error}}",
@@ -426,7 +461,13 @@
 		"runtimePath": "路徑：{{path}}",
 		"errorCopied": "錯誤已複製",
 		"errorCopyFailed": "無法複製。請選取錯誤文字後手動複製。",
-		"copyError": "複製錯誤"
+		"copyError": "複製錯誤",
+		"renderSpeed": "Render speed {{fps}} FPS",
+		"saving": "Opening save dialog...",
+		"renderingAudio": "Rendering audio {{percent}}%",
+		"muxingAndSaving": "Muxing audio and saving file...",
+		"muxingAndSavingPercent": "Muxing and saving {{percent}}%",
+		"finalizingPercent": "Finalizing {{percent}}%"
 	},
 	"export": {
 		"processingAudioEdits": "正在處理帶有速度/疊加編輯的音訊",
@@ -461,7 +502,8 @@
 	},
 	"timeline": {
 		"expand": "展開時間軸",
-		"collapse": "摺疊時間軸"
+		"collapse": "摺疊時間軸",
+		"unsupportedSpeed": "This speed is not supported for preview on this device."
 	},
 	"openRecordingsFolder": "打開錄製資料夾"
 }

@@ -1,6 +1,7 @@
 import { Avatar } from "@heroui/react";
 import { createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
+import { useScopedT } from "@/contexts/I18nContext";
 
 export const AccountProfileContext = createContext<User | null>(null);
 export function getAccountProfile(user: User | null, fallback?: string) {
@@ -30,8 +31,12 @@ export function AccountAvatar({
 	className?: string;
 	user?: User | null;
 }) {
+	const t = useScopedT("common");
 	const context = useContext(AccountProfileContext);
-	const profile = getAccountProfile(user === undefined ? context : user, label);
+	const profile = getAccountProfile(
+		user === undefined ? context : user,
+		label || t("account.localProfile", "Local profile"),
+	);
 	return (
 		<Avatar
 			aria-label={profile.name}

@@ -40,7 +40,9 @@
 		"addSuccess": "Fonte \"{{name}}\" adicionada com sucesso",
 		"addFailed": "Falha ao adicionar fonte",
 		"loadTimeout": "A fonte demorou muito para carregar. Verifique a URL e tente novamente.",
-		"loadFailed": "A fonte não pode ser carregada. Verifique se a URL do Google Fonts está correta."
+		"loadFailed": "A fonte não pode ser carregada. Verifique se a URL do Google Fonts está correta.",
+		"alreadyAdded": "This font has already been added.",
+		"cancel": "Cancel"
 	},
 	"shortcutsConfig": {
 		"title": "Atalhos de teclado",
@@ -57,7 +59,8 @@
 		"instructions": "Clique em um atalho e pressione a nova combinação de teclas. Pressione Esc para cancelar.",
 		"resetToDefaults": "Redefinir para padrão",
 		"cancel": "Cancelar",
-		"save": "Salvar"
+		"save": "Salvar",
+		"changeShortcut": "Change {{action}} shortcut, currently {{binding}}"
 	},
 	"feedback": {
 		"buttonLabel": "Feedback",

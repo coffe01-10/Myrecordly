@@ -38,7 +38,7 @@ export function useProjectSnapshotModel({
 		[project.videoPath, project.videoSourcePath],
 	);
 	const projectDisplayName = useMemo(() => {
-		const fileName = project.currentProjectPath?.split(/[\\/]/).pop() ?? "Untitled Project";
+		const fileName = project.currentProjectPath?.split(/[\\/]/).pop() ?? "";
 		return (
 			fileName.replace(/\.recordly$/i, "").replace(/\.[^.]+$/, "") ||
 			t("editor.project.untitled", "Untitled Project")

@@ -676,11 +676,11 @@ export function registerProjectHandlers() {
 				defaultPath: projectsDir,
 				filters: [
 					{
-						name: "Recordly Project",
+						name: t("filter.recordlyProject", "Recordly Project"),
 						extensions: [PROJECT_FILE_EXTENSION, ...LEGACY_PROJECT_FILE_EXTENSIONS],
 					},
 					{ name: t("filter.json", "JSON"), extensions: ["json"] },
-					{ name: "All Files", extensions: ["*"] },
+					{ name: t("filter.allFiles", "All Files"), extensions: ["*"] },
 				],
 				properties: ["openFile"],
 			});
@@ -749,6 +749,7 @@ export function registerProjectHandlers() {
 				const target = await createUntitledProject(
 					await getProjectsDir(),
 					JSON.stringify(prepared.projectData, null, 2),
+					t("project.untitled", "Untitled Project"),
 				);
 				setCurrentProjectPath(target);
 				const warning = await persistRecentMetadata(() => rememberRecentProject(target));

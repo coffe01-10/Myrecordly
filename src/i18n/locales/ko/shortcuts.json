@@ -11,6 +11,15 @@
 		"cycleBackward": "주석 이전으로 순환",
 		"deleteSelectedAlt": "선택 항목 삭제 (보조)",
 		"panTimeline": "타임라인 이동",
-		"zoomTimeline": "타임라인 확대/축소"
+		"zoomTimeline": "타임라인 확대/축소",
+		"splitClip": "Split Clip"
+	},
+	"scroll": "Scroll",
+	"fixed": {
+		"Cycle Annotations Forward": "Cycle Annotations Forward",
+		"Cycle Annotations Backward": "Cycle Annotations Backward",
+		"Delete Selected (alt)": "Delete Selected (alt)",
+		"Pan Timeline": "Pan Timeline",
+		"Zoom Timeline": "Zoom Timeline"
 	}
 }

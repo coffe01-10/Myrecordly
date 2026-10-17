@@ -13,7 +13,10 @@
 		"modeManual": "手動",
 		"modeManualDescription": "為此縮放設定固定的對焦點",
 		"modeAutoDescription": "相機會自動跟隨游標",
-		"modeAria": "縮放模式"
+		"modeAria": "縮放模式",
+		"mode": "Mode",
+		"amount": "Amount",
+		"globalSettings": "Animation"
 	},
 	"trim": {
 		"deleteRegion": "刪除修剪區域"
@@ -22,7 +25,8 @@
 		"playbackSpeed": "播放速度",
 		"selectRegion": "選取要調整的速度區域",
 		"deleteRegion": "刪除速度區域",
-		"label": "速度"
+		"label": "速度",
+		"unsupported": "Not supported for preview on this device"
 	},
 	"clip": {
 		"title": "片段",
@@ -160,7 +164,31 @@
 		"paddingRight": "右",
 		"linkPaddingSides": "連動內距各邊",
 		"customEffectColor": "自訂特效顏色",
-		"removeBackground": "移除背景"
+		"removeBackground": "移除背景",
+		"devSection": "Dev",
+		"devBadge": "DEV",
+		"devSectionHint": "Temporary testing controls for native capture and motion tuning.",
+		"nativeCaptureWarningTester": "Native capture warning",
+		"nativeCaptureWarningTesterUnavailable": "This project is currently marked as native capture unavailable.",
+		"nativeCaptureWarningTesterAvailable": "This project is not marked as unsupported, but you can still open the modal for UI testing.",
+		"openNativeCaptureWarning": "Open warning",
+		"cameraDebugTuning": "Camera Debug Tuning",
+		"cameraDebugTuningHint": "Development-only spring tuning controls for camera motion.",
+		"cameraSpringStiffnessMultiplier": "Camera stiffness",
+		"cameraSpringDampingMultiplier": "Camera damping",
+		"cameraSpringMassMultiplier": "Camera mass",
+		"cursorDebugTuning": "Cursor Debug Tuning",
+		"cursorDebugTuningHint": "Development-only spring tuning controls.",
+		"cursorSpringStiffnessMultiplier": "Spring stiffness",
+		"cursorSpringDampingMultiplier": "Spring damping",
+		"cursorSpringMassMultiplier": "Spring mass",
+		"classicZoom": "Classic Animation",
+		"cursorDebugMovedToDev": "Cursor spring tuning is available in Settings > Dev.",
+		"webcamPosition": "Position",
+		"webcamCustomPosition": "Custom position",
+		"webcamHorizontal": "Horizontal",
+		"webcamVertical": "Vertical",
+		"webcamMargin": "Margin"
 	},
 	"sections": {
 		"scene": "場景",
@@ -170,7 +198,9 @@
 		"cursor": "游標",
 		"webcam": "網路攝影機",
 		"frame": "外框",
-		"crop": "裁切"
+		"crop": "裁切",
+		"title": "Editor tools",
+		"appearance": "Appearance"
 	},
 	"captions": {
 		"selectOnTimeline": "在時間軸上選擇字幕進行編輯。",
@@ -229,7 +259,10 @@
 			"split": "分割",
 			"merge": "合併",
 			"delete": "刪除"
-		}
+		},
+		"generation": "Generation",
+		"useCustomModel": "Use custom",
+		"generatingStatus": "Generating captions. This can take a moment."
 	},
 	"crop": {
 		"title": "裁切影片",
@@ -254,7 +287,14 @@
 		"videoUnsupportedFormat": "不支援的格式",
 		"videoUnsupportedFormatDescription": "請選擇影片檔案（mp4、webm、mov 等）",
 		"videoAdded": "已新增影片背景",
-		"videoImportFailed": "匯入影片背景失敗"
+		"videoImportFailed": "匯入影片背景失敗",
+		"video": "Video",
+		"addWallpaper": "Add wallpaper",
+		"addVideoWallpaper": "Add video wallpaper",
+		"customWallpaper": "Custom wallpaper",
+		"removeWallpaper": "Remove {{name}}",
+		"gradientOption": "Gradient {{number}}",
+		"wallpaperNumber": "Wallpaper {{number}}"
 	},
 	"export": {
 		"title": "匯出",
@@ -276,7 +316,29 @@
 		"saveProject": "儲存專案",
 		"exportVideo": "匯出 {{format}}",
 		"reportBug": "回報錯誤",
-		"starOnGithub": "在 GitHub 按讚"
+		"starOnGithub": "在 GitHub 按讚",
+		"format": "Format",
+		"qualityTitle": "Quality",
+		"encodingTitle": "Encoding",
+		"nvidiaCuda": {
+			"title": "NVIDIA CUDA"
+		},
+		"captionSidecar": {
+			"title": "Export captions file",
+			"hint": "Save .srt and .vtt files next to your exported video."
+		},
+		"size": "Size",
+		"encoding": {
+			"fast": "Fast",
+			"balanced": "Balanced",
+			"quality": "Quality"
+		},
+		"sizePresets": {
+			"medium": "Medium (720p)",
+			"large": "Large (1080p)",
+			"original": "Original"
+		},
+		"video": "Video"
 	},
 	"audio": {
 		"title": "音訊",
@@ -320,5 +382,53 @@
 		"openProjectsFolderFailed": "無法開啟專案資料夾",
 		"showFolder": "顯示資料夾",
 		"projectsNote": "具名專案會自動儲存。返回「專案」時預覽會重新整理。"
+	},
+	"annotation": {
+		"delete": "Delete Annotation"
+	},
+	"webcamCrop": {
+		"move": "Move webcam crop",
+		"nw": "Resize webcam crop from top left",
+		"ne": "Resize webcam crop from top right",
+		"sw": "Resize webcam crop from bottom left",
+		"se": "Resize webcam crop from bottom right"
+	},
+	"webcamPositions": {
+		"top-left": "Top left",
+		"top-center": "Top center",
+		"top-right": "Top right",
+		"center-left": "Center left",
+		"center": "Center",
+		"center-right": "Center right",
+		"bottom-left": "Bottom left",
+		"bottom-center": "Bottom center",
+		"bottom-right": "Bottom right"
+	},
+	"wallpapers": {
+		"tahoe-light": "Tahoe Light",
+		"tahoe-dark": "Tahoe Dark",
+		"midnight-8": "Midnight 8",
+		"ipad-17-dark": "iPad 17 Dark",
+		"ipad-17-light": "iPad 17 Light",
+		"sequoia-blue": "Sequoia Blue",
+		"sequoia-blue-orange": "Sequoia Blue Orange",
+		"ventura": "Ventura",
+		"sonoma-clouds": "Sonoma Clouds",
+		"sonoma-light": "Sonoma Light",
+		"sonoma-dark": "Sonoma Dark",
+		"glassmorphism-3": "Glassmorphism 3",
+		"glassmorphism-4": "Glassmorphism 4",
+		"energy-19": "Energy 19",
+		"wallpaper3": "Wallpaper 3",
+		"wallpaper4": "Wallpaper 4",
+		"cityscape": "Cityscape",
+		"levels": "Levels",
+		"wallpaper10": "Wallpaper 10",
+		"ventura-dark": "Ventura Dark",
+		"sonoma-evening": "Sonoma Evening",
+		"sonoma-horizon": "Sonoma Horizon",
+		"iridescent-9": "Iridescent 9",
+		"energy-17": "Energy 17",
+		"wispysky": "Wispy Sky"
 	}
 }

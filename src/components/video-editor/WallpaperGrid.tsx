@@ -3,6 +3,7 @@ import { Check, Plus, X } from "@/components/ui/icons";
 import { useEffect, useState } from "react";
 import { getRenderableVideoUrl } from "@/lib/assetPath";
 import { isVideoWallpaperSource } from "@/lib/wallpapers";
+import { useScopedT } from "@/contexts/I18nContext";
 
 interface WallpaperTile {
 	key: string;
@@ -28,6 +29,7 @@ export function WallpaperGrid({
 	onRemove: (value: string) => void;
 	isSelected: (value: string, previewUrl?: string) => boolean;
 }) {
+	const t = useScopedT("settings");
 	return (
 		<div className="wallpaper-gallery grid grid-cols-3 gap-2">
 			<Button
@@ -71,7 +73,9 @@ export function WallpaperGrid({
 							<Button
 								variant="secondary"
 								isIconOnly
-								aria-label={`Remove ${item.label}`}
+								aria-label={t("background.removeWallpaper", "Remove {{name}}", {
+									name: item.label,
+								})}
 								onPress={() => onRemove(item.value)}
 								className="absolute right-0.5 top-0.5 z-10 size-5 min-w-0 rounded-full p-0 bg-overlay text-foreground shadow-sm opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100"
 							>

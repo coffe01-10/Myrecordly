@@ -541,7 +541,12 @@ export function AnnotationSettingsPanel({
 													aria-label={t(
 														"annotations.arrowDirectionOption",
 														"Arrow direction: {{direction}}",
-														{ direction: direction.replace(/-/g, " ") },
+														{
+															direction: t(
+																`annotations.directions.${direction}`,
+																direction.replace(/-/g, " "),
+															),
+														},
 													)}
 													className={cn(
 														"h-16 flex items-center justify-center p-2",

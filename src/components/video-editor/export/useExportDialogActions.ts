@@ -189,12 +189,12 @@ export function useExportDialogActions({
 				toast.error(
 					result.error ||
 						result.message ||
-						t("exportRunner.revealFailed", "Failed to reveal item in folder."),
+						t("editor.exportRunner.revealFailed", "Failed to reveal item in folder."),
 				);
 			}
 		} catch (error) {
 			toast.error(
-				t("exportRunner.revealError", "Error revealing in folder: {{error}}", {
+				t("editor.exportRunner.revealError", "Error revealing in folder: {{error}}", {
 					error: String(error),
 				}),
 			);

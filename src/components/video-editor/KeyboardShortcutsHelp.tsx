@@ -11,6 +11,9 @@ import { formatShortcut } from "@/utils/platformUtils";
 export function KeyboardShortcutsHelp() {
 	const { shortcuts, isMac, openConfig } = useShortcuts();
 	const t = useScopedT("editor");
+	const tShortcuts = useScopedT("shortcuts");
+	const shortcutLabel = (action: keyof typeof SHORTCUT_LABELS) =>
+		tShortcuts(`actions.${action}`, SHORTCUT_LABELS[action]);
 
 	const [scrollLabels, setScrollLabels] = useState({
 		pan: "Shift + Scroll",
@@ -51,7 +54,7 @@ export function KeyboardShortcutsHelp() {
 				<div className="space-y-1.5 text-[10px]">
 					{SHORTCUT_ACTIONS.map((action) => (
 						<div key={action} className="flex items-center justify-between">
-							<span className="text-muted-foreground">{SHORTCUT_LABELS[action]}</span>
+							<span className="text-muted-foreground">{shortcutLabel(action)}</span>
 							<Kbd>{formatBinding(shortcuts[action], isMac)}</Kbd>
 						</div>
 					))}
@@ -61,13 +64,20 @@ export function KeyboardShortcutsHelp() {
 							<span className="text-muted-foreground">
 								{t("keyboardShortcuts.panTimeline")}
 							</span>
-							<Kbd>{scrollLabels.pan}</Kbd>
+							<Kbd>
+								{scrollLabels.pan.replace("Scroll", tShortcuts("scroll", "Scroll"))}
+							</Kbd>
 						</div>
 						<div className="flex items-center justify-between mt-1.5">
 							<span className="text-muted-foreground">
 								{t("keyboardShortcuts.zoomTimeline")}
 							</span>
-							<Kbd>{scrollLabels.zoom}</Kbd>
+							<Kbd>
+								{scrollLabels.zoom.replace(
+									"Scroll",
+									tShortcuts("scroll", "Scroll"),
+								)}
+							</Kbd>
 						</div>
 						<div className="flex items-center justify-between mt-1.5">
 							<span className="text-muted-foreground">

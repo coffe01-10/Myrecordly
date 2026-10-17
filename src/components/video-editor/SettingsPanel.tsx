@@ -624,7 +624,7 @@ const APP_LANGUAGE_LABELS: Record<AppLocale, string> = {
 	nl: "Nederlands",
 	ko: "한국어",
 	"pt-BR": "Português",
-	"zh-CN": "簡體中文",
+	"zh-CN": "简体中文",
 	"zh-TW": "繁體中文",
 };
 
@@ -1237,27 +1237,31 @@ export function SettingsPanel({
 				const wallpaper = imageWallpapers[index];
 				return {
 					key: wallpaper ? `builtin/${wallpaper.id}` : previewPath,
-					label: wallpaper?.label ?? `Wallpaper ${index + 1}`,
+					label: wallpaper
+						? tSettings(`wallpapers.${wallpaper.id}`, wallpaper.label)
+						: tSettings("background.wallpaperNumber", "Wallpaper {{number}}", {
+								number: index + 1,
+							}),
 					value: wallpaper?.publicPath ?? previewPath,
 					previewUrl: wallpaperPreviewPaths.length ? previewPath : "",
 				};
 			});
 
 		return builtInTiles;
-	}, [builtInWallpaperPaths, builtInWallpapers, wallpaperPreviewPaths]);
+	}, [builtInWallpaperPaths, builtInWallpapers, wallpaperPreviewPaths, tSettings]);
 
 	const videoWallpaperTiles = useMemo<WallpaperTile[]>(() => {
 		const builtInTiles = builtInWallpapers
 			.filter((wallpaper) => isVideoWallpaperSource(wallpaper.publicPath))
 			.map((wallpaper) => ({
 				key: `builtin/${wallpaper.id}`,
-				label: wallpaper.label,
+				label: tSettings(`wallpapers.${wallpaper.id}`, wallpaper.label),
 				value: wallpaper.publicPath,
 				previewUrl: wallpaper.publicPath,
 			}));
 
 		return builtInTiles;
-	}, [builtInWallpapers]);
+	}, [builtInWallpapers, tSettings]);
 
 	useEffect(() => {
 		saveEditorPreferences({ customWallpapers: customImages });
@@ -1586,7 +1590,9 @@ export function SettingsPanel({
 			onWallpaperChange(filePath);
 			toast.success(tSettings("background.videoAdded", "Video background added"));
 		} catch {
-			toast.error(tSettings("background.videoImportFailed", "Failed to import video background"));
+			toast.error(
+				tSettings("background.videoImportFailed", "Failed to import video background"),
+			);
 		}
 	};
 
@@ -1742,7 +1748,11 @@ export function SettingsPanel({
 										variant="ghost"
 										key={g}
 										className={wallpaperTileClass(gradient === g)}
-										aria-label={`Gradient ${idx + 1}`}
+										aria-label={tSettings(
+											"background.gradientOption",
+											"Gradient {{number}}",
+											{ number: idx + 1 },
+										)}
 										onClick={() => {
 											setGradient(g);
 											onWallpaperChange(g);
@@ -1857,9 +1867,14 @@ export function SettingsPanel({
 				<div className="flex flex-col gap-3 pt-0.5">
 					{advanced && (
 						<div className="flex items-center justify-between gap-3">
-							<Label>{tSettings("effects.linkPaddingSides", "Link padding sides")}</Label>
+							<Label>
+								{tSettings("effects.linkPaddingSides", "Link padding sides")}
+							</Label>
 							<Switch
-								aria-label={tSettings("effects.linkPaddingSides", "Link padding sides")}
+								aria-label={tSettings(
+									"effects.linkPaddingSides",
+									"Link padding sides",
+								)}
 								checked={padding.linked !== false}
 								onCheckedChange={togglePaddingLink}
 							/>
@@ -2410,8 +2425,8 @@ export function SettingsPanel({
 										)}
 									</div>
 								</div>
-								<span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-accent">
-									DEV
+								<span className="shrink-0 whitespace-nowrap rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-accent">
+									{tSettings("effects.devBadge", "DEV")}
 								</span>
 							</div>
 
@@ -3153,7 +3168,14 @@ export function SettingsPanel({
 										<ChoiceItem
 											key={option.preset}
 											value={option.preset}
-											textValue={option.preset}
+											textValue={tSettings(
+												`webcamPositions.${option.preset}`,
+												option.preset,
+											)}
+											aria-label={tSettings(
+												`webcamPositions.${option.preset}`,
+												option.preset,
+											)}
 										>
 											{option.label}
 										</ChoiceItem>

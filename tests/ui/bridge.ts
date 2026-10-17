@@ -11,7 +11,8 @@ export async function installDesktopBridge(page: Page, videoFixture = "preview.m
 		};
 		Object.assign(window, {
 			electronAPI: {
-				getAppSetting: (key: string) => key === "recordly.onboarding.v1.seen" ? true : null,
+				getAppSetting: (key: string) =>
+					key === "recordly.onboarding.v1.seen" ? true : null,
 				finishRecordingStartup: async () => undefined,
 				showProjectDashboard: async () => {
 					document.documentElement.dataset.dashboardOpened = "true";
@@ -54,7 +55,7 @@ export async function installDesktopBridge(page: Page, videoFixture = "preview.m
 					);
 					return {
 						success: true,
-						path: "/projects/Untitled Project.recordly",
+						path: `/projects/${document.documentElement.lang === "zh-CN" ? "未命名项目" : document.documentElement.lang === "zh-TW" ? "未命名專案" : "Untitled Project"}.recordly`,
 						projectId: "test-project",
 					};
 				},
@@ -88,6 +89,7 @@ export async function installDesktopBridge(page: Page, videoFixture = "preview.m
 				getVideoAudioFallbackPaths: async () => ({ success: true, paths: [] }),
 				getWhisperSmallModelStatus: async () => ({ success: true, exists: false }),
 				listProjectFiles: async () => ({ success: true, projects: [], entries: [] }),
+				listRecordings: async () => ({ success: true, value: [] }),
 				setCurrentVideoPath: success,
 				finishRecordingImport: success,
 				setCurrentRecordingSession: success,

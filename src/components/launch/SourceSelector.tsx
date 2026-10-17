@@ -124,7 +124,7 @@ export const SourceSelectorContent = ({
 										loading ? "opacity-100" : "opacity-0",
 									)}
 								>
-									{t("common.loading", "Refreshing...")}
+									{t("recording.refreshing", "Refreshing...")}
 								</span>
 							</div>
 							<div className="space-y-0.5">

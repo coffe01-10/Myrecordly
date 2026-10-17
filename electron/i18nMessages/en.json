@@ -8,7 +8,30 @@
 		"view": "View",
 		"window": "Window",
 		"help": "Help",
-		"checkForUpdates": "Check for Updates…"
+		"checkForUpdates": "Check for Updates…",
+		"about": "About Recordly",
+		"services": "Services",
+		"hide": "Hide Recordly",
+		"hideOthers": "Hide Others",
+		"unhide": "Show All",
+		"quit": "Quit",
+		"undo": "Undo",
+		"redo": "Redo",
+		"cut": "Cut",
+		"copy": "Copy",
+		"paste": "Paste",
+		"selectAll": "Select All",
+		"reload": "Reload",
+		"forceReload": "Force Reload",
+		"toggleDevTools": "Toggle Developer Tools",
+		"resetZoom": "Actual Size",
+		"zoomIn": "Zoom In",
+		"zoomOut": "Zoom Out",
+		"togglefullscreen": "Toggle Full Screen",
+		"minimize": "Minimize",
+		"zoom": "Zoom",
+		"front": "Bring All to Front",
+		"close": "Close Window"
 	},
 	"tray": {
 		"recording": "Recording: {{name}}",
@@ -31,7 +54,8 @@
 		"importMediaOrProjectTitle": "Import Media or Recordly Project",
 		"selectAudioTitle": "Select Audio File",
 		"selectWhisperExecutableTitle": "Select Whisper Executable",
-		"selectWhisperModelTitle": "Select Whisper Model"
+		"selectWhisperModelTitle": "Select Whisper Model",
+		"importGoogleClient": "Import Google Desktop OAuth client"
 	},
 	"filter": {
 		"mediaOrProjects": "Media or Recordly Projects",
@@ -44,7 +68,9 @@
 		"whisperModels": "Whisper Models",
 		"json": "JSON",
 		"gifImage": "GIF Image",
-		"mp4Video": "MP4 Video"
+		"mp4Video": "MP4 Video",
+		"googleClient": "Google Desktop OAuth client JSON",
+		"recordlyMedia": "Recordly media"
 	},
 	"permission": {
 		"screenTitle": "Screen Recording Permission Required",
@@ -178,5 +204,8 @@
 		"sourceSystem": "system audio sidecar",
 		"generatedCues": "Generated {{count}} caption cues.",
 		"generatedCuesFrom": "Generated {{count}} caption cues from the {{source}}."
+	},
+	"project": {
+		"untitled": "Untitled Project"
 	}
 }

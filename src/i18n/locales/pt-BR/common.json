@@ -4,7 +4,8 @@
 		"editorTitle": "Editor do Recordly",
 		"subtitle": "Gravação e edição de tela",
 		"language": "Idioma",
-		"manageRecordings": "Abrir pasta de gravações"
+		"manageRecordings": "Abrir pasta de gravações",
+		"discord": "Join Discord"
 	},
 	"actions": {
 		"cancel": "Cancelar",
@@ -162,5 +163,28 @@
 	},
 	"dropdownMenu": {
 		"actions": "Actions"
+	},
+	"announcements": {
+		"openFailed": "Failed to open link.",
+		"carousel": "Announcements",
+		"previous": "Previous announcement",
+		"show": "Show announcement",
+		"next": "Next announcement",
+		"dismiss": "Dismiss"
+	},
+	"account": {
+		"localProfile": "Local profile"
+	},
+	"toast": {
+		"copy": "Copy",
+		"errorCopied": "Error copied",
+		"copyFailed": "Could not copy error"
+	},
+	"select": {
+		"option": "Select option",
+		"placeholder": "Select"
+	},
+	"popover": {
+		"options": "Options"
 	}
 }

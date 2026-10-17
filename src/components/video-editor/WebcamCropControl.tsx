@@ -6,6 +6,7 @@ import {
 	isWebcamMediaSynchronized,
 } from "./videoPlayback/webcamSync";
 import { normalizeWebcamCropRegion } from "./webcamOverlay";
+import { useScopedT } from "@/contexts/I18nContext";
 
 type CropHandle = "move" | "nw" | "ne" | "sw" | "se";
 
@@ -129,6 +130,7 @@ export function WebcamCropControl({
 	previewTimeOffsetMs = 0,
 	onCropChange,
 }: WebcamCropControlProps) {
+	const t = useScopedT("settings");
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const previewVideoRef = useRef<HTMLVideoElement | null>(null);
 	const dragStateRef = useRef<DragState | null>(null);
@@ -451,7 +453,7 @@ export function WebcamCropControl({
 					height: `${cropHeight}%`,
 				}}
 				tabIndex={0}
-				aria-label={HANDLE_LABELS.move}
+				aria-label={t("webcamCrop.move", HANDLE_LABELS.move)}
 				onPointerDown={(event) => handlePointerDown(event, "move")}
 				onFocus={() => setActiveHandle("move")}
 				onBlur={() => setActiveHandle(null)}
@@ -467,7 +469,7 @@ export function WebcamCropControl({
 						key={handle.handle}
 						role="slider"
 						tabIndex={0}
-						aria-label={HANDLE_LABELS[handle.handle]}
+						aria-label={t(`webcamCrop.${handle.handle}`, HANDLE_LABELS[handle.handle])}
 						aria-valuemin={Math.round(MIN_CROP_SIZE * 100)}
 						aria-valuemax={100}
 						aria-valuenow={Math.round(crop.width * 100)}

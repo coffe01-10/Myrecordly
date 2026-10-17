@@ -49,7 +49,9 @@
 	},
 	"theme": {
 		"light": "Clair",
-		"dark": "Sombre"
+		"dark": "Sombre",
+		"appearance": "Appearance",
+		"system": "System"
 	},
 	"cloud": {
 		"signInRequired": "Connectez-vous à Recordly avant de créer un lien de partage.",
@@ -208,7 +210,8 @@
 		"finalizeFailed": "Could not finalize imported media",
 		"thumbnailPreview": "Preview of {{name}}",
 		"thumbnailUnavailable": "Preview unavailable",
-		"thumbnailLoading": "Loading preview image"
+		"thumbnailLoading": "Loading preview image",
+		"clearSearch": "Clear search"
 	},
 	"library": {
 		"videos": "Vidéos"
@@ -225,7 +228,8 @@
 		"videoErrorFormat": "format not supported",
 		"videoErrorNetwork": "network error",
 		"videoErrorDecode": "decode error",
-		"videoErrorCode": "code {{code}}"
+		"videoErrorCode": "code {{code}}",
+		"seek": "Playback position"
 	},
 	"annotations": {
 		"settings": "Paramètres des annotations",
@@ -269,7 +273,22 @@
 		"noArrowData": "No arrow data",
 		"typeLabel": "Annotation type",
 		"uploadedAlt": "Uploaded annotation",
-		"customFonts": "Custom Fonts"
+		"customFonts": "Custom Fonts",
+		"arrowDirectionOption": "Arrow direction: {{direction}}",
+		"customColor": "Custom color",
+		"imageUploadErrorDescription": "Choose a JPG, PNG, GIF, or WebP image.",
+		"imageUploadFailed": "Could not upload image",
+		"imageUploadFailedDescription": "Could not read the image. Please choose another file.",
+		"directions": {
+			"up": "Up",
+			"down": "Down",
+			"left": "Left",
+			"right": "Right",
+			"up-right": "Up right",
+			"up-left": "Up left",
+			"down-right": "Down right",
+			"down-left": "Down left"
+		}
 	},
 	"fontStyles": {
 		"classic": "Classique",
@@ -285,7 +304,8 @@
 		"mp4Video": "Vidéo MP4",
 		"mp4Description": "Fichier vidéo de haute qualité",
 		"gifAnimation": "Animation GIF",
-		"gifDescription": "Image animée à partager"
+		"gifDescription": "Image animée à partager",
+		"title": "Export format"
 	},
 	"gifOptions": {
 		"frameRate": "Fréquence d’images",
@@ -367,7 +387,11 @@
 		"mediaError": "Could not load project media",
 		"renameFailed": "Could not rename project",
 		"libraryLoadFailed": "Failed to load project library",
-		"openProjects": "Open Projects"
+		"openProjects": "Open Projects",
+		"saveTitle": "Save Project",
+		"saveDescription": "Name this project. It will be saved in your Recordly Projects folder.",
+		"saveNameLabel": "Project name",
+		"saving": "Saving..."
 	},
 	"exportTips": {
 		"autoZooms": "Astuce : Désactivez les zooms automatiques dans les paramètres",
@@ -402,7 +426,18 @@
 		"namePlaceholder": "Preset name",
 		"savedList": "Saved presets",
 		"empty": "No presets yet.",
-		"deleteAriaLabel": "Delete preset {{name}}"
+		"deleteAriaLabel": "Delete preset {{name}}",
+		"toasts": {
+			"applied": "Applied preset \"{{name}}\"",
+			"saved": "Saved preset \"{{name}}\"",
+			"deleted": "Deleted preset \"{{name}}\""
+		},
+		"errors": {
+			"nameRequired": "Enter a preset name.",
+			"duplicateName": "A preset with that name already exists.",
+			"saveFailed": "Could not save that preset. Check your browser storage settings and try again.",
+			"deleteFailed": "Could not delete that preset. Check your browser storage settings and try again."
+		}
 	},
 	"audio": {
 		"sourceLoadFailed": "Could not load companion audio source: {{error}}",
@@ -426,7 +461,13 @@
 		"runtimePath": "Path: {{path}}",
 		"errorCopied": "Error copied",
 		"errorCopyFailed": "Couldn't copy. Select the error text and copy it manually.",
-		"copyError": "Copy error"
+		"copyError": "Copy error",
+		"renderSpeed": "Render speed {{fps}} FPS",
+		"saving": "Opening save dialog...",
+		"renderingAudio": "Rendering audio {{percent}}%",
+		"muxingAndSaving": "Muxing audio and saving file...",
+		"muxingAndSavingPercent": "Muxing and saving {{percent}}%",
+		"finalizingPercent": "Finalizing {{percent}}%"
 	},
 	"export": {
 		"processingAudioEdits": "Traitement de l’audio avec modifications de vitesse/superposition",
@@ -461,7 +502,8 @@
 	},
 	"timeline": {
 		"expand": "Développer la timeline",
-		"collapse": "Réduire la timeline"
+		"collapse": "Réduire la timeline",
+		"unsupportedSpeed": "This speed is not supported for preview on this device."
 	},
 	"openRecordingsFolder": "Ouvrir le dossier des enregistrements"
 }

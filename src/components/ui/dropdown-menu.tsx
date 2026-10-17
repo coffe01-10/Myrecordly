@@ -45,13 +45,14 @@ export function DropdownMenuItem({
 	onSelect?: (event: Event) => void;
 	disabled?: boolean;
 }) {
+	const t = useScopedT("common");
 	return (
 		<Dropdown.Item
 			{...props}
 			isDisabled={disabled}
 			textValue={
 				props.textValue ??
-				(typeof children === "string" ? children : String(props.id ?? "Action"))
+				(typeof children === "string" ? children : t("dropdownMenu.actions", "Actions"))
 			}
 			onAction={() => {
 				onSelect?.(new Event("select"));

@@ -86,18 +86,6 @@ export function normalizeLocale(locale: string | null | undefined): MainLocale {
 	return FALLBACK_LOCALE;
 }
 
-function resolveSystemLocale(): MainLocale {
-	try {
-		// Resolved lazily so importing this module never requires the `electron`
-		// runtime (unit tests import the modules that call `t()` without Electron).
-		const electron = require("electron") as { app?: { getLocale?: () => string } };
-		const locale = electron.app?.getLocale?.();
-		return locale ? normalizeLocale(locale) : FALLBACK_LOCALE;
-	} catch {
-		return FALLBACK_LOCALE;
-	}
-}
-
 function readStoredLocale(): MainLocale | null {
 	try {
 		// Required lazily: `appSettingsStore` pulls in `ipc/constants`, which reads
@@ -111,14 +99,14 @@ function readStoredLocale(): MainLocale | null {
 			return normalizeLocale(stored);
 		}
 	} catch {
-		// Fall through to the system locale.
+		// Fall through to the default application language.
 	}
 	return null;
 }
 
-/** Applies the stored preference, falling back to the OS locale, then English. */
+/** Applies the stored preference, defaulting to Simplified Chinese. */
 export function initializeMainLocale(): MainLocale {
-	currentLocale = readStoredLocale() ?? resolveSystemLocale();
+	currentLocale = readStoredLocale() ?? "zh-CN";
 	return currentLocale;
 }
 

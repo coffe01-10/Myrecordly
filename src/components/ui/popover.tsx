@@ -2,6 +2,7 @@ import { Popover as HeroPopover } from "@heroui/react";
 import { createContext, useContext, useState, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useUNSAFE_PortalContext } from "react-aria";
+import { useScopedT } from "@/contexts/I18nContext";
 const ModalContext = createContext(true);
 const CloseContext = createContext<(() => void) | undefined>(undefined);
 export function Popover({
@@ -56,6 +57,7 @@ export function PopoverContent({
 	animated: _animated,
 	...props
 }: ContentProps) {
+	const t = useScopedT("common");
 	const modal = useContext(ModalContext);
 	const scopedPortalContainer = useUNSAFE_PortalContext().getContainer?.();
 	const close = useContext(CloseContext);
@@ -79,7 +81,7 @@ export function PopoverContent({
 			className="max-w-[calc(100vw-24px)]"
 		>
 			<HeroPopover.Dialog
-				aria-label={props["aria-label"] ?? "Options"}
+				aria-label={props["aria-label"] ?? t("popover.options", "Options")}
 				className={cn("max-w-full max-h-[min(80vh,640px)] overflow-y-auto p-4", className)}
 			>
 				<div

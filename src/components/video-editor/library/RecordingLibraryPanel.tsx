@@ -134,7 +134,9 @@ export function RecordingLibraryPanel({
 						<SearchField.Input
 							placeholder={t("clips.searchPlaceholder", "Search videos")}
 						/>
-						<SearchField.ClearButton />
+						<SearchField.ClearButton
+							aria-label={t("clips.clearSearch", "Clear search")}
+						/>
 					</SearchField.Group>
 				</SearchField>
 			</div>

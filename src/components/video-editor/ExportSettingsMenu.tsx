@@ -254,7 +254,7 @@ export function ExportSettingsMenu({
 							onChange={onGifSizePresetChange}
 							options={Object.entries(GIF_SIZE_PRESETS).map(([key, preset]) => ({
 								value: key as GifSizePreset,
-								label: preset.label,
+								label: tSettings(`export.sizePresets.${key}`, preset.label),
 							}))}
 						/>
 						<Description>
@@ -271,7 +271,8 @@ export function ExportSettingsMenu({
 					<Button size="lg" onClick={onExport} className="w-full">
 						<Download />
 						{tSettings("export.exportVideo", undefined, {
-							format: exportFormat === "gif" ? "GIF" : "Video",
+							format:
+								exportFormat === "gif" ? "GIF" : tSettings("export.video", "Video"),
 						})}
 					</Button>
 				</Card.Footer>

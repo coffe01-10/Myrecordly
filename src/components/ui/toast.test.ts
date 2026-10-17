@@ -29,9 +29,9 @@ it("copies the error title and details through the native action", async () => {
 		][]
 	)[0][1];
 	expect(options.variant).toBe("danger");
-	expect(options.actionProps.children).toBe("Copy");
+	expect(options.actionProps.children).toBe("复制");
 	options.actionProps.onPress();
-	await vi.waitFor(() => expect(native.success).toHaveBeenCalledWith("Error copied"));
+	await vi.waitFor(() => expect(native.success).toHaveBeenCalledWith("已复制错误信息"));
 	expect(writeText).toHaveBeenCalledWith("Export failed\n\nEncoder unavailable");
 });
 it("preserves explicit actions and updates named notifications", () => {

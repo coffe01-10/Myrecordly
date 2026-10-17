@@ -4,7 +4,8 @@
 		"editorTitle": "Recordly Editor",
 		"subtitle": "Enregistrement et édition d’écran",
 		"language": "Langue",
-		"manageRecordings": "Ouvrir le dossier des enregistrements"
+		"manageRecordings": "Ouvrir le dossier des enregistrements",
+		"discord": "Join Discord"
 	},
 	"actions": {
 		"cancel": "Annuler",
@@ -162,5 +163,28 @@
 	},
 	"dropdownMenu": {
 		"actions": "Actions"
+	},
+	"announcements": {
+		"openFailed": "Failed to open link.",
+		"carousel": "Announcements",
+		"previous": "Previous announcement",
+		"show": "Show announcement",
+		"next": "Next announcement",
+		"dismiss": "Dismiss"
+	},
+	"account": {
+		"localProfile": "Local profile"
+	},
+	"toast": {
+		"copy": "Copy",
+		"errorCopied": "Error copied",
+		"copyFailed": "Could not copy error"
+	},
+	"select": {
+		"option": "Select option",
+		"placeholder": "Select"
+	},
+	"popover": {
+		"options": "Options"
 	}
 }

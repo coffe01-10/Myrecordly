@@ -11,6 +11,15 @@
 		"cycleBackward": "Cycle Annotations Backward",
 		"deleteSelectedAlt": "Delete Selected (alt)",
 		"panTimeline": "Pan Timeline",
-		"zoomTimeline": "Zoom Timeline"
+		"zoomTimeline": "Zoom Timeline",
+		"splitClip": "Split Clip"
+	},
+	"scroll": "Scroll",
+	"fixed": {
+		"Cycle Annotations Forward": "Cycle Annotations Forward",
+		"Cycle Annotations Backward": "Cycle Annotations Backward",
+		"Delete Selected (alt)": "Delete Selected (alt)",
+		"Pan Timeline": "Pan Timeline",
+		"Zoom Timeline": "Zoom Timeline"
 	}
 }

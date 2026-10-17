@@ -13,7 +13,10 @@
 		"modeManual": "手动",
 		"modeManualDescription": "为此缩放设置固定焦点",
 		"modeAutoDescription": "镜头会自动跟随光标",
-		"modeAria": "缩放模式"
+		"modeAria": "缩放模式",
+		"mode": "模式",
+		"amount": "缩放倍率",
+		"globalSettings": "动画"
 	},
 	"trim": {
 		"deleteRegion": "删除修剪区域"
@@ -22,7 +25,8 @@
 		"playbackSpeed": "播放速度",
 		"selectRegion": "选择变速区域以调整",
 		"deleteRegion": "删除变速区域",
-		"label": "速度"
+		"label": "速度",
+		"unsupported": "此设备不支持以该速度预览"
 	},
 	"clip": {
 		"title": "片段",
@@ -160,7 +164,31 @@
 		"paddingRight": "右",
 		"linkPaddingSides": "联动内边距各边",
 		"customEffectColor": "自定义特效颜色",
-		"removeBackground": "移除背景"
+		"removeBackground": "移除背景",
+		"devSection": "开发调试",
+		"devBadge": "开发",
+		"devSectionHint": "用于测试原生捕获和调节运动效果的临时控件。",
+		"nativeCaptureWarningTester": "原生捕获警告",
+		"nativeCaptureWarningTesterUnavailable": "此项目当前被标记为无法使用原生捕获。",
+		"nativeCaptureWarningTesterAvailable": "此项目未被标记为不受支持，仍可打开警告弹窗以测试界面。",
+		"openNativeCaptureWarning": "打开警告弹窗",
+		"cameraDebugTuning": "镜头运动调试",
+		"cameraDebugTuningHint": "仅用于开发调试，调节镜头运动的弹簧参数。",
+		"cameraSpringStiffnessMultiplier": "镜头弹簧刚度",
+		"cameraSpringDampingMultiplier": "镜头弹簧阻尼",
+		"cameraSpringMassMultiplier": "镜头弹簧质量",
+		"cursorDebugTuning": "光标运动调试",
+		"cursorDebugTuningHint": "仅用于开发调试的弹簧参数控件。",
+		"cursorSpringStiffnessMultiplier": "弹簧刚度",
+		"cursorSpringDampingMultiplier": "弹簧阻尼",
+		"cursorSpringMassMultiplier": "弹簧质量",
+		"classicZoom": "经典动画",
+		"cursorDebugMovedToDev": "可在“设置”>“开发调试”中调节光标弹簧参数。",
+		"webcamPosition": "位置",
+		"webcamCustomPosition": "自定义位置",
+		"webcamHorizontal": "水平位置",
+		"webcamVertical": "垂直位置",
+		"webcamMargin": "边距"
 	},
 	"sections": {
 		"scene": "场景",
@@ -170,7 +198,9 @@
 		"cursor": "光标",
 		"webcam": "摄像头",
 		"frame": "边框",
-		"crop": "裁剪"
+		"crop": "裁剪",
+		"title": "编辑工具",
+		"appearance": "外观"
 	},
 	"captions": {
 		"selectOnTimeline": "在时间轴上选择字幕进行编辑。",
@@ -229,7 +259,10 @@
 			"split": "拆分",
 			"merge": "合并",
 			"delete": "删除"
-		}
+		},
+		"generation": "生成字幕",
+		"useCustomModel": "使用自定义模型",
+		"generatingStatus": "正在生成字幕，请稍候。"
 	},
 	"crop": {
 		"title": "裁剪视频",
@@ -254,7 +287,14 @@
 		"videoUnsupportedFormat": "不支持的格式",
 		"videoUnsupportedFormatDescription": "请选择视频文件（mp4、webm、mov 等）",
 		"videoAdded": "已添加视频背景",
-		"videoImportFailed": "导入视频背景失败"
+		"videoImportFailed": "导入视频背景失败",
+		"video": "视频",
+		"addWallpaper": "添加壁纸",
+		"addVideoWallpaper": "添加视频壁纸",
+		"customWallpaper": "自定义壁纸",
+		"removeWallpaper": "移除{{name}}",
+		"gradientOption": "渐变 {{number}}",
+		"wallpaperNumber": "壁纸 {{number}}"
 	},
 	"export": {
 		"title": "导出",
@@ -276,7 +316,29 @@
 		"saveProject": "保存项目",
 		"exportVideo": "导出{{format}}",
 		"reportBug": "报告问题",
-		"starOnGithub": "在 GitHub 上点赞"
+		"starOnGithub": "在 GitHub 上点赞",
+		"format": "格式",
+		"qualityTitle": "画质",
+		"encodingTitle": "编码方式",
+		"nvidiaCuda": {
+			"title": "NVIDIA CUDA 加速"
+		},
+		"captionSidecar": {
+			"title": "导出字幕文件",
+			"hint": "将 .srt 和 .vtt 字幕文件保存到导出视频所在的文件夹。"
+		},
+		"size": "尺寸",
+		"encoding": {
+			"fast": "速度优先",
+			"balanced": "均衡",
+			"quality": "画质优先"
+		},
+		"sizePresets": {
+			"medium": "中等（720p）",
+			"large": "较大（1080p）",
+			"original": "原始尺寸"
+		},
+		"video": "视频"
 	},
 	"audio": {
 		"title": "音频",
@@ -320,5 +382,53 @@
 		"openProjectsFolderFailed": "无法打开项目文件夹",
 		"showFolder": "显示文件夹",
 		"projectsNote": "命名项目会自动保存。返回“项目”时预览会刷新。"
+	},
+	"annotation": {
+		"delete": "删除注释"
+	},
+	"webcamCrop": {
+		"move": "移动摄像头裁剪区域",
+		"nw": "从左上角调整摄像头裁剪区域",
+		"ne": "从右上角调整摄像头裁剪区域",
+		"sw": "从左下角调整摄像头裁剪区域",
+		"se": "从右下角调整摄像头裁剪区域"
+	},
+	"webcamPositions": {
+		"top-left": "左上",
+		"top-center": "上方居中",
+		"top-right": "右上",
+		"center-left": "左侧居中",
+		"center": "居中",
+		"center-right": "右侧居中",
+		"bottom-left": "左下",
+		"bottom-center": "下方居中",
+		"bottom-right": "右下"
+	},
+	"wallpapers": {
+		"tahoe-light": "太浩湖·浅色",
+		"tahoe-dark": "太浩湖·深色",
+		"midnight-8": "午夜 8",
+		"ipad-17-dark": "iPad 17·深色",
+		"ipad-17-light": "iPad 17·浅色",
+		"sequoia-blue": "红杉·蓝色",
+		"sequoia-blue-orange": "红杉·蓝橙",
+		"ventura": "文图拉",
+		"sonoma-clouds": "索诺玛·云海",
+		"sonoma-light": "索诺玛·浅色",
+		"sonoma-dark": "索诺玛·深色",
+		"glassmorphism-3": "毛玻璃 3",
+		"glassmorphism-4": "毛玻璃 4",
+		"energy-19": "能量 19",
+		"wallpaper3": "壁纸 3",
+		"wallpaper4": "壁纸 4",
+		"cityscape": "城市风景",
+		"levels": "层次",
+		"wallpaper10": "壁纸 10",
+		"ventura-dark": "文图拉·深色",
+		"sonoma-evening": "索诺玛·暮色",
+		"sonoma-horizon": "索诺玛·地平线",
+		"iridescent-9": "虹彩 9",
+		"energy-17": "能量 17",
+		"wispysky": "轻云天空"
 	}
 }

@@ -77,7 +77,10 @@
 			"upToDateTitle": "Recordly {{version}} está atualizado.",
 			"availableTitle": "Recordly {{version}} está disponível.",
 			"availableGenericTitle": "Há uma atualização disponível."
-		}
+		},
+		"preparing": "Preparing recording",
+		"preparingSubtitle": "Opening the editor in a moment",
+		"refreshing": "Refreshing..."
 	},
 	"sourceSelector": {
 		"loadingSources": "Carregando fontes...",

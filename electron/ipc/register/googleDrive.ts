@@ -8,6 +8,7 @@ import type { DriveTransfer, DriveTransferResult } from "../../../src/types/goog
 import { isOwnedExportPath } from "../export/exportStream";
 import { isAllowedLocalReadPath } from "../project/manager";
 import type { DriveTicket } from "../../googleDrive/api";
+import { t } from "../../i18n";
 
 const transfers = new Map<string, AbortController>();
 const mimeTypes: Record<string, string> = {
@@ -59,7 +60,12 @@ export function registerGoogleDriveHandlers(tickets: {
 	ipcMain.handle("google-drive-pick-upload", async () => {
 		const selected = await dialog.showOpenDialog({
 			properties: ["openFile"],
-			filters: [{ name: "Recordly media", extensions: ["mp4", "webm", "mov", "gif"] }],
+			filters: [
+				{
+					name: t("filter.recordlyMedia", "Recordly media"),
+					extensions: ["mp4", "webm", "mov", "gif"],
+				},
+			],
 		});
 		if (selected.canceled) return { canceled: true };
 		const filePath = await fs.realpath(selected.filePaths[0]);

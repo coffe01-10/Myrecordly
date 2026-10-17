@@ -77,7 +77,10 @@
 			"upToDateTitle": "У вас актуальная версия Recordly {{version}}.",
 			"availableTitle": "Доступна новая версия Recordly {{version}}.",
 			"availableGenericTitle": "Доступно обновление."
-		}
+		},
+		"preparing": "Preparing recording",
+		"preparingSubtitle": "Opening the editor in a moment",
+		"refreshing": "Refreshing..."
 	},
 	"sourceSelector": {
 		"loadingSources": "Загрузка источников...",

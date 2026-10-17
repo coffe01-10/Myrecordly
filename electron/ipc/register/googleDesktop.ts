@@ -4,6 +4,7 @@ import { GoogleDesktopAuth, GoogleError } from "../../googleDrive/auth";
 import { DesktopDriveApi } from "../../googleDrive/api";
 import { googleStorage } from "../../googleDrive/storage";
 import { cancelAllDriveTransfers } from "./googleDrive";
+import { t } from "../../i18n";
 
 export function registerGoogleDesktopHandlers() {
 	let previousVersion = 0;
@@ -40,9 +41,14 @@ export function registerGoogleDesktopHandlers() {
 		};
 	const importClient = async () => {
 		const choice = await dialog.showOpenDialog({
-			title: "Import Google Desktop OAuth client",
+			title: t("dialog.importGoogleClient", "Import Google Desktop OAuth client"),
 			properties: ["openFile"],
-			filters: [{ name: "Google Desktop OAuth client JSON", extensions: ["json"] }],
+			filters: [
+				{
+					name: t("filter.googleClient", "Google Desktop OAuth client JSON"),
+					extensions: ["json"],
+				},
+			],
 		});
 		if (choice.canceled) return auth.state();
 		await googleStorage.importClient(choice.filePaths[0]);

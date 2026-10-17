@@ -128,7 +128,7 @@ export function EditorSidebar({
 					</Tooltip>
 				</nav>
 				<aside
-					aria-label={panelContent ? "Clips" : undefined}
+					aria-label={panelContent ? t("editor.clips.title", "Clips") : undefined}
 					className="editor-inspector [--text-sm:0.8125rem] [--text-base:0.8125rem] flex min-w-0 min-h-0 flex-col"
 				>
 					<Card className="editor-inspector-card min-h-0 flex-1 gap-0 overflow-hidden p-0">

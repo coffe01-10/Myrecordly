@@ -4,7 +4,8 @@
 		"editorTitle": "Recordly 編輯器",
 		"subtitle": "螢幕錄製與編輯",
 		"language": "語言",
-		"manageRecordings": "打開錄製影像文件夾"
+		"manageRecordings": "打開錄製影像文件夾",
+		"discord": "Join Discord"
 	},
 	"actions": {
 		"cancel": "取消",
@@ -162,5 +163,28 @@
 	},
 	"dropdownMenu": {
 		"actions": "操作"
+	},
+	"announcements": {
+		"openFailed": "Failed to open link.",
+		"carousel": "Announcements",
+		"previous": "Previous announcement",
+		"show": "Show announcement",
+		"next": "Next announcement",
+		"dismiss": "Dismiss"
+	},
+	"account": {
+		"localProfile": "Local profile"
+	},
+	"toast": {
+		"copy": "Copy",
+		"errorCopied": "Error copied",
+		"copyFailed": "Could not copy error"
+	},
+	"select": {
+		"option": "Select option",
+		"placeholder": "Select"
+	},
+	"popover": {
+		"options": "Options"
 	}
 }

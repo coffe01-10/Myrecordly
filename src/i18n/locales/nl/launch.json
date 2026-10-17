@@ -77,7 +77,10 @@
 			"upToDateTitle": "Recordly {{version}} is up-to-date.",
 			"availableTitle": "Recordly {{version}} is beschikbaar.",
 			"availableGenericTitle": "Er is een update beschikbaar."
-		}
+		},
+		"preparing": "Preparing recording",
+		"preparingSubtitle": "Opening the editor in a moment",
+		"refreshing": "Refreshing..."
 	},
 	"sourceSelector": {
 		"loadingSources": "Bronnen laden...",

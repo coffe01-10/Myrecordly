@@ -1,7 +1,6 @@
 import { Separator } from "@heroui/react";
 import type { CSSProperties, FormEvent, RefObject } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { FeedbackDialog } from "@/components/feedback/FeedbackDialog";
 import { Button } from "@/components/ui/button";
 import {
 	FilmStrip,
@@ -226,7 +225,6 @@ export function EditorHeader(props: Props) {
 					</Button>
 				</div>
 				{SHOW_PRESETS_BUTTON && <EditorPresetMenu t={t} presets={presets} />}
-				<FeedbackDialog />
 				<Button
 					variant="ghost"
 					size="icon"
@@ -234,7 +232,11 @@ export function EditorHeader(props: Props) {
 					aria-label={t(theme === "dark" ? "editor.theme.light" : "editor.theme.dark")}
 					title={t(theme === "dark" ? "editor.theme.light" : "editor.theme.dark")}
 				>
-					{theme === "dark" ? <SunIcon className="size-5" /> : <MoonIcon className="size-5" />}
+					{theme === "dark" ? (
+						<SunIcon className="size-5" />
+					) : (
+						<MoonIcon className="size-5" />
+					)}
 				</Button>
 				<EditorExportMenu
 					t={t}

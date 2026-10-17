@@ -77,7 +77,10 @@
 			"upToDateTitle": "Recordly {{version}} 已是最新版本。",
 			"availableTitle": "Recordly {{version}} 可更新。",
 			"availableGenericTitle": "有可用更新。"
-		}
+		},
+		"preparing": "正在准备录制",
+		"preparingSubtitle": "即将打开编辑器",
+		"refreshing": "正在刷新…"
 	},
 	"sourceSelector": {
 		"loadingSources": "正在加载源...",

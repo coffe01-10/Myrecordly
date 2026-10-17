@@ -8,7 +8,30 @@
 		"view": "檢視",
 		"window": "視窗",
 		"help": "說明",
-		"checkForUpdates": "檢查更新…"
+		"checkForUpdates": "檢查更新…",
+		"about": "關於 Recordly",
+		"services": "服務",
+		"hide": "隱藏 Recordly",
+		"hideOthers": "隱藏其他應用程式",
+		"unhide": "顯示全部",
+		"quit": "結束",
+		"undo": "復原",
+		"redo": "重做",
+		"cut": "剪下",
+		"copy": "複製",
+		"paste": "貼上",
+		"selectAll": "全選",
+		"reload": "重新載入",
+		"forceReload": "強制重新載入",
+		"toggleDevTools": "切換開發者工具",
+		"resetZoom": "實際大小",
+		"zoomIn": "放大",
+		"zoomOut": "縮小",
+		"togglefullscreen": "切換全螢幕",
+		"minimize": "最小化",
+		"zoom": "縮放視窗",
+		"front": "將所有視窗移至最前方",
+		"close": "關閉視窗"
 	},
 	"tray": {
 		"recording": "正在錄影：{{name}}",
@@ -31,7 +54,8 @@
 		"importMediaOrProjectTitle": "匯入媒體或 Recordly 專案",
 		"selectAudioTitle": "選擇音訊檔案",
 		"selectWhisperExecutableTitle": "選擇 Whisper 執行檔",
-		"selectWhisperModelTitle": "選擇 Whisper 模型"
+		"selectWhisperModelTitle": "選擇 Whisper 模型",
+		"importGoogleClient": "匯入 Google 桌面 OAuth 用戶端"
 	},
 	"filter": {
 		"mediaOrProjects": "媒體或 Recordly 專案",
@@ -44,7 +68,9 @@
 		"whisperModels": "Whisper 模型",
 		"json": "JSON",
 		"gifImage": "GIF 圖片",
-		"mp4Video": "MP4 影片"
+		"mp4Video": "MP4 影片",
+		"googleClient": "Google 桌面 OAuth 用戶端 JSON 檔案",
+		"recordlyMedia": "Recordly 媒體檔案"
 	},
 	"permission": {
 		"screenTitle": "需要螢幕錄製權限",
@@ -178,5 +204,8 @@
 		"sourceSystem": "系統音訊旁檔",
 		"generatedCues": "已產生 {{count}} 條字幕。",
 		"generatedCuesFrom": "已從{{source}}產生 {{count}} 條字幕。"
+	},
+	"project": {
+		"untitled": "未命名專案"
 	}
 }

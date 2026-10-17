@@ -7,6 +7,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { I18nProvider as ReactAriaI18nProvider } from "react-aria";
 import {
 	type AppLocale,
 	DEFAULT_LOCALE,
@@ -224,29 +225,6 @@ function normalizeLocale(locale: string | null | undefined): AppLocale {
 	return DEFAULT_LOCALE;
 }
 
-function getSystemLocale(): AppLocale {
-	if (typeof navigator === "undefined") {
-		return DEFAULT_LOCALE;
-	}
-
-	const preferredLocales = Array.isArray(navigator.languages)
-		? navigator.languages
-		: [navigator.language];
-
-	for (const locale of preferredLocales) {
-		if (typeof locale !== "string" || locale.trim().length === 0) {
-			continue;
-		}
-
-		const normalized = normalizeLocale(locale);
-		if (normalized !== DEFAULT_LOCALE || locale.toLowerCase().startsWith(DEFAULT_LOCALE)) {
-			return normalized;
-		}
-	}
-
-	return DEFAULT_LOCALE;
-}
-
 function getInitialLocale(): AppLocale {
 	if (typeof window === "undefined") {
 		return DEFAULT_LOCALE;
@@ -264,7 +242,7 @@ function getInitialLocale(): AppLocale {
 		return normalizeLocale(storedLocale);
 	}
 
-	return getSystemLocale();
+	return DEFAULT_LOCALE;
 }
 
 function notifyMainProcessLocale(locale: AppLocale) {
@@ -363,7 +341,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 		[locale, setLocale, t],
 	);
 
-	return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+	return (
+		<I18nContext.Provider value={value}>
+			<ReactAriaI18nProvider locale={locale}>{children}</ReactAriaI18nProvider>
+		</I18nContext.Provider>
+	);
+}
+
+export function translateAppMessage(key: string, fallback?: string) {
+	return translateForLocale(getInitialLocale(), key, fallback);
 }
 
 export function useI18n() {

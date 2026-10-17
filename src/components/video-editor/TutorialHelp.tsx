@@ -54,6 +54,7 @@ export async function openExternalLink(url: string, errorMessage: string) {
 
 export function DiscordLinkButton() {
 	const t = useScopedT("editor");
+	const tCommon = useScopedT("common");
 
 	return (
 		<Button
@@ -67,15 +68,13 @@ export function DiscordLinkButton() {
 				)
 			}
 			className={APP_HEADER_ICON_BUTTON_CLASS}
-			title={t("common.app.discord", "Join Discord")}
-			aria-label={t("common.app.discord", "Join Discord")}
+			title={tCommon("app.discord", "Join Discord")}
+			aria-label={tCommon("app.discord", "Join Discord")}
 		>
 			<DiscordIcon className="h-3.5 w-3.5" />
 		</Button>
 	);
 }
-
-export { FeedbackDialog } from "@/components/feedback/FeedbackDialog";
 
 export function KeyboardShortcutsDialog({
 	triggerLabel,
@@ -83,6 +82,9 @@ export function KeyboardShortcutsDialog({
 }: KeyboardShortcutsDialogProps) {
 	const { shortcuts, isMac, openConfig } = useShortcuts();
 	const t = useScopedT("editor");
+	const tShortcuts = useScopedT("shortcuts");
+	const shortcutLabel = (action: keyof typeof SHORTCUT_LABELS) =>
+		tShortcuts(`actions.${action}`, SHORTCUT_LABELS[action]);
 	const [scrollLabels, setScrollLabels] = useState({
 		pan: "Shift + Scroll",
 		zoom: "Ctrl + Scroll",
@@ -129,7 +131,7 @@ export function KeyboardShortcutsDialog({
 								className="flex items-center justify-between gap-3 rounded-lg border border-foreground/5 bg-foreground/5 px-3 py-2.5"
 							>
 								<span className="text-muted-foreground">
-									{SHORTCUT_LABELS[action]}
+									{shortcutLabel(action)}
 								</span>
 								<kbd className="rounded border border-foreground/10 bg-foreground/10 px-2 py-1 font-mono text-[#2563EB]">
 									{formatBinding(shortcuts[action], isMac)}
@@ -142,7 +144,10 @@ export function KeyboardShortcutsDialog({
 									{t("keyboardShortcuts.panTimeline")}
 								</p>
 								<kbd className="mt-2 inline-flex rounded border border-foreground/10 bg-foreground/10 px-2 py-1 font-mono text-[#2563EB]">
-									{scrollLabels.pan}
+									{scrollLabels.pan.replace(
+										"Scroll",
+										tShortcuts("scroll", "Scroll"),
+									)}
 								</kbd>
 							</div>
 							<div className="rounded-lg border border-foreground/5 bg-foreground/5 px-3 py-2.5">
@@ -150,7 +155,10 @@ export function KeyboardShortcutsDialog({
 									{t("keyboardShortcuts.zoomTimeline")}
 								</p>
 								<kbd className="mt-2 inline-flex rounded border border-foreground/10 bg-foreground/10 px-2 py-1 font-mono text-[#2563EB]">
-									{scrollLabels.zoom}
+									{scrollLabels.zoom.replace(
+										"Scroll",
+										tShortcuts("scroll", "Scroll"),
+									)}
 								</kbd>
 							</div>
 							<div className="rounded-lg border border-foreground/5 bg-foreground/5 px-3 py-2.5">

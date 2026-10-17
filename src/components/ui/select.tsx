@@ -1,6 +1,7 @@
 import { Select as HeroSelect, ListBox, Label, Separator } from "@heroui/react";
 import { type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useScopedT } from "@/contexts/I18nContext";
 export function Select({
 	value,
 	defaultValue,
@@ -15,10 +16,11 @@ export function Select({
 	disabled?: boolean;
 	children: ReactNode;
 }) {
+	const t = useScopedT("common");
 	return (
 		<HeroSelect
 			{...props}
-			aria-label={props["aria-label"] ?? "Select option"}
+			aria-label={props["aria-label"] ?? t("select.option", "Select option")}
 			value={value || null}
 			defaultValue={defaultValue}
 			onChange={(key) => onValueChange?.(String(key ?? ""))}
@@ -45,9 +47,10 @@ export function SelectValue({
 	placeholder,
 	...props
 }: ComponentProps<typeof HeroSelect.Value> & { placeholder?: string }) {
+	const t = useScopedT("common");
 	return (
 		<HeroSelect.Value {...props}>
-			{({ selectedText }) => selectedText || placeholder || "Select"}
+			{({ selectedText }) => selectedText || placeholder || t("select.placeholder", "Select")}
 		</HeroSelect.Value>
 	);
 }

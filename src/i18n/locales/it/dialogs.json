@@ -40,7 +40,9 @@
 		"addSuccess": "Font \"{{name}}\" aggiunto con successo",
 		"addFailed": "Aggiunta del font non riuscita",
 		"loadTimeout": "Il caricamento del font ha richiesto troppo tempo. Verifica l'URL e riprova.",
-		"loadFailed": "Impossibile caricare il font. Verifica che l'URL Google Fonts sia corretto."
+		"loadFailed": "Impossibile caricare il font. Verifica che l'URL Google Fonts sia corretto.",
+		"alreadyAdded": "This font has already been added.",
+		"cancel": "Cancel"
 	},
 	"shortcutsConfig": {
 		"title": "Scorciatoie da tastiera",
@@ -57,7 +59,8 @@
 		"instructions": "Clicca su una scorciatoia, poi premi la nuova combinazione di tasti. Premi Esc per annullare.",
 		"resetToDefaults": "Ripristina predefinite",
 		"cancel": "Annulla",
-		"save": "Salva"
+		"save": "Salva",
+		"changeShortcut": "Change {{action}} shortcut, currently {{binding}}"
 	},
 	"feedback": {
 		"buttonLabel": "Feedback",

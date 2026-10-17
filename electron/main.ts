@@ -453,15 +453,15 @@ function setupApplicationMenu() {
 		template.push({
 			label: app.name,
 			submenu: [
-				{ role: "about" },
+				{ label: t("menu.about", "About Recordly"), role: "about" },
 				{ type: "separator" },
-				{ role: "services" },
+				{ label: t("menu.services", "Services"), role: "services" },
 				{ type: "separator" },
-				{ role: "hide" },
-				{ role: "hideOthers" },
-				{ role: "unhide" },
+				{ label: t("menu.hide", "Hide Recordly"), role: "hide" },
+				{ label: t("menu.hideOthers", "Hide Others"), role: "hideOthers" },
+				{ label: t("menu.unhide", "Show All"), role: "unhide" },
 				{ type: "separator" },
-				{ role: "quit" },
+				{ label: t("menu.quit", "Quit"), role: "quit" },
 			],
 		});
 	}
@@ -489,41 +489,59 @@ function setupApplicationMenu() {
 					? []
 					: [
 							{ type: "separator" as const },
-							{ role: "quit" as const, accelerator: "CmdOrCtrl+Q" },
+							{
+								label: t("menu.quit", "Quit"),
+								role: "quit" as const,
+								accelerator: "CmdOrCtrl+Q",
+							},
 						]),
 			],
 		},
 		{
 			label: t("menu.edit", "Edit"),
 			submenu: [
-				{ role: "undo" },
-				{ role: "redo" },
+				{ label: t("menu.undo", "Undo"), role: "undo" },
+				{ label: t("menu.redo", "Redo"), role: "redo" },
 				{ type: "separator" },
-				{ role: "cut" },
-				{ role: "copy" },
-				{ role: "paste" },
-				{ role: "selectAll" },
+				{ label: t("menu.cut", "Cut"), role: "cut" },
+				{ label: t("menu.copy", "Copy"), role: "copy" },
+				{ label: t("menu.paste", "Paste"), role: "paste" },
+				{ label: t("menu.selectAll", "Select All"), role: "selectAll" },
 			],
 		},
 		{
 			label: t("menu.view", "View"),
 			submenu: [
-				{ role: "reload" },
-				{ role: "forceReload" },
-				{ role: "toggleDevTools" },
+				{ label: t("menu.reload", "Reload"), role: "reload" },
+				{ label: t("menu.forceReload", "Force Reload"), role: "forceReload" },
+				{
+					label: t("menu.toggleDevTools", "Toggle Developer Tools"),
+					role: "toggleDevTools",
+				},
 				{ type: "separator" },
-				{ role: "resetZoom" },
-				{ role: "zoomIn" },
-				{ role: "zoomOut" },
+				{ label: t("menu.resetZoom", "Actual Size"), role: "resetZoom" },
+				{ label: t("menu.zoomIn", "Zoom In"), role: "zoomIn" },
+				{ label: t("menu.zoomOut", "Zoom Out"), role: "zoomOut" },
 				{ type: "separator" },
-				{ role: "togglefullscreen" },
+				{
+					label: t("menu.togglefullscreen", "Toggle Full Screen"),
+					role: "togglefullscreen",
+				},
 			],
 		},
 		{
 			label: t("menu.window", "Window"),
 			submenu: isMac
-				? [{ role: "minimize" }, { role: "zoom" }, { type: "separator" }, { role: "front" }]
-				: [{ role: "minimize" }, { role: "close" }],
+				? [
+						{ label: t("menu.minimize", "Minimize"), role: "minimize" },
+						{ label: t("menu.zoom", "Zoom"), role: "zoom" },
+						{ type: "separator" },
+						{ label: t("menu.front", "Bring All to Front"), role: "front" },
+					]
+				: [
+						{ label: t("menu.minimize", "Minimize"), role: "minimize" },
+						{ label: t("menu.close", "Close Window"), role: "close" },
+					],
 		},
 		{
 			label: t("menu.help", "Help"),
@@ -841,7 +859,10 @@ function createEditorWindowWrapper() {
 		offerDiscard: async () => {
 			const result = await dialog.showMessageBox(editorWindow, {
 				type: "warning",
-				buttons: [t("dialog.discardAndClose", "Discard & Close"), t("dialog.cancel", "Cancel")],
+				buttons: [
+					t("dialog.discardAndClose", "Discard & Close"),
+					t("dialog.cancel", "Cancel"),
+				],
 				defaultId: 1,
 				cancelId: 1,
 				title: t("dialog.unsavedChangesTitle", "Project could not be saved"),
