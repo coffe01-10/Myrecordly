@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ProjectPreviewData } from "@/types/projectPreview";
-import VideoPlayback, { type VideoPlaybackRef } from "../VideoPlayback";
+import type { VideoPlaybackRef } from "../VideoPlayback";
+import VideoPlayback from "../videoPlayback/LazyVideoPlayback";
 import { normalizeProjectEditor } from "../projectPersistence";
 import type { CursorTelemetryPoint } from "../types";
 

@@ -377,7 +377,9 @@ export function EditorShell(props: Props) {
 						isPlaying={ui.isPlaying}
 						previewVolume={ui.previewVolume}
 						setPreviewVolume={ui.setPreviewVolume}
-						suspendRendering={exportStatus.shouldSuspendPreviewRendering}
+						suspendRendering={
+							project.projectBrowserOpen || exportStatus.shouldSuspendPreviewRendering
+						}
 						appearance={appearance}
 						timeline={timeline}
 						audio={audio}

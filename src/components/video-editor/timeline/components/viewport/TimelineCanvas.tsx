@@ -6,7 +6,6 @@ import {
 	type MouseEventHandler,
 	memo,
 	useCallback,
-	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -49,7 +48,7 @@ import {
 	getTimelineRowsMinHeightPx,
 	TIMELINE_AXIS_HEIGHT_PX,
 } from "../../timelineLayout";
-import PlaybackCursor from "../playhead/PlaybackCursor";
+import PlaybackCursor, { type PlaybackCursorHandle } from "../playhead/PlaybackCursor";
 
 const HINT_CLIP = "hintClip";
 const HINT_ANNOTATION = "hintAnnotation";
@@ -154,6 +153,7 @@ function useTimelineLaneHover({
 
 	const onMouseEnter = useCallback(
 		(event: MouseEvent<HTMLDivElement>) => {
+			if (event.buttons) return;
 			setIsHovered(true);
 			updateHoverTime(event.clientX, event.currentTarget.getBoundingClientRect());
 		},
@@ -162,6 +162,7 @@ function useTimelineLaneHover({
 
 	const onMouseMove = useCallback(
 		(event: MouseEvent<HTMLDivElement>) => {
+			if (event.buttons) return;
 			setIsHovered(true);
 			updateHoverTime(event.clientX, event.currentTarget.getBoundingClientRect());
 		},
@@ -931,13 +932,12 @@ export default function TimelineCanvas({
 	isDragging = false,
 	isLoading = false,
 }: TimelineCanvasProps) {
-	const { setTimelineRef, style, sidebarWidth, direction, range, valueToPixels, pixelsToValue } =
+	const { setTimelineRef, style, sidebarWidth, direction, range, valueToPixels } =
 		useTimelineContext();
 	const { clips: clipPresentation } = useTimelinePresentation();
 	const localTimelineRef = useRef<HTMLDivElement | null>(null);
 	const [isSeeking, setIsSeeking] = useState(false);
-	const seekRafRef = useRef<number | null>(null);
-	const pendingSeekClientXRef = useRef<number | null>(null);
+	const playbackCursorRef = useRef<PlaybackCursorHandle>(null);
 
 	const setRefs = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -945,64 +945,6 @@ export default function TimelineCanvas({
 			localTimelineRef.current = node;
 		},
 		[setTimelineRef],
-	);
-
-	const handleTimelineClick = useCallback(
-		(e: MouseEvent<HTMLDivElement>) => {
-			if (isSeeking || (e.target as Element).closest("[data-timeline-item]")) return;
-			if (!onSeek || videoDurationMs <= 0) return;
-
-			if (onClearBlockSelection) {
-				onClearBlockSelection();
-			} else {
-				onSelectZoom?.(null);
-				onSelectClip?.(null);
-				onSelectAnnotation?.(null);
-				onSelectAudio?.(null);
-				onSelectCaption?.(null);
-			}
-
-			const rect = e.currentTarget.getBoundingClientRect();
-			const clickX =
-				direction === "rtl"
-					? rect.right - sidebarWidth - e.clientX
-					: e.clientX - rect.left - sidebarWidth;
-			if (clickX < 0) return;
-			const relativeMs = pixelsToValue(clickX);
-			const absoluteMs = Math.max(0, Math.min(range.start + relativeMs, videoDurationMs));
-			onSeek(getTimeAtClipSeam(absoluteMs, clipPresentation) / 1000);
-		},
-		[
-			isSeeking,
-			clipPresentation,
-			onSeek,
-			onSelectZoom,
-			onSelectClip,
-			onSelectAnnotation,
-			onSelectAudio,
-			onSelectCaption,
-			onClearBlockSelection,
-			videoDurationMs,
-			sidebarWidth,
-			direction,
-			range.start,
-			pixelsToValue,
-		],
-	);
-
-	const getAbsoluteMsFromClientX = useCallback(
-		(clientX: number, rect: DOMRect) => {
-			const clickX =
-				direction === "rtl"
-					? rect.right - sidebarWidth - clientX
-					: clientX - rect.left - sidebarWidth;
-			const relativeMs = pixelsToValue(clickX);
-			return getTimeAtClipSeam(
-				Math.max(0, Math.min(range.start + relativeMs, videoDurationMs)),
-				clipPresentation,
-			);
-		},
-		[direction, pixelsToValue, range.start, sidebarWidth, videoDurationMs, clipPresentation],
 	);
 
 	const handleTimelineMouseDown = useCallback(
@@ -1023,13 +965,10 @@ export default function TimelineCanvas({
 				onSelectCaption?.(null);
 			}
 
-			const rect = localTimelineRef.current.getBoundingClientRect();
-			onSeek(getAbsoluteMsFromClientX(e.clientX, rect) / 1000);
-			setIsSeeking(true);
+			playbackCursorRef.current?.startDrag(e.clientX);
 			e.preventDefault();
 		},
 		[
-			getAbsoluteMsFromClientX,
 			onClearBlockSelection,
 			onSeek,
 			onSelectAnnotation,
@@ -1040,50 +979,6 @@ export default function TimelineCanvas({
 			videoDurationMs,
 		],
 	);
-
-	useEffect(() => {
-		if (!isSeeking) return;
-
-		const flushSeek = () => {
-			seekRafRef.current = null;
-			if (!onSeek || !localTimelineRef.current || pendingSeekClientXRef.current === null)
-				return;
-			const rect = localTimelineRef.current.getBoundingClientRect();
-			onSeek(getAbsoluteMsFromClientX(pendingSeekClientXRef.current, rect) / 1000);
-		};
-
-		const handleMouseMove = (event: globalThis.MouseEvent) => {
-			pendingSeekClientXRef.current = event.clientX;
-			if (seekRafRef.current === null) {
-				seekRafRef.current = requestAnimationFrame(flushSeek);
-			}
-		};
-
-		const handleMouseUp = () => {
-			if (seekRafRef.current !== null) {
-				cancelAnimationFrame(seekRafRef.current);
-				seekRafRef.current = null;
-			}
-			if (pendingSeekClientXRef.current !== null) {
-				flushSeek();
-			}
-			pendingSeekClientXRef.current = null;
-			setIsSeeking(false);
-		};
-
-		window.addEventListener("mousemove", handleMouseMove);
-		window.addEventListener("mouseup", handleMouseUp);
-
-		return () => {
-			if (seekRafRef.current !== null) {
-				cancelAnimationFrame(seekRafRef.current);
-				seekRafRef.current = null;
-			}
-			pendingSeekClientXRef.current = null;
-			window.removeEventListener("mousemove", handleMouseMove);
-			window.removeEventListener("mouseup", handleMouseUp);
-		};
-	}, [getAbsoluteMsFromClientX, isSeeking, onSeek]);
 
 	const timelineRowCount = useMemo(() => {
 		const annotationRowIds = new Set<string>();
@@ -1134,7 +1029,7 @@ export default function TimelineCanvas({
 		resolveCaptionSpanAtMs,
 		captionsEnabled,
 		captionQuickAddEnabled,
-		isDragging,
+		isDragging: isDragging || isSeeking,
 		valueToPixels,
 	});
 
@@ -1149,13 +1044,21 @@ export default function TimelineCanvas({
 			}}
 			className="select-none bg-editor-panel relative cursor-pointer group flex flex-col"
 			onMouseDown={handleTimelineMouseDown}
-			onClick={handleTimelineClick}
-			onMouseEnter={handleTimelineMouseEnter}
-			onMouseMove={handleTimelineMouseMove}
+			onMouseEnter={(event) => {
+				if (!event.buttons) handleTimelineMouseEnter(event);
+			}}
+			onMouseMove={(event) => {
+				if (!event.buttons) handleTimelineMouseMove(event);
+			}}
 			onMouseLeave={handleTimelineMouseLeave}
 		>
 			<div aria-hidden="true" style={{ height: TIMELINE_AXIS_HEIGHT_PX, flexShrink: 0 }} />
 			<PlaybackCursor
+				ref={playbackCursorRef}
+				onDraggingChange={(dragging) => {
+					setIsSeeking(dragging);
+					if (dragging) handleTimelineMouseLeave();
+				}}
 				clips={clipPresentation}
 				currentTimeMs={currentTimeMs}
 				videoDurationMs={videoDurationMs}
@@ -1164,7 +1067,7 @@ export default function TimelineCanvas({
 				keyframes={keyframes}
 				isLoading={isLoading}
 			/>
-			{canShowGhostPlayhead && (
+			{canShowGhostPlayhead && !isSeeking && (
 				<div
 					className="absolute top-0 bottom-0 z-[45] pointer-events-none"
 					style={{

@@ -1,5 +1,14 @@
 import { useTimelineContext } from "dnd-timeline";
-import { useEffect, useState, type RefObject } from "react";
+import {
+	useEffect,
+	useLayoutEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+	type Ref,
+	type RefObject,
+} from "react";
+import { createScrubScheduler } from "./scrubScheduler";
 import { useScopedT } from "@/contexts/I18nContext";
 import { cn } from "@/lib/utils";
 import { formatPlayheadTime } from "../../core/time";
@@ -10,7 +19,13 @@ import {
 	type ClipPresentation,
 } from "../../core/clipPresentation";
 
+export interface PlaybackCursorHandle {
+	startDrag(clientX: number, snapToKeyframes?: boolean): void;
+}
+
 interface PlaybackCursorProps {
+	ref?: Ref<PlaybackCursorHandle>;
+	onDraggingChange?: (dragging: boolean) => void;
 	clips: ClipPresentation[];
 	currentTimeMs: number;
 	videoDurationMs: number;
@@ -21,6 +36,8 @@ interface PlaybackCursorProps {
 }
 
 export default function PlaybackCursor({
+	ref,
+	onDraggingChange,
 	clips,
 	currentTimeMs,
 	videoDurationMs,
@@ -35,81 +52,122 @@ export default function PlaybackCursor({
 	const [isDragging, setIsDragging] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 
-	useEffect(() => {
-		if (!isDragging) return;
+	const lineRef = useRef<HTMLDivElement>(null);
+	const capRef = useRef<HTMLButtonElement>(null);
+	const labelRef = useRef<HTMLSpanElement>(null);
+	const dragRef = useRef<{ time: number; dispose: () => void } | null>(null);
+	const expanded = isHovered || isDragging || isLoading;
+	const paint = (timeMs: number) => {
+		const line = lineRef.current;
+		const cap = capRef.current;
+		if (!line || !cap) return;
+		const time = Math.max(0, Math.min(timeMs, videoDurationMs));
+		const offset = valueToPixels(getPlayheadDisplayTime(time, clips) - range.start);
+		const width = valueToPixels(range.end - range.start);
+		const capShift = Math.max(0, 34 - offset) - Math.max(0, 34 - (width - offset));
+		line.style.transform = `translate3d(${direction === "rtl" ? -offset : offset}px, 0, 0)`;
+		line.style.visibility = time < range.start || time > range.end ? "hidden" : "visible";
+		cap.style.transform = `translateX(calc(-50% + ${expanded || dragRef.current ? (direction === "rtl" ? -capShift : capShift) : 0}px))`;
+		const label = formatPlayheadTime(time);
+		if (labelRef.current) labelRef.current.textContent = label;
+		cap.setAttribute("aria-label", t("playhead.aria", undefined, { time: label }));
+	};
+	// Media callbacks must not pull the cursor back to an older decoded frame mid-drag.
+	useLayoutEffect(() => {
+		paint(dragRef.current?.time ?? currentTimeMs);
+	});
+	function timeAt(x: number, rect: DOMRect, snapToKeyframes: boolean) {
+		const position =
+			direction === "rtl" ? rect.right - sidebarWidth - x : x - rect.left - sidebarWidth;
+		const displayMs = Math.max(
+			0,
+			Math.min(range.start + pixelsToValue(position), videoDurationMs),
+		);
+		let time = getTimeAtClipSeam(displayMs, clips);
+		// A small pixel magnet stays predictable at every timeline zoom level.
+		let distance = 4;
+		if (snapToKeyframes)
+			for (const keyframe of keyframes) {
+				if (keyframe.time < range.start || keyframe.time > range.end) continue;
+				const delta = Math.abs(
+					valueToPixels(getPlayheadDisplayTime(keyframe.time, clips) - displayMs),
+				);
+				if (delta <= distance) {
+					distance = delta;
+					time = keyframe.time;
+				}
+			}
+		return time;
+	}
+	const latestRef = useRef({ paint, onSeek, timeAt });
+	useLayoutEffect(() => {
+		latestRef.current = { paint, onSeek, timeAt };
+	});
+	useEffect(() => () => dragRef.current?.dispose(), []);
 
-		const handleMouseMove = (e: MouseEvent) => {
-			if (!timelineRef.current || !onSeek) return;
-			const rect = timelineRef.current.getBoundingClientRect();
-			const clickX =
-				direction === "rtl"
-					? rect.right - sidebarWidth - e.clientX
-					: e.clientX - rect.left - sidebarWidth;
-			const relativeMs = pixelsToValue(clickX);
-			let absoluteMs = getTimeAtClipSeam(
-				Math.max(0, Math.min(range.start + relativeMs, videoDurationMs)),
-				clips,
-			);
-
-			const snapThresholdMs = 150;
-			const nearbyKeyframe = keyframes.find(
-				(kf) =>
-					Math.abs(kf.time - absoluteMs) <= snapThresholdMs &&
-					kf.time >= range.start &&
-					kf.time <= range.end,
-			);
-			if (nearbyKeyframe) absoluteMs = nearbyKeyframe.time;
-
-			onSeek(absoluteMs / 1000);
+	const startDrag = (clientX: number, snapToKeyframes = false) => {
+		if (!timelineRef.current || !onSeek || videoDurationMs <= 0) return;
+		dragRef.current?.dispose();
+		// Read layout once per gesture, not after each cursor style write.
+		let rect = timelineRef.current.getBoundingClientRect();
+		const refreshRect = () => {
+			if (timelineRef.current) rect = timelineRef.current.getBoundingClientRect();
 		};
-
-		const handleMouseUp = () => {
+		const timeFromPointer = (x: number) => latestRef.current.timeAt(x, rect, snapToKeyframes);
+		const scheduler = createScrubScheduler(
+			(time) => {
+				if (dragRef.current) dragRef.current.time = time;
+				latestRef.current.paint(time);
+			},
+			(time) => latestRef.current.onSeek?.(time / 1000),
+		);
+		const previousCursor = document.body.style.cursor;
+		const dispose = () => {
+			scheduler.cancel();
+			window.removeEventListener("mousemove", move);
+			window.removeEventListener("mouseup", up);
+			window.removeEventListener("blur", blur);
+			window.removeEventListener("resize", refreshRect);
+			window.removeEventListener("scroll", refreshRect, true);
+			document.body.style.cursor = previousCursor;
+			dragRef.current = null;
+		};
+		const finish = (time: number) => {
+			scheduler.finish(time);
+			dispose();
 			setIsDragging(false);
-			document.body.style.cursor = "";
+			onDraggingChange?.(false);
 		};
-
-		window.addEventListener("mousemove", handleMouseMove);
-		window.addEventListener("mouseup", handleMouseUp);
+		const move = (event: MouseEvent) => scheduler.update(timeFromPointer(event.clientX));
+		const up = (event: MouseEvent) => finish(timeFromPointer(event.clientX));
+		const blur = () => finish(dragRef.current!.time);
+		dragRef.current = { time: currentTimeMs, dispose };
+		window.addEventListener("mousemove", move);
+		window.addEventListener("mouseup", up);
+		window.addEventListener("blur", blur);
+		window.addEventListener("resize", refreshRect);
+		window.addEventListener("scroll", refreshRect, true);
 		document.body.style.cursor = "ew-resize";
-
-		return () => {
-			window.removeEventListener("mousemove", handleMouseMove);
-			window.removeEventListener("mouseup", handleMouseUp);
-			document.body.style.cursor = "";
-		};
-	}, [
-		isDragging,
-		clips,
-		onSeek,
-		timelineRef,
-		sidebarWidth,
-		range.start,
-		range.end,
-		videoDurationMs,
-		pixelsToValue,
-		keyframes,
-		direction,
-	]);
+		setIsDragging(true);
+		onDraggingChange?.(true);
+		scheduler.update(timeFromPointer(clientX));
+	};
+	useImperativeHandle(ref, () => ({ startDrag }));
 
 	if (videoDurationMs <= 0 || currentTimeMs < 0) return null;
-	const clampedTime = Math.min(currentTimeMs, videoDurationMs);
-	if (clampedTime < range.start || clampedTime > range.end) return null;
-
-	const offset = valueToPixels(getPlayheadDisplayTime(clampedTime, clips) - range.start);
-
-	const expanded = isHovered || isDragging || isLoading;
-	// Keep the timestamp inside the viewport even at either end of the timeline.
-	const width = valueToPixels(range.end - range.start);
-	const capShift = Math.max(0, 34 - offset) - Math.max(0, 34 - (width - offset));
 	return (
 		<div data-testid="timeline-playhead" className="absolute inset-0 z-50 pointer-events-none">
 			<div
+				ref={lineRef}
 				className="absolute top-0 bottom-0 w-px bg-accent"
-				style={{ [sideProperty]: sidebarWidth + offset }}
+				style={{
+					[sideProperty]: sidebarWidth,
+					willChange: isDragging ? "transform" : undefined,
+				}}
 			>
 				<button
 					type="button"
-					aria-label={t("playhead.aria", undefined, { time: formatPlayheadTime(clampedTime) })}
+					ref={capRef}
 					data-testid="playhead-cap"
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}
@@ -120,23 +178,21 @@ export default function PlaybackCursor({
 						if (event.button !== 0) return;
 						event.preventDefault();
 						event.stopPropagation();
-						setIsDragging(true);
+						startDrag(event.clientX, true);
 					}}
-					className="absolute top-0 h-4 rounded-full bg-accent text-accent-foreground cursor-ew-resize pointer-events-auto overflow-hidden transition-[width,transform] duration-150"
+					className="absolute top-0 h-4 rounded-full bg-accent text-accent-foreground cursor-ew-resize pointer-events-auto overflow-hidden transition-[width] duration-150"
 					style={{
 						width: expanded ? 68 : 16,
 						left: "50%",
-						transform: `translateX(calc(-50% + ${expanded ? (direction === "rtl" ? -capShift : capShift) : 0}px))`,
 					}}
 				>
 					<span
+						ref={labelRef}
 						className={cn(
 							"block whitespace-nowrap text-[10px] font-medium tabular-nums transition-opacity",
 							expanded ? "opacity-100" : "opacity-0",
 						)}
-					>
-						{formatPlayheadTime(clampedTime)}
-					</span>
+					/>
 				</button>
 			</div>
 		</div>

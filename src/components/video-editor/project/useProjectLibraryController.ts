@@ -1,7 +1,7 @@
 /* biome-ignore-all lint/correctness/useExhaustiveDependencies: grouped editor domain objects contain the thumbnail renderer dependencies. */
 import { type RefObject, useCallback, useEffect, useRef } from "react";
 import { useI18n } from "@/contexts/I18nContext";
-import { FrameRenderer } from "@/lib/exporter/frameRenderer";
+import type { FrameRenderer } from "@/lib/exporter/frameRenderer";
 import { PROJECT_THUMBNAIL_HEIGHT, PROJECT_THUMBNAIL_WIDTH } from "@/lib/projectThumbnail";
 import { toFileUrl } from "../projectPersistence";
 import type { useAppearanceState } from "../state/useAppearanceState";
@@ -174,6 +174,7 @@ export function useProjectLibraryController({
 				if (findPreviewClipAtTimelineTime(frameTimestampUs / 1000, clipRegions)) {
 					videoFrame = new VideoFrame(thumbnailVideo, { timestamp: sourceTimestampUs });
 				}
+				const { FrameRenderer } = await import("@/lib/exporter/frameRenderer");
 				frameRenderer = new FrameRenderer({
 					timelineEffects: true,
 					width: targetWidth,

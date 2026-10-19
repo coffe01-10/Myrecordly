@@ -4,7 +4,8 @@ import type { useVideoEditorAudio } from "../audio/useVideoEditorAudio";
 import type { useAppearanceState } from "../state/useAppearanceState";
 import type { useTimelineState } from "../state/useTimelineState";
 import type { CursorTelemetryPoint, ZoomRegion } from "../types";
-import VideoPlayback, { type VideoPlaybackRef } from "../VideoPlayback";
+import type { VideoPlaybackRef } from "../VideoPlayback";
+import VideoPlayback from "../videoPlayback/LazyVideoPlayback";
 
 type PlaybackProps = ComponentProps<typeof VideoPlayback>;
 type Handlers = Pick<

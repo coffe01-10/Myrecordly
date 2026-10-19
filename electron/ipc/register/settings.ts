@@ -1,7 +1,7 @@
 import { createCountdownController } from "../../countdownController";
 import fs from "node:fs/promises";
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
-import { hasAppSetting, readAppSettingsStore, writeAppSettingsStore } from "../../appSettingsStore";
+import { readAppSetting, writeAppSetting } from "../../appSettingsStore";
 import { hideCursor } from "../../cursorHider";
 import { createCountdownWindow } from "../../windows";
 import { COUNTDOWN_SETTINGS_FILE, RECORDINGS_SETTINGS_FILE, SHORTCUTS_FILE } from "../constants";
@@ -70,10 +70,9 @@ export function registerSettingsHandlers() {
 				return;
 			}
 
-			const store = readAppSettingsStore();
 			event.returnValue = {
 				success: true,
-				value: hasAppSetting(store, key) ? store[key] : null,
+				value: readAppSetting(key),
 			};
 		} catch (error) {
 			console.error("Failed to read app setting:", error);
@@ -88,9 +87,7 @@ export function registerSettingsHandlers() {
 				return;
 			}
 
-			const store = readAppSettingsStore();
-			store[key] = value;
-			writeAppSettingsStore(store);
+			writeAppSetting(key, value);
 			if (key === "recordly.theme") {
 				nativeTheme.themeSource = value === "dark" || value === "light" ? value : "system";
 			}
