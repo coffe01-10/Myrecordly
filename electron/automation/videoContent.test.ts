@@ -169,6 +169,48 @@ describe("autonomous edit planning", () => {
 		expect(plan.planner).toBe("model");
 		expect((await deps.projectEdits(plan.edits)).clips[0].sourceStartMs).toBe(2000);
 	});
+	it("does not duplicate captions added explicitly in the same task", async () => {
+		const data = index(),
+			active = project(),
+			deps = dependencies(active);
+		const cue = { startMs: 100, endMs: 1000, text: "打开项目" };
+		data.segments[0].transcript = [cue];
+		const plan = await planVideoTask(
+			data,
+			active,
+			{
+				indexId: "v",
+				goal: "添加字幕",
+				edits: [{ type: "caption", ...cue }],
+				addCaptions: true,
+			},
+			new AbortController().signal,
+			deps,
+		);
+		expect((await deps.projectEdits(plan.edits)).editor.autoCaptions).toHaveLength(1);
+	});
+	it("can regenerate a caption removed earlier in the same task", async () => {
+		const data = index(),
+			active = project();
+		const cue = { startMs: 100, endMs: 1000, text: "打开项目" };
+		data.segments[0].transcript = [cue];
+		const withCaption = await dependencies(active).projectEdits([{ type: "caption", ...cue }]);
+		const deps = dependencies(withCaption);
+		const [{ id }] = withCaption.editor.autoCaptions as Array<{ id: string }>;
+		const plan = await planVideoTask(
+			data,
+			withCaption,
+			{
+				indexId: "v",
+				goal: "重新生成字幕",
+				edits: [{ type: "remove_effect", id }],
+				addCaptions: true,
+			},
+			new AbortController().signal,
+			deps,
+		);
+		expect((await deps.projectEdits(plan.edits)).editor.autoCaptions).toHaveLength(1);
+	});
 	it("does not silently delete video when local pause analysis has no idle evidence", async () => {
 		const active = project();
 		const plan = await planVideoTask(

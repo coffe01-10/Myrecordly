@@ -80,7 +80,7 @@ export async function planVideoTask(
 			);
 	}
 	if (options.addCaptions) {
-		const existing = project.editor.autoCaptions as Array<{
+		const existing = projected.editor.autoCaptions as Array<{
 			startMs: number;
 			endMs: number;
 			text: string;

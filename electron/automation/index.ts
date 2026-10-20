@@ -205,8 +205,8 @@ export async function startRecordlyAutomation(options: {
 							},
 						});
 						progress(25);
-						signal.throwIfAborted();
 						const captured = await enqueue(async () => {
+							signal.throwIfAborted();
 							const project = plan.edits.length
 								? await send<ProjectSnapshot>("apply_edits", {
 										expectedRevision: active.revision,
@@ -233,9 +233,10 @@ export async function startRecordlyAutomation(options: {
 								videoPath: snapshot.sourcePath,
 								editor: snapshot.editor,
 							};
-							await fs.writeFile(target, JSON.stringify(data, null, 2), {
-								flag: target === snapshot.projectPath ? "w" : "wx",
-							});
+							const contents = JSON.stringify(data, null, 2);
+							if (target === snapshot.projectPath)
+								await writeProjectFileAtomically(target, contents);
+							else await fs.writeFile(target, contents, { flag: "wx" });
 							await enqueue(() =>
 								send("mark_saved", { path: target, project: data }),
 							);

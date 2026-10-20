@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import fs from "node:fs/promises";
 import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import path from "node:path";
 import type { ConnectionInfo } from "../../packages/automation/src/types";
 
@@ -53,9 +54,7 @@ export async function startAutomationBridge(
 		server.once("error", reject);
 		server.listen(0, "127.0.0.1", resolve);
 	});
-	const address = server.address();
-	if (!address || typeof address === "string")
-		throw new Error("Cannot start local automation endpoint");
+	const address = server.address() as AddressInfo;
 	const info: ConnectionInfo = {
 		version: 1,
 		url: `http://127.0.0.1:${address.port}`,
