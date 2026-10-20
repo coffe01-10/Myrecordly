@@ -2,10 +2,18 @@ import type { ExportProgress } from "@/lib/exporter";
 import { toFileUrl } from "../projectPersistence";
 import type { useAppearanceState } from "../state/useAppearanceState";
 import type { useTimelineState } from "../state/useTimelineState";
+import type { ProjectEditorState } from "../projectPersistence";
 import type { CursorTelemetryPoint, SpeedRegion, ZoomRegion } from "../types";
 
-type AppearanceState = ReturnType<typeof useAppearanceState>;
-type TimelineState = ReturnType<typeof useTimelineState>;
+type TimelineState = Pick<
+	ReturnType<typeof useTimelineState>,
+	"clipRegions" | "trimRegions" | "annotationRegions" | "autoCaptions" | "autoCaptionSettings"
+>;
+type AppearanceState = Omit<
+	ProjectEditorState,
+	keyof ReturnType<typeof useTimelineState> | "aspectRatio"
+> &
+	Pick<ReturnType<typeof useAppearanceState>, "resolvedWebcamVideoUrl">;
 
 type BuildExportRenderOptionsInput = {
 	appearance: AppearanceState;

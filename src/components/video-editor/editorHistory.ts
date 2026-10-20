@@ -3,12 +3,14 @@ import type {
 	AnnotationRegion,
 	AudioRegion,
 	CaptionCue,
+	AutoCaptionSettings,
 	ClipRegion,
 	SpeedRegion,
 	ZoomRegion,
 } from "./types";
 
 export type EditorHistorySnapshot = {
+	autoCaptionSettings?: AutoCaptionSettings;
 	sourceAudioTrackSettingsByClip?: Record<string, SourceAudioTrackSettings>;
 	zoomRegions: ZoomRegion[];
 	clipRegions: ClipRegion[];

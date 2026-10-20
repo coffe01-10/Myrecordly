@@ -1,0 +1,31 @@
+{
+	"name": "@recordly/automation",
+	"version": "0.1.0",
+	"description": "Recordly local editing SDK, CLI and MCP server",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"bin": {
+		"recordly": "dist/cli.js",
+		"recordly-mcp": "dist/mcp.js"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"examples"
+	],
+	"engines": {
+		"node": ">=20"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.29.0",
+		"zod": "^3.25.0"
+	}
+}

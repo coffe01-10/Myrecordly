@@ -19,6 +19,7 @@ import {
 	type ComponentProps,
 } from "react";
 import { useSmartCut } from "../smartCut/useSmartCut";
+import { useAutomation } from "@/automation/useAutomation";
 import { EditorAnnouncementBanner } from "@/components/announcements/EditorAnnouncementBanner";
 import { Toaster } from "@/components/ui/toast";
 import type { useI18n } from "@/contexts/I18nContext";
@@ -109,6 +110,21 @@ export function EditorShell(props: Props) {
 		previewAspectRatioValue,
 	} = props;
 	const library = useRecordingLibrary(project, timeline, ui, appearance);
+	useAutomation({
+		project,
+		timeline,
+		ui,
+		controller: projectController,
+		isPreviewReady: ui.isPreviewReady,
+		renderContext: {
+			cursorTelemetry: editing.cursor.normalizedCursorTelemetry,
+			sourceAudioFallbackPaths: editing.audio.sourceAudioFallbackPaths,
+			sourceAudioFallbackStartDelayMsByPath:
+				editing.audio.sourceAudioFallbackStartDelayMsByPath,
+			sourceAudioTrackSettings: editing.audio.activeSourceAudioTrackSettings,
+			effectiveShowCursor,
+		},
+	});
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Changing the active inspector closes the Videos view.
 	useEffect(() => {
 		library.setOpen(false);

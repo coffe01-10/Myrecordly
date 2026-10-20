@@ -133,6 +133,10 @@ export default defineConfig(({ mode }) => ({
 			},
 		},
 		rollupOptions: {
+			input: {
+				main: path.resolve(__dirname, "index.html"),
+				automationRender: path.resolve(__dirname, "automation-render.html"),
+			},
 			output: {
 				manualChunks: {
 					"react-vendor": ["react", "react-dom"],

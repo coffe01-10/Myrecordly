@@ -1,5 +1,7 @@
 Language: EN | [简中](README.zh-CN.md)
 
+AI editing: [Local MCP server, TypeScript SDK and CLI](packages/automation/README.md) for inspecting media, batch editing, previewing, undoing and exporting videos.
+
 <p align="center">
   <img width="220" alt="Recordly Logo" src="https://github.com/user-attachments/assets/414b8838-6731-45d4-a815-6e3c0aa1fe52" />
 </p>

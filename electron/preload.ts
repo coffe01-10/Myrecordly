@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import type { RecordingSessionData } from "./ipc/types";
 import type { DriveTransfer } from "../src/types/googleDrive";
 import type { SmartCutRequest } from "../src/types/smartCut";
+import type { AutomationRequest, AutomationResponse } from "../packages/automation/src/types";
 
 type NativeVideoExportWriteResult = { success: boolean; error?: string };
 type NativeVideoAudioMuxMetrics = {
@@ -186,6 +187,16 @@ function settleNativeVideoExportPendingRequests(
 }
 
 contextBridge.exposeInMainWorld("electronAPI", {
+	onAutomationRequest: (callback: (request: AutomationRequest) => void) => {
+		const listener = (_event: Electron.IpcRendererEvent, request: AutomationRequest) =>
+			callback(request);
+		ipcRenderer.on("automation:request", listener);
+		return () => ipcRenderer.removeListener("automation:request", listener);
+	},
+	automationResponse: (response: AutomationResponse) =>
+		ipcRenderer.send("automation:response", response),
+	automationReady: () => ipcRenderer.send("automation:ready"),
+	automationProgress: (progress: unknown) => ipcRenderer.send("automation:progress", progress),
 	hudOverlaySetIgnoreMouse: (ignore: boolean) => {
 		ipcRenderer.send("hud-overlay-set-ignore-mouse", ignore);
 	},

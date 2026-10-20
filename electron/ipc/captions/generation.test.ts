@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import path from "node:path";
 
 const mocks = vi.hoisted(() => ({
 	exec: vi.fn(),
@@ -66,7 +67,8 @@ beforeEach(() => {
 	mocks.rm.mockResolvedValue(undefined);
 });
 
-const whisperCalls = () => mocks.exec.mock.calls.filter(([file]) => file === "/whisper");
+const whisperCalls = () =>
+	mocks.exec.mock.calls.filter(([file]) => file === path.resolve("/whisper"));
 
 describe("caption generation pipeline", () => {
 	it("transcribes both sidecars independently, preserving the microphone delay", async () => {
@@ -120,7 +122,7 @@ describe("caption generation pipeline", () => {
 
 	it("retries SRT only for a runtime that rejects full JSON", async () => {
 		mocks.exec.mockImplementation(async (file: string, args: string[]) => {
-			if (file === "/whisper" && args.includes("-ojf"))
+			if (file === path.resolve("/whisper") && args.includes("-ojf"))
 				throw new Error("unknown argument: -ojf");
 			return { stderr: "" };
 		});
@@ -135,6 +137,36 @@ describe("caption generation pipeline", () => {
 			return { stderr: "" };
 		});
 		expect((await generateAutoCaptionsFromVideo(options)).cues[0].text).toBe("Hello world.");
+	});
+	it("aborts extraction without trying more sources and removes temporary files", async () => {
+		const controller = new AbortController();
+		mocks.exec.mockImplementation(async () => {
+			controller.abort(new Error("Extraction canceled"));
+			throw new Error("Process aborted");
+		});
+		await expect(
+			generateAutoCaptionsFromVideo({ ...options, signal: controller.signal }),
+		).rejects.toThrow("Extraction canceled");
+		expect(mocks.exec).toHaveBeenCalledTimes(1);
+		expect(mocks.rm).toHaveBeenCalledTimes(3);
+	});
+	it("passes cancellation to Whisper and does not retry a canceled process", async () => {
+		const controller = new AbortController();
+		mocks.exec.mockImplementation(
+			async (file: string, _args: string[], processOptions: { signal?: AbortSignal }) => {
+				if (file === path.resolve("/whisper")) {
+					expect(processOptions.signal).toBe(controller.signal);
+					controller.abort();
+					throw new Error("Whisper canceled");
+				}
+				return { stderr: "" };
+			},
+		);
+		await expect(
+			generateAutoCaptionsFromVideo({ ...options, signal: controller.signal }),
+		).rejects.toThrow("Whisper canceled");
+		expect(whisperCalls()).toHaveLength(1);
+		expect(mocks.rm).toHaveBeenCalledTimes(3);
 	});
 });
 

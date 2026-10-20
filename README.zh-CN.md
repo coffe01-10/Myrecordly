@@ -1,5 +1,7 @@
 语言: [EN](README.md) | 简中
 
+AI 自动剪辑：[本地 MCP、TypeScript SDK 与 CLI 接入说明](packages/automation/README.md)。支持读取素材、批量编辑、预览、撤销和导出。
+
 <p align="center">
   <img width="220" alt="Recordly Logo" src="https://github.com/user-attachments/assets/414b8838-6731-45d4-a815-6e3c0aa1fe52" />
 </p>

@@ -1,4 +1,5 @@
 import { createSaveBeforeCloseController } from "./saveBeforeClose";
+import { startRecordlyAutomation } from "./automation";
 import { clearRecordingTrashUndo } from "./ipc/recording/library";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -67,6 +68,8 @@ import {
 
 const electronMainDir = path.dirname(fileURLToPath(import.meta.url));
 const IS_SMOKE_EXPORT = process.env.RECORDLY_SMOKE_EXPORT === "1";
+const IS_AUTOMATION =
+	process.env.RECORDLY_AUTOMATION === "1" || process.argv.includes("--automation");
 
 function ignoreBrokenConsolePipe(stream: NodeJS.WritableStream | undefined) {
 	stream?.on("error", (error: NodeJS.ErrnoException) => {
@@ -1093,6 +1096,23 @@ app.whenReady().then(async () => {
 		return { success: true };
 	});
 
+	if (IS_AUTOMATION) {
+		const automation = await startRecordlyAutomation({
+			getEditor: () => getExistingEditorWindow() ?? createEditorWindowWrapper()!,
+			rendererDir: RENDERER_DIST,
+			preloadPath: path.join(MAIN_DIST, "preload.mjs"),
+			devUrl: VITE_DEV_SERVER_URL,
+		});
+		let stoppingAutomation = false;
+		app.on("before-quit", (event) => {
+			if (stoppingAutomation) return;
+			stoppingAutomation = true;
+			event.preventDefault();
+			void automation.close().finally(() => app.quit());
+		});
+		createEditorWindowWrapper();
+		return;
+	}
 	if (IS_SMOKE_EXPORT || process.env.RECORDLY_DEV_OPEN_RECORDING_INPUT) {
 		await logSmokeExportGpuDiagnostics();
 		if (IS_SMOKE_EXPORT) {

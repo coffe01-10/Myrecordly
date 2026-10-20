@@ -35,6 +35,8 @@ export function useEditorHistory({
 		annotationRegions,
 		audioRegions,
 		autoCaptions,
+		autoCaptionSettings,
+		setAutoCaptionSettings,
 		selectedZoomId,
 		selectedClipId,
 		selectedAnnotationId,
@@ -66,6 +68,7 @@ export function useEditorHistory({
 	}, []);
 	const buildSnapshot = useCallback(
 		(): EditorHistorySnapshot => ({
+			autoCaptionSettings,
 			sourceAudioTrackSettingsByClip,
 			zoomRegions,
 			clipRegions,
@@ -79,6 +82,7 @@ export function useEditorHistory({
 			selectedAudioId,
 		}),
 		[
+			autoCaptionSettings,
 			sourceAudioTrackSettingsByClip,
 			zoomRegions,
 			clipRegions,
@@ -96,6 +100,7 @@ export function useEditorHistory({
 		(snapshot: EditorHistorySnapshot) => {
 			applyingRef.current = true;
 			const cloned = cloneStructured(snapshot);
+			if (cloned.autoCaptionSettings) setAutoCaptionSettings(cloned.autoCaptionSettings);
 			setSourceAudioTrackSettingsByClip(cloned.sourceAudioTrackSettingsByClip ?? {});
 			setZoomRegions(cloned.zoomRegions);
 			setClipRegions(cloned.clipRegions);
@@ -129,6 +134,7 @@ export function useEditorHistory({
 		},
 		[
 			setSourceAudioTrackSettingsByClip,
+			setAutoCaptionSettings,
 			setZoomRegions,
 			setClipRegions,
 			setSpeedRegions,

@@ -1,7 +1,10 @@
 import path from "node:path";
 import { app } from "electron";
 
-if (process.env["VITE_DEV_SERVER_URL"]) {
+if (process.env.RECORDLY_AUTOMATION_USER_DATA) {
+	app.setPath("userData", path.resolve(process.env.RECORDLY_AUTOMATION_USER_DATA));
+	app.setPath("sessionData", path.join(app.getPath("userData"), "session"));
+} else if (process.env["VITE_DEV_SERVER_URL"]) {
 	const devUserDataPath = path.join(app.getPath("appData"), "Recordly-dev");
 	app.setPath("userData", devUserDataPath);
 	app.setPath("sessionData", path.join(devUserDataPath, "session"));

@@ -218,6 +218,16 @@ interface RendererExportHardwareInfo {
 
 interface Window {
 	electronAPI: {
+		onAutomationRequest: (
+			callback: (
+				request: import("../packages/automation/src/types").AutomationRequest,
+			) => void,
+		) => () => void;
+		automationResponse: (
+			response: import("../packages/automation/src/types").AutomationResponse,
+		) => void;
+		automationReady: () => void;
+		automationProgress: (progress: unknown) => void;
 		hudOverlaySetIgnoreMouse: (ignore: boolean) => void;
 		hudOverlaySetSourceSelectionActive: (active: boolean) => void;
 		hudOverlayDrag: (phase: "start" | "move" | "end", screenX: number, screenY: number) => void;

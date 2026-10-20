@@ -30,11 +30,13 @@ const execFileAsync = promisify(execFile);
 
 class NoCaptionAudioError extends Error {}
 
-async function executeWhisper(whisperExecutablePath: string, args: string[]) {
+async function executeWhisper(whisperExecutablePath: string, args: string[], signal?: AbortSignal) {
 	try {
 		await execFileAsync(whisperExecutablePath, args, {
 			timeout: 30 * 60 * 1000,
 			maxBuffer: 20 * 1024 * 1024,
+			signal,
+			windowsHide: true,
 		});
 	} catch (error) {
 		if (isMissingWindowsWhisperRuntimeDependency(error)) {
@@ -146,6 +148,7 @@ export async function resolveCaptionAudioCandidates(videoPath: string) {
 }
 
 export async function extractCaptionAudioSource(options: {
+	signal?: AbortSignal;
 	videoPath: string;
 	ffmpegPath: string;
 	wavPath: string;
@@ -185,11 +188,17 @@ export async function extractCaptionAudioSource(options: {
 					"pcm_s16le",
 					options.wavPath,
 				],
-				{ timeout: 5 * 60 * 1000, maxBuffer: 20 * 1024 * 1024 },
+				{
+					timeout: 5 * 60 * 1000,
+					maxBuffer: 20 * 1024 * 1024,
+					signal: options.signal,
+					windowsHide: true,
+				},
 			);
 			attemptedCandidates.push({ ...candidate, readable: true, extractedAudio: true });
 			return candidate;
 		} catch (error) {
+			options.signal?.throwIfAborted();
 			attemptedCandidates.push({
 				...candidate,
 				readable: true,
@@ -210,6 +219,7 @@ export async function extractCaptionAudioSource(options: {
 }
 
 export async function detectSilenceIntervals(options: {
+	signal?: AbortSignal;
 	ffmpegPath: string;
 	wavPath: string;
 }): Promise<SilenceInterval[]> {
@@ -227,13 +237,19 @@ export async function detectSilenceIntervals(options: {
 			"null",
 			"-",
 		],
-		{ timeout: 5 * 60 * 1000, maxBuffer: 20 * 1024 * 1024 },
+		{
+			timeout: 5 * 60 * 1000,
+			maxBuffer: 20 * 1024 * 1024,
+			signal: options.signal,
+			windowsHide: true,
+		},
 	);
 
 	return parseSilenceIntervals(stderr ?? "");
 }
 
 async function generateCaptionsForSource(options: {
+	signal?: AbortSignal;
 	videoPath: string;
 	whisperExecutablePath?: string;
 	whisperModelPath: string;
@@ -266,6 +282,7 @@ async function generateCaptionsForSource(options: {
 			ffmpegPath,
 			wavPath,
 			candidates: options.candidates,
+			signal: options.signal,
 		});
 
 		const language =
@@ -288,7 +305,11 @@ async function generateCaptionsForSource(options: {
 
 		let jsonEnabled = true;
 		try {
-			await executeWhisper(whisperExecutablePath, [...whisperBaseArgs, "-ojf"]);
+			await executeWhisper(
+				whisperExecutablePath,
+				[...whisperBaseArgs, "-ojf"],
+				options.signal,
+			);
 		} catch (error) {
 			if (!shouldRetryWhisperWithoutJson(error)) {
 				throw error;
@@ -299,7 +320,7 @@ async function generateCaptionsForSource(options: {
 				"[auto-captions] Whisper runtime does not support JSON full output, retrying with SRT only:",
 				error,
 			);
-			await executeWhisper(whisperExecutablePath, whisperBaseArgs);
+			await executeWhisper(whisperExecutablePath, whisperBaseArgs, options.signal);
 		}
 
 		const cues = await readWhisperCaptionOutput(outputBase, jsonEnabled);
@@ -310,12 +331,17 @@ async function generateCaptionsForSource(options: {
 		// Failure here must not block caption generation — fall back to raw.
 		let cuesToReturn = cues;
 		try {
-			const silences = await detectSilenceIntervals({ ffmpegPath, wavPath });
+			const silences = await detectSilenceIntervals({
+				ffmpegPath,
+				wavPath,
+				signal: options.signal,
+			});
 			// An empty result is a valid resegmentation (e.g. every transcribed word fell
 			// inside a long detected silence and was dropped as a hallucination), so take it
 			// as-is. Only a thrown exception should fall back to the raw cues.
 			cuesToReturn = segmentCuesIntoPhrases(cues, silences);
 		} catch (error) {
+			options.signal?.throwIfAborted();
 			console.warn(
 				"[auto-captions] Silence-aware re-segmentation failed, using raw cues:",
 				error,
@@ -336,6 +362,7 @@ async function generateCaptionsForSource(options: {
 }
 
 export async function generateAutoCaptionsFromVideo(options: {
+	signal?: AbortSignal;
 	videoPath: string;
 	whisperExecutablePath?: string;
 	whisperModelPath: string;
