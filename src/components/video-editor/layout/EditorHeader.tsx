@@ -24,6 +24,9 @@ import { EditorPresetMenu } from "./EditorPresetMenu";
 const SHOW_PRESETS_BUTTON = false;
 
 type Props = {
+	smartCutOpen: boolean;
+	smartCutDisabled: boolean;
+	onToggleSmartCut: () => void;
 	clipsOpen: boolean;
 	onToggleClips: () => void;
 	t: ReturnType<typeof useI18n>["t"];
@@ -192,6 +195,16 @@ export function EditorHeader(props: Props) {
 				>
 					<FilmStrip weight={props.clipsOpen ? "fill" : "regular"} className="size-4" />
 					{t("editor.clips.title", "Clips")}
+				</Button>
+				<Button
+					variant={props.smartCutOpen ? "secondary" : "ghost"}
+					size="sm"
+					className="h-9 shrink-0"
+					aria-expanded={props.smartCutOpen}
+					disabled={props.smartCutDisabled}
+					onClick={props.onToggleSmartCut}
+				>
+					{t("editor.smartCut.title", "Smart cut")}
 				</Button>
 			</div>
 

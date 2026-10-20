@@ -1,3 +1,4 @@
+import type { SourceAudioTrackSettings } from "./audio/audioTypes";
 import type {
 	AnnotationRegion,
 	AudioRegion,
@@ -8,6 +9,7 @@ import type {
 } from "./types";
 
 export type EditorHistorySnapshot = {
+	sourceAudioTrackSettingsByClip?: Record<string, SourceAudioTrackSettings>;
 	zoomRegions: ZoomRegion[];
 	clipRegions: ClipRegion[];
 	speedRegions: SpeedRegion[];

@@ -717,6 +717,10 @@ interface Window {
 				error?: string;
 			}) => void,
 		) => () => void;
+		analyzeSmartCut: (
+			options: import("../src/types/smartCut").SmartCutRequest,
+		) => Promise<import("../src/types/smartCut").SmartCutAnalysisResult>;
+		cancelSmartCut: (requestId: string) => Promise<void>;
 		generateAutoCaptions: (options: {
 			videoPath: string;
 			whisperExecutablePath?: string;

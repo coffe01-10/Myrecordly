@@ -8,7 +8,17 @@ import { useRecordingLibrary } from "../library/useRecordingLibrary";
 import { RecordingLibraryPanel } from "../library/RecordingLibraryPanel";
 import { RECORDING_DRAG_TYPE } from "@/types/recordingLibrary";
 import { Button } from "@/components/ui/button";
-import { useCallback, useMemo, useEffect, useRef, useState, type ComponentProps } from "react";
+import {
+	lazy,
+	Suspense,
+	useCallback,
+	useMemo,
+	useEffect,
+	useRef,
+	useState,
+	type ComponentProps,
+} from "react";
+import { useSmartCut } from "../smartCut/useSmartCut";
 import { EditorAnnouncementBanner } from "@/components/announcements/EditorAnnouncementBanner";
 import { Toaster } from "@/components/ui/toast";
 import type { useI18n } from "@/contexts/I18nContext";
@@ -31,6 +41,8 @@ import { EditorHeader } from "./EditorHeader";
 import { EditorPreviewPanel } from "./EditorPreviewPanel";
 import { EditorSidebar } from "./EditorSidebar";
 import { EditorTimelinePanel } from "./EditorTimelinePanel";
+
+const SmartCutPanel = lazy(() => import("../smartCut/SmartCutPanel"));
 
 type Props = {
 	t: ReturnType<typeof useI18n>["t"];
@@ -136,6 +148,16 @@ export function EditorShell(props: Props) {
 		handleAutoSuggestZoomsConsumed,
 	} = editing;
 	const { dialogActions, status: exportStatus, exportMessage } = exportController;
+	const smartCut = useSmartCut(
+		project.videoSourcePath,
+		timeline,
+		ui,
+		cursor.normalizedCursorTelemetry,
+		playback.startPlayback,
+	);
+	useEffect(() => {
+		if (project.projectBrowserOpen) smartCut.close();
+	}, [project.projectBrowserOpen, smartCut.close]);
 	const dashboardSettingsContent = useMemo(
 		() => (
 			<SettingsPanel
@@ -256,8 +278,22 @@ export function EditorShell(props: Props) {
 	return (
 		<div className="editor-shell flex h-screen flex-col overflow-hidden bg-editor-bg text-foreground selection:bg-accent/20">
 			<EditorHeader
+				smartCutOpen={smartCut.open}
+				smartCutDisabled={
+					!ui.isPreviewReady ||
+					library.importing ||
+					exportStatus.shouldSuspendPreviewRendering
+				}
+				onToggleSmartCut={() => {
+					library.setOpen(false);
+					if (smartCut.open) smartCut.close();
+					else smartCut.setOpen(true);
+				}}
 				clipsOpen={library.open}
-				onToggleClips={() => library.setOpen((open) => !open)}
+				onToggleClips={() => {
+					smartCut.close();
+					library.setOpen((open) => !open);
+				}}
 				t={t}
 				headerLeftControlsPaddingClass={headerLeftControlsPaddingClass}
 				project={project}
@@ -346,11 +382,24 @@ export function EditorShell(props: Props) {
 						accountUser={auth.user}
 						onAccountClick={() => requestSignIn("account")}
 						panelContent={
-							library.open ? <RecordingLibraryPanel library={library} /> : undefined
+							smartCut.open ? (
+								<Suspense
+									fallback={
+										<div className="p-4" role="status">
+											{t("editor.smartCut.title", "Smart cut")}…
+										</div>
+									}
+								>
+									<SmartCutPanel cut={smartCut} />
+								</Suspense>
+							) : library.open ? (
+								<RecordingLibraryPanel library={library} />
+							) : undefined
 						}
 						t={t}
 						activeSection={ui.activeEffectSection}
 						setActiveSection={(section) => {
+							smartCut.close();
 							library.setOpen(false);
 							timeline.setSelectedAnnotationId(null);
 							timeline.setSelectedZoomId(null);

@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { RecordingSessionData } from "./ipc/types";
 import type { DriveTransfer } from "../src/types/googleDrive";
+import type { SmartCutRequest } from "../src/types/smartCut";
 
 type NativeVideoExportWriteResult = { success: boolean; error?: string };
 type NativeVideoAudioMuxMetrics = {
@@ -757,6 +758,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.on("whisper-small-model-download-progress", listener);
 		return () => ipcRenderer.removeListener("whisper-small-model-download-progress", listener);
 	},
+	analyzeSmartCut: (options: SmartCutRequest) => ipcRenderer.invoke("analyze-smart-cut", options),
+	cancelSmartCut: (requestId: string) => ipcRenderer.invoke("cancel-smart-cut", requestId),
 	generateAutoCaptions: (options: {
 		videoPath: string;
 		whisperExecutablePath?: string;

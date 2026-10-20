@@ -12,6 +12,8 @@ import { LEGACY_PROJECT_FILE_EXTENSIONS, PROJECT_FILE_EXTENSION } from "../const
 import { hasProjectFileExtension, loadProjectFromPath } from "../project/manager";
 import { setCurrentProjectPath } from "../state";
 import { approveUserPath, getRecordingsDir } from "../utils";
+import { analyzeSmartCut } from "../smartCut";
+import type { SmartCutRequest } from "../../../src/types/smartCut";
 
 const VIDEO_FILE_EXTENSIONS = ["webm", "mp4", "mov", "avi", "mkv"];
 const PROJECT_FILE_EXTENSIONS = [PROJECT_FILE_EXTENSION, ...LEGACY_PROJECT_FILE_EXTENSIONS];
@@ -38,6 +40,29 @@ function captionAudioSourceLabel(label: string): string {
 }
 
 export function registerCaptionHandlers() {
+	const smartCutJobs = new Map<number, { id: string; controller: AbortController }>();
+	ipcMain.handle("analyze-smart-cut", async (event, options: SmartCutRequest) => {
+		const senderId = event.sender.id;
+		smartCutJobs.get(senderId)?.controller.abort();
+		const controller = new AbortController();
+		smartCutJobs.set(senderId, { id: options.requestId, controller });
+		const cancel = () => controller.abort();
+		event.sender.once("destroyed", cancel);
+		try {
+			const analysis = await analyzeSmartCut(options.videoPath, controller.signal);
+			return { success: true, analysis };
+		} catch (error) {
+			return { success: false, canceled: controller.signal.aborted, error: String(error) };
+		} finally {
+			event.sender.removeListener("destroyed", cancel);
+			if (smartCutJobs.get(senderId)?.controller === controller)
+				smartCutJobs.delete(senderId);
+		}
+	});
+	ipcMain.handle("cancel-smart-cut", (event, requestId: string) => {
+		const job = smartCutJobs.get(event.sender.id);
+		if (job?.id === requestId) job.controller.abort();
+	});
 	ipcMain.handle("open-video-file-picker", async (_, options?: OpenVideoFilePickerOptions) => {
 		try {
 			const includeProjects = Boolean(options?.includeProjects);
