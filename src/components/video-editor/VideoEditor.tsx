@@ -231,6 +231,7 @@ export default function VideoEditor() {
 		setCurrentTime,
 		setIsPlaying,
 		setDuration,
+		uiDuration: duration,
 		whisperExecutablePath,
 		setWhisperExecutablePath,
 		whisperModelPath,

@@ -57,6 +57,7 @@ async function main() {
 			appPath: values.app,
 			userDataDir: values["user-data"],
 			connectionFile,
+			detached: true,
 		});
 		running.process.unref();
 		process.stdout.write(`${JSON.stringify({ pid: running.process.pid, connectionFile })}\n`);

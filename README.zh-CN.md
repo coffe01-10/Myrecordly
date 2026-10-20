@@ -1,6 +1,6 @@
 语言: [EN](README.md) | 简中
 
-AI 自动剪辑：[本地 MCP、TypeScript SDK 与 CLI 接入说明](packages/automation/README.md)。支持读取素材、批量编辑、预览、撤销和导出。
+AI 自动剪辑：[本地 MCP、TypeScript SDK 与 CLI 接入说明](packages/automation/README.md)。支持视频内容索引、故事板、OCR、内容搜索、局部精看与试听，以及批量剪辑、预览、保存和导出的完整任务。
 
 <p align="center">
   <img width="220" alt="Recordly Logo" src="https://github.com/user-attachments/assets/414b8838-6731-45d4-a815-6e3c0aa1fe52" />

@@ -463,6 +463,64 @@ describe("StreamingVideoDecoder decode failures", () => {
 		);
 		expect(decoder.getEffectiveDuration(undefined, undefined, clips)).toBe(1.2);
 	});
+	it("releases all frames and stops a backpressured producer when rendering fails", async () => {
+		const closedFrames: ReturnType<typeof vi.fn>[] = [];
+		const cancelRead = vi.fn();
+		let decodedChunks = 0;
+		let activeDecoder: TestDecoder;
+		mockDemuxerRead.mockImplementation(
+			() =>
+				new ReadableStream({
+					start(controller) {
+						for (let i = 0; i < 120; i++)
+							controller.enqueue({ timestamp: (i * 1_000_000) / 30 });
+						controller.close();
+					},
+					cancel: cancelRead,
+				}),
+		);
+		class TestDecoder {
+			state = "unconfigured";
+			decodeQueueSize = 0;
+			constructor(private callbacks: { output: (frame: VideoFrame) => void }) {
+				activeDecoder = this;
+			}
+			configure() {
+				this.state = "configured";
+			}
+			decode(chunk: EncodedVideoChunk) {
+				decodedChunks++;
+				const close = vi.fn();
+				closedFrames.push(close);
+				this.callbacks.output({
+					timestamp: chunk.timestamp,
+					close,
+				} as unknown as VideoFrame);
+			}
+			async flush() {}
+			close() {
+				this.state = "closed";
+			}
+		}
+		vi.stubGlobal("VideoDecoder", TestDecoder);
+		const decoder = new StreamingVideoDecoder({ maxDecodeQueue: 1, maxPendingFrames: 1 });
+		await decoder.loadMetadata("/tmp/render-failure.mp4");
+		const failure = new Error("Render target was destroyed");
+		await expect(
+			decoder.decodeAll(30, undefined, undefined, async () => {
+				// Allow the producer to fill its queue while this frame is being rendered.
+				await new Promise((resolve) => setTimeout(resolve, 0));
+				throw failure;
+			}),
+		).rejects.toBe(failure);
+		expect(decodedChunks).toBeLessThan(120);
+		expect(cancelRead).toHaveBeenCalledOnce();
+		expect(activeDecoder!.state).toBe("closed");
+		for (const close of closedFrames) expect(close).toHaveBeenCalledOnce();
+		expect(mockDemuxerRead).toHaveBeenCalledTimes(1);
+		decoder.destroy();
+		for (const close of closedFrames) expect(close).toHaveBeenCalledOnce();
+	});
 });
 
 describe("StreamingVideoDecoder local media loading", () => {

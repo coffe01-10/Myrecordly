@@ -83,6 +83,43 @@ describe("clip timeline playback", () => {
 		expect(video.play).not.toHaveBeenCalled();
 		expect(onTime).not.toHaveBeenCalled();
 	});
+	it("updates cached timing when edits replace clips during playback", async () => {
+		let clips = [{ id: "a", startMs: 0, endMs: 2000, sourceStartMs: 0, speed: 1 }];
+		const { video } = setup();
+		const onTime = vi.fn();
+		const playback = createClipPlayback({
+			video,
+			getClips: () => clips,
+			onTime,
+			onPlaying: vi.fn(),
+			onError: vi.fn(),
+		});
+		await playback.play();
+		video.currentTime = 0.5;
+		advance(500);
+		clips = [{ id: "b", startMs: 0, endMs: 1000, sourceStartMs: 5000, speed: 2 }];
+		playback.refresh();
+		expect(video.currentTime).toBe(6);
+		expect(video.playbackRate).toBe(2);
+		video.currentTime = 7;
+		advance(500);
+		expect(onTime).toHaveBeenLastCalledWith(1, 7);
+		expect(playback.isPlaying).toBe(false);
+	});
+	it("does not repeatedly assign the same native playback rate while advancing frames", async () => {
+		const { video, playback } = setup();
+		let rate = 1;
+		const setRate = vi.fn((value: number) => {
+			rate = value;
+		});
+		Object.defineProperty(video, "playbackRate", { get: () => rate, set: setRate });
+		await playback.play();
+		for (let i = 1; i <= 30; i++) {
+			video.currentTime = i / 30;
+			advance(1000 / 30);
+		}
+		expect(setRate.mock.calls).toEqual([[3]]);
+	});
 
 	it("skips a deleted middle at 3x and resumes at the retained source in-point", async () => {
 		const { video, playback, onTime } = setup();

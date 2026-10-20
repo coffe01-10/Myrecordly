@@ -8,6 +8,7 @@ import {
 import type { useEditorProjectController } from "@/components/video-editor/project/useEditorProjectController";
 import type { useProjectState } from "@/components/video-editor/state/useProjectState";
 import type { useTimelineState } from "@/components/video-editor/state/useTimelineState";
+import type { useAppearanceState } from "@/components/video-editor/state/useAppearanceState";
 import type { useEditorUiState } from "@/components/video-editor/state/useEditorUiState";
 import { applyEditCommands, timelineDuration } from "./editCommands";
 import type { RenderContext } from "./renderTypes";
@@ -15,6 +16,7 @@ import { findSmartCutCandidates } from "@/components/video-editor/smartCut/smart
 import type { SmartCutAnalysis } from "@/types/smartCut";
 
 type Input = {
+	appearance: ReturnType<typeof useAppearanceState>;
 	project: ReturnType<typeof useProjectState>;
 	timeline: ReturnType<typeof useTimelineState>;
 	ui: ReturnType<typeof useEditorUiState>;
@@ -34,17 +36,23 @@ export function useAutomation(input: Input) {
 	}
 	const snapshot = (): ProjectSnapshot => {
 		const { project, ui, timeline, controller, isPreviewReady } = current.current;
+		const durationMs = timelineDuration(timeline.clipRegions);
 		return {
 			projectId: project.lastSavedSnapshot?.projectId,
 			revision: revision.current,
 			projectPath: project.currentProjectPath,
 			sourcePath: controller.snapshot.currentSourcePath,
 			sourceDurationMs: ui.duration * 1000,
-			durationMs: timelineDuration(timeline.clipRegions),
+			durationMs,
 			ready: isPreviewReady && !project.loading,
 			error: project.error,
 			canUndo: controller.history.canUndo,
 			canRedo: controller.history.canRedo,
+			playback: {
+				timeMs: Math.round(ui.currentTime * 1000),
+				playing: ui.isPlaying,
+				durationMs,
+			},
 			clips: timeline.clipRegions,
 			editor: controller.snapshot.currentPersistedEditorState as unknown as Record<
 				string,
@@ -58,12 +66,72 @@ export function useAutomation(input: Input) {
 		if (!window.electronAPI.onAutomationRequest) return;
 		const handle = async ({ id, command, args }: AutomationRequest) => {
 			try {
-				const { controller, project, timeline, ui } = current.current;
+				const { controller, project, timeline, ui, appearance } = current.current;
 				let result: unknown;
 				switch (command) {
 					case "get_project":
 						result = snapshotRef.current();
 						break;
+					case "list_recordings": {
+						const listed = await window.electronAPI.listRecordings?.();
+						if (!listed?.success)
+							throw new Error(listed?.error ?? "Could not list recordings");
+						const recordings = listed.value;
+						result = {
+							recordings: recordings.map((item) => ({
+								path: item.path,
+								name: item.name,
+								bytes: item.bytes,
+								createdAt: item.createdAt,
+							})),
+						};
+						break;
+					}
+					case "list_projects": {
+						const listed = await window.electronAPI.listProjectFiles?.();
+						result = {
+							projectsDir: listed?.projectsDir ?? null,
+							projects: (listed?.entries ?? []).map((item) => ({
+								path: item.path,
+								name: item.name,
+								updatedAt: item.updatedAt,
+								videoPath: "videoPath" in item ? item.videoPath : undefined,
+							})),
+						};
+						break;
+					}
+					case "playback": {
+						const active = snapshotRef.current();
+						const playback = ui.videoPlaybackRef.current;
+						if (!playback) throw new Error("Video preview is still loading");
+						const action = args.action;
+						if (action === "seek") {
+							const timeMs = Number(args.timeMs);
+							if (
+								!Number.isFinite(timeMs) ||
+								timeMs < 0 ||
+								timeMs > active.durationMs
+							)
+								throw new Error("timeMs must be inside the edited timeline");
+							playback.pause();
+							playback.seekTimeline(timeMs / 1000);
+							ui.setIsPlaying(false);
+						} else if (action === "play") {
+							await playback.play();
+							ui.setIsPlaying(true);
+						} else if (action === "pause") {
+							playback.pause();
+							ui.setIsPlaying(false);
+						} else {
+							throw new Error("action must be play, pause, or seek");
+						}
+						result = {
+							timeMs: playback.timeMs,
+							playing: playback.isPlaying,
+							durationMs: active.durationMs,
+						};
+						break;
+					}
 					case "open": {
 						if (
 							controller.hasUnsavedChanges &&
@@ -115,6 +183,40 @@ export function useAutomation(input: Input) {
 							timeline.setSourceAudioTrackSettingsByClip(
 								next.sourceAudioTrackSettingsByClip ?? {},
 							);
+							appearance.setWallpaper(next.wallpaper);
+							appearance.setShadowIntensity(next.shadowIntensity);
+							appearance.setBackgroundBlur(next.backgroundBlur);
+							appearance.setZoomMotionBlur(next.zoomMotionBlur);
+							appearance.setConnectZooms(next.connectZooms);
+							appearance.setZoomInDurationMs(next.zoomInDurationMs);
+							appearance.setZoomInOverlapMs(next.zoomInOverlapMs);
+							appearance.setZoomOutDurationMs(next.zoomOutDurationMs);
+							appearance.setConnectedZoomGapMs(next.connectedZoomGapMs);
+							appearance.setConnectedZoomDurationMs(next.connectedZoomDurationMs);
+							appearance.setZoomInEasing(next.zoomInEasing);
+							appearance.setZoomOutEasing(next.zoomOutEasing);
+							appearance.setConnectedZoomEasing(next.connectedZoomEasing);
+							appearance.setShowCursor(next.showCursor);
+							appearance.setLoopCursor(next.loopCursor);
+							appearance.setCursorStyle(next.cursorStyle);
+							appearance.setCursorSize(next.cursorSize);
+							appearance.setCursorSmoothing(next.cursorSmoothing);
+							appearance.setCursorMotionBlur(next.cursorMotionBlur);
+							appearance.setCursorClickEffect(next.cursorClickEffect);
+							appearance.setCursorClickEffectColor(next.cursorClickEffectColor);
+							appearance.setCursorClickEffectScale(next.cursorClickEffectScale);
+							appearance.setCursorClickEffectOpacity(next.cursorClickEffectOpacity);
+							appearance.setCursorClickEffectDurationMs(
+								next.cursorClickEffectDurationMs,
+							);
+							appearance.setCursorClickBounce(next.cursorClickBounce);
+							appearance.setCursorClickBounceDuration(next.cursorClickBounceDuration);
+							appearance.setCursorSway(next.cursorSway);
+							appearance.setBorderRadius(next.borderRadius);
+							appearance.setPadding(next.padding);
+							appearance.setCropRegion(next.cropRegion);
+							appearance.setWebcam(next.webcam);
+							ui.setAspectRatio(next.aspectRatio);
 							timeline.setSelectedClipId(null);
 							timeline.setSelectedZoomId(null);
 							timeline.setSelectedAnnotationId(null);
@@ -123,6 +225,22 @@ export function useAutomation(input: Input) {
 						});
 						ui.videoPlaybackRef.current?.seekTimeline(0);
 						result = snapshotRef.current();
+						break;
+					}
+					case "plan_edits": {
+						const active = snapshotRef.current();
+						const editor = normalizeProjectEditor(active.editor);
+						const next = applyEditCommands(
+							editor,
+							args.edits as Edit[],
+							active.sourceDurationMs,
+						);
+						result = {
+							...active,
+							clips: next.clipRegions,
+							durationMs: timelineDuration(next.clipRegions),
+							editor: next,
+						};
 						break;
 					}
 					case "undo":

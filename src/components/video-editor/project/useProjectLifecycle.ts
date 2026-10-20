@@ -42,6 +42,7 @@ type Input = {
 	setIsPlaying: Dispatch<SetStateAction<boolean>>;
 	setCurrentTime: Dispatch<SetStateAction<number>>;
 	setDuration: Dispatch<SetStateAction<number>>;
+	uiDuration: number;
 	applySessionPresentation: (
 		session:
 			| { hideOverlayCursorByDefault?: boolean; nativeCaptureUnavailable?: boolean }
@@ -79,6 +80,7 @@ export function useProjectLifecycle(input: Input) {
 
 	const applyLoadedProject = useCallback(async (candidate: unknown, path?: string | null) => {
 		const current = inputRef.current;
+		const previousDuration = current.uiDuration;
 		const { project, appearance, timeline, refs } = current;
 		if (!validateProjectData(candidate)) return false;
 		const loadedProject = candidate;
@@ -132,7 +134,22 @@ export function useProjectLifecycle(input: Input) {
 		const videoUrl = await resolveVideoUrl(sourcePath);
 		project.setVideoSourcePath(sourcePath);
 		project.setCurrentProjectPath(path ?? null);
+		const sameMedia = project.videoPath === videoUrl;
 		project.setVideoPath(videoUrl);
+		// The same file does not fire loadedmetadata again. Keep the duration the
+		// clips already describe so source-time edits still have a range.
+		if (sameMedia || previousDuration <= 0) {
+			const knownSeconds =
+				Math.max(
+					0,
+					...editor.clipRegions.map(
+						(clip) =>
+							(clip.sourceStartMs ?? 0) +
+							Math.max(0, clip.endMs - clip.startMs) * (clip.speed || 1),
+					),
+				) / 1000;
+			if (knownSeconds > 0) current.setDuration(knownSeconds);
+		}
 
 		appearance.setWallpaper(editor.wallpaper);
 		appearance.setShadowIntensity(editor.shadowIntensity);

@@ -156,7 +156,17 @@ recordly export_video --file export.json --wait
 
 | 工具 | 输入与输出 |
 |---|---|
-| `get_project` | 当前工程、素材时长、剪后时长、clips、完整 editor、revision、ready 与撤销状态 |
+| `index_video` | 创建或复用持久内容索引，返回 jobId；结果包含 indexId、能力状态和环境说明 |
+| `get_video_index` | 分页读取带稳定片段 ID 的素材时间索引：画面文字、转写、点击、描述 |
+| `get_storyboard` | 分页返回故事板真实图片，每张图片带素材时间；offset/limit 按片段计 |
+| `search_video` | query 检索转写、OCR、描述和关键词；semantic:true 使用配置模型理解查询和事件顺序；返回片段 ID、素材区间和证据 |
+| `inspect_segment` | 按 segmentId 或素材 startMs/endMs 精看，最多 30 秒；连续图片、局部放大、真实音频 |
+| `annotate_video` | 把外部 AI 对图片的理解写回指定片段，供后续搜索与剪辑使用 |
+| `run_edit_task` | 规划、批量剪辑、可选字幕/点击缩放/保存/预览/导出，一次撤销整个编辑批次 |
+| `list_recordings` | 本机录制文件：路径、名称、大小、时间 |
+| `list_projects` | 已保存的 `.recordly` 工程和工程目录 |
+| `playback` | `play`、`pause`，或按时间轴 `seek`（`timeMs`） |
+| `get_project` | 当前工程、素材时长、剪后时长、clips、完整 editor、播放位置、revision、ready 与撤销状态 |
 | `open_project` | 打开视频或 `.recordly` 工程，等待预览就绪；先保存现有未保存编辑 |
 | `save_project` | 保存可编辑 `.recordly` 工程，保留工程 ID；新路径覆盖已有文件需 `overwrite: true` |
 | `apply_edits` | `expectedRevision` 与 `edits`；一批操作原子提交、一次撤销 |
@@ -178,10 +188,15 @@ recordly export_video --file export.json --wait
 | `speed` | timeBase + startMs/endMs + speed，0.25～4 倍绝对速度，后续片段与关联效果随之移动 |
 | `reorder` | clipId + index，调整片段顺序 |
 | `mute` | clipId + muted，静音或取消静音 |
-| `caption` | startMs/endMs + text，**素材时间**，随剪辑投射到时间轴 |
+| `caption` | startMs/endMs + text。默认是素材时间；`timeBase: "timeline"` 按剪后时间轴换算到素材时间 |
 | `zoom` | startMs/endMs + depth（1～6）+ cx/cy（0～1），时间轴位置 |
 | `text` | startMs/endMs + text；可选 x/y（0～100）、fontSize、color，时间轴位置 |
 | `remove_effect` | id，删除字幕、缩放或文字标注 |
+| `annotation` | kind 为 text、image、figure、blur；时间轴 startMs/endMs；可带位置、尺寸、颜色、箭头或模糊强度 |
+| `audio` | audioPath + startMs/endMs，可选 volume（0～1）和 normalize |
+| `audio_volume` | id 改导入音频，或 clipId 改片段原声音量 |
+| `remove_audio` | id，删除一条导入音频 |
+| `set_appearance` | 画面、光标、缩放过渡、裁剪、边距、画幅、摄像头和字幕样式。字段与工程 editor 相同 |
 
 一批操作按顺序执行，后一个操作读取前一个操作修改后的时间轴。针对原视频的多个剪切通常使用 `timeBase: "source"`，避免前一次删除导致后续时间点错位。同一段原素材重复出现时，source 区间作用于每次出现；只编辑其中一次时使用 timeline 区间。
 
@@ -190,6 +205,60 @@ recordly export_video --file export.json --wait
 音频静音只表示候选停顿。没有光标记录时活动为 unknown，不能据此认定没有操作。转写需要本地 Whisper 模型；缺失时任务明确失败，其余工具继续可用。模型不会由接口自动下载。
 
 导出支持 MP4、24/30/60 fps；不指定尺寸时使用工程画幅和默认导出质量。已存在的输出必须明确传入 `overwrite: true`；原视频、摄像头、工程及正在使用的音频文件不能作为导出覆盖目标。
+
+## 视频理解与自主剪辑
+
+推荐外部 AI 工作流：`index_video` → `get_storyboard` → `search_video` / `inspect_segment` → `annotate_video` → `run_edit_task`。读完整体故事板，再针对短暂弹窗、动作过程或小字增加连续帧、局部放大与试听。索引描述来自模型或外部 AI 时标记 descriptionSource，未分析的画面不会自动编造描述。
+
+```ts
+const job = await recordly.indexVideo({ path: "D:/Videos/demo.mp4" });
+const { result } = await recordly.waitForJob<{ indexId: string }>(job.jobId);
+const { indexId } = result;
+const page = await recordly.getVideoIndex({ indexId, offset: 0, limit: 20 });
+const board = await recordly.getStoryboard({ indexId, offset: 0, limit: 4 });
+const matches = await recordly.searchVideo({ indexId, query: "导出失败" });
+const detail = await recordly.inspectSegment({
+  indexId, segmentId: matches.hits[0].segmentId,
+  frameCount: 12, audio: true,
+  crop: { x: 0.2, y: 0.1, width: 0.6, height: 0.7 },
+});
+// AI 查看 board/detail 的图片和音频后，保存实际观察。
+await recordly.annotateVideo({ indexId, observations: [{
+  segmentId: matches.hits[0].segmentId,
+  description: "导出对话框显示磁盘空间不足。", keywords: ["导出", "失败", "磁盘"],
+}] });
+// 外部 AI 根据真实内容选择片段；goal 是任务说明，选择模式按 segmentIds 执行。
+const task = await recordly.runEditTask({
+  indexId, goal: "只保留这次操作的关键过程，添加字幕和点击缩放",
+  mode: "selected", segmentIds: [page.segments[0].id, page.segments[1].id],
+  addCaptions: true, zoomClicks: true,
+  projectPath: "D:/Videos/demo-edited.recordly",
+  previewPath: "D:/Videos/demo-preview.mp4",
+  outputPath: "D:/Videos/demo-final.mp4",
+});
+await recordly.waitForJob(task.jobId);
+```
+
+SDK/CLI 的图片、音频为 base64；MCP 直接返回原生 image/audio 内容块。`get_storyboard` 每页默认 4 个片段、最多 8 个，每个片段包含 3 张图。`inspect_segment` 默认 8 帧、最多 16 帧，crop 使用原图归一化坐标。它返回素材画面与音频；检查剪后画面仍用 `render_preview`，再通过 `get_frames` 读取成片。
+
+索引以 RGB 画面切换分段，长静态画面每段最多 15 秒。默认尝试 Windows 系统 OCR、已有 Whisper 模型；可用 `ocr: false` / `transcribe: false` 关闭，也可用 `transcript: [{startMs,endMs,text}]` 提供已有转写。缺少 OCR 语言或 Whisper 模型会记录在 capabilities/notes，其余索引照常完成。试听混合可用的独立麦克风和系统音轨，并应用录制偏移，系统独立音轨会替代重复的内嵌音轨。
+
+索引保存在当前实例用户目录的 `video-index/`：JSON 与关键帧用于后续重复读取，不是临时文件。按素材路径、大小与修改时间复用；`refresh: true` 重新分析并生成新索引，旧索引 ID 保留。未完成的分析任务会删除自己生成的图像目录。默认搜索是中文双字词/英文词与常见操作同义词检索；设置 `semantic: true` 后，配置的模型根据索引证据理解查询并排序，可处理同义表达和事件顺序，返回 `retrieval: "model"`。两种模式都使用真实片段 ID 和素材时间；语义模式会把索引文字发送到所配置的服务，不会暗中启用未配置的向量模型。
+
+应用内自动看图/规划可选接入兼容 Chat Completions 的视觉模型服务（例如本机 Qwen 服务）。在启动 Recordly **之前**设置：
+
+```powershell
+$env:RECORDLY_VISION_BASE_URL = "http://127.0.0.1:8000/v1"
+$env:RECORDLY_VISION_MODEL = "your-vision-model"
+# 需要鉴权的服务再设置 RECORDLY_VISION_API_KEY。
+recordly start --executable "C:/Apps/Recordly/Recordly.exe"
+```
+
+`index_video({vision:true})` 才把关键帧发送给配置的服务以生成描述；默认不外发画面。随后 `run_edit_task({indexId,goal})` 自动根据索引规划。当前使用时间标记图片序列理解画面，没有直接向模型传原始视频。模型需要支持 image_url 与 JSON object 输出。模型服务出错会如实记录，不会将失败伪装成“看懂了”。
+
+无额外模型服务时，外部 AI 可直接看 MCP 图片，使用 `annotate_video`，并传 `edits` 或 `mode:"selected"` 执行完整任务；`mode:"remove_pauses"` 复用现有静音与光标活动分析，只删除被识别为空闲的静音候选。`targetDurationMs` 通过调整速度缩短所选片段，最高 4 倍；达不到目标会在结果 notes 中说明。任务不会按任意 goal 文本假装完成语义规划。
+
+编辑批次一次提交、一次撤销；预览、保存和导出直接继续执行，无额外确认。取消任务会停止剩余阶段，已经提交的时间轴编辑保留并可撤销。导出仍使用当前编辑器的画幅、字幕和效果。任务是本次应用实例的后台作业，应用退出后不会自动继续；内容索引会保留。
 
 ## 测试
 

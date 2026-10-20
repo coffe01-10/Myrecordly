@@ -19,6 +19,47 @@ const editor = () =>
 		sourceAudioTrackSettingsByClip: { a: { embedded: { volume: 0.4, muted: false } } },
 	});
 describe("automation edit batches", () => {
+	it("maps captions beginning at source zero and selects the correct side of a source cut", () => {
+		const input = normalizeProjectEditor({
+			clipRegions: [
+				{ id: "a", startMs: 0, endMs: 1000, sourceStartMs: 0, speed: 1 },
+				{ id: "b", startMs: 1000, endMs: 2000, sourceStartMs: 4000, speed: 1 },
+			],
+		});
+		const next = applyEditCommands(
+			input,
+			[
+				{ type: "caption", timeBase: "timeline", startMs: 0, endMs: 500, text: "开始" },
+				{
+					type: "caption",
+					timeBase: "timeline",
+					startMs: 1000,
+					endMs: 1500,
+					text: "切换后",
+				},
+			],
+			5000,
+		);
+		expect(next.autoCaptions.map(({ startMs, endMs }) => [startMs, endMs])).toEqual([
+			[0, 500],
+			[4000, 4500],
+		]);
+		expect(() =>
+			applyEditCommands(
+				input,
+				[
+					{
+						type: "caption",
+						timeBase: "timeline",
+						startMs: 500,
+						endMs: 1500,
+						text: "跨片段",
+					},
+				],
+				5000,
+			),
+		).toThrow("inside one timeline clip");
+	});
 	it("maps source deletion through sped/repeated footage and ripples effects and audio", () => {
 		const next = applyEditCommands(
 			editor(),
@@ -89,6 +130,50 @@ describe("automation edit batches", () => {
 		});
 		expect(next.zoomRegions).toHaveLength(1);
 		expect(next.zoomRegions[0].focus).toEqual({ cx: 0.2, cy: 0.7 });
+	});
+	it("adds annotations and audio, changes appearance, and updates clip volume", () => {
+		const next = applyEditCommands(
+			editor(),
+			[
+				{
+					type: "annotation",
+					kind: "figure",
+					startMs: 100,
+					endMs: 800,
+					arrow: "right",
+					color: "#ff0000",
+				},
+				{ type: "audio", audioPath: "voice.wav", startMs: 0, endMs: 1000, volume: 0.5 },
+				{ type: "audio_volume", clipId: "a", volume: 0.2 },
+				{
+					type: "set_appearance",
+					appearance: { showCursor: false, wallpaper: "solid:#111" },
+				},
+			],
+			9000,
+			() => "added",
+		);
+		expect(next.annotationRegions[0]).toMatchObject({
+			type: "figure",
+			figureData: { arrowDirection: "right", color: "#ff0000" },
+		});
+		expect(next.audioRegions.at(-1)).toMatchObject({ audioPath: "voice.wav", volume: 0.5 });
+		expect(next.sourceAudioTrackSettingsByClip?.a.embedded).toMatchObject({ volume: 0.2 });
+		expect(next.showCursor).toBe(false);
+		expect(next.wallpaper).toBe("solid:#111");
+		expect(next.clipRegions.map((clip) => clip.id)).toEqual(["a", "b"]);
+	});
+	it("places a timeline caption onto the source time of the kept clip", () => {
+		const next = applyEditCommands(
+			editor(),
+			[{ type: "caption", timeBase: "timeline", startMs: 4500, endMs: 5500, text: "kept" }],
+			9000,
+		);
+		expect(next.autoCaptions.at(-1)).toMatchObject({
+			startMs: 500,
+			endMs: 1500,
+			text: "kept",
+		});
 	});
 	it("reorders complete clips, keeps audio duration, and mutes by stable id", () => {
 		const next = applyEditCommands(

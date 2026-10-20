@@ -368,6 +368,8 @@ export class ModernVideoExporter {
 	private lastFinalizationAudioProgress = INITIAL_FINALIZATION_PROGRESS_STATE.lastAudioProgress;
 	private lastProgressSampleTimeMs = 0;
 	private lastProgressSampleFrame = 0;
+	private lastReportedProgressFrame = 0;
+	private lastReportedProgressValue = -1;
 	private displayedRenderFps = 0;
 	private sourceVideoInfo: DecodedVideoInfo | null = null;
 	private mediaSourceRetryAttempted = false;
@@ -3314,10 +3316,10 @@ export class ModernVideoExporter {
 			phase === "preparing"
 				? 0
 				: phase === "finalizing"
-					? (safeRenderProgress ?? 100)
+					? Math.min(safeRenderProgress ?? 99, 99)
 					: totalFrames > 0
-						? (currentFrame / totalFrames) * 100
-						: 100;
+						? Math.min(95, (currentFrame / totalFrames) * 95)
+						: 95;
 
 		if (nowMs - this.lastThroughputLogTimeMs >= 1000 || currentFrame === totalFrames) {
 			const safeFrameCount = Math.max(this.processedFrameCount, 1);
@@ -3367,7 +3369,12 @@ export class ModernVideoExporter {
 			this.lastProgressSampleFrame = currentFrame;
 		}
 
-		if (this.config.onProgress) {
+		const progressMoved =
+			currentFrame - this.lastReportedProgressFrame >= 15 ||
+			Math.floor(percentage) > this.lastReportedProgressValue;
+		if (this.config.onProgress && (progressMoved || currentFrame === totalFrames || phase !== "extracting")) {
+			this.lastReportedProgressFrame = currentFrame;
+			this.lastReportedProgressValue = Math.floor(percentage);
 			this.config.onProgress({
 				currentFrame,
 				totalFrames,

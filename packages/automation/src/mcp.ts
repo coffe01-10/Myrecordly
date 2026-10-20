@@ -5,6 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { RecordlyClient } from "./index.js";
 import { tools } from "./tools.js";
 import type { ToolName } from "./types.js";
+import { mediaToolResult } from "./mediaResult.js";
 
 const { values } = parseArgs({
 	options: { connection: { type: "string" }, help: { type: "boolean" } },
@@ -24,7 +25,17 @@ if (values.help) {
 				description,
 				inputSchema: schema.shape,
 				annotations: {
-					readOnlyHint: ["get_project", "get_frames", "get_job"].includes(name),
+					readOnlyHint: [
+						"get_project",
+						"get_frames",
+						"get_job",
+						"list_recordings",
+						"list_projects",
+						"get_video_index",
+						"get_storyboard",
+						"search_video",
+						"inspect_segment",
+					].includes(name),
 					destructiveHint: ["save_project", "render_preview", "export_video"].includes(
 						name,
 					),
@@ -34,29 +45,12 @@ if (values.help) {
 			async (args: Record<string, unknown>) => {
 				try {
 					const result = await client.call(name, schema.parse(args) as never);
-					if (name === "get_frames") {
-						const frames = result as Awaited<ReturnType<RecordlyClient["getFrames"]>>;
-						return {
-							content: [
-								{
-									type: "text" as const,
-									text: JSON.stringify({
-										path: frames.path,
-										timeBase: frames.timeBase,
-										frames: frames.frames.map(({ timeMs, mimeType }) => ({
-											timeMs,
-											mimeType,
-										})),
-									}),
-								},
-								...frames.frames.map((frame) => ({
-									type: "image" as const,
-									mimeType: frame.mimeType,
-									data: frame.data,
-								})),
-							],
-						};
-					}
+					if (
+						name === "get_frames" ||
+						name === "get_storyboard" ||
+						name === "inspect_segment"
+					)
+						return mediaToolResult(result as Parameters<typeof mediaToolResult>[0]);
 					return {
 						content: [{ type: "text" as const, text: JSON.stringify(result) }],
 						structuredContent: result as unknown as Record<string, unknown>,

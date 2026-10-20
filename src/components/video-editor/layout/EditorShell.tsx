@@ -111,6 +111,7 @@ export function EditorShell(props: Props) {
 	} = props;
 	const library = useRecordingLibrary(project, timeline, ui, appearance);
 	useAutomation({
+		appearance,
 		project,
 		timeline,
 		ui,

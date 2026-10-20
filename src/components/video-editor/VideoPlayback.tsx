@@ -290,6 +290,7 @@ interface VideoPlaybackProps {
 
 export interface VideoPlaybackRef {
 	readonly isPlaying: boolean;
+	readonly timeMs: number;
 	seekTimeline: (time: number) => void;
 	video: HTMLVideoElement | null;
 	app: Application | null;
@@ -1105,6 +1106,9 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		useImperativeHandle(ref, () => ({
 			get isPlaying() {
 				return playbackCommands.isPlaying;
+			},
+			get timeMs() {
+				return playbackCommands.timeMs;
 			},
 			seekTimeline: playbackCommands.seekTimeline,
 			video: videoRef.current,

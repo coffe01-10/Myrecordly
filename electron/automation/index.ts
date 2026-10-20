@@ -2,7 +2,14 @@ import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { BrowserWindow, ipcMain, app } from "electron";
-import type { ProjectSnapshot, RenderOptions } from "../../packages/automation/src/types";
+import type {
+	Edit,
+	EditTaskOptions,
+	EditTaskResult,
+	ProjectSnapshot,
+	RenderOptions,
+	ToolArguments,
+} from "../../packages/automation/src/types";
 import type { RenderSnapshot } from "../../src/automation/renderTypes";
 import { startAutomationBridge } from "./bridge";
 import { createAutomationTransport } from "./rendererTransport";
@@ -15,6 +22,9 @@ import { hasProjectFileExtension, loadProjectFromPath } from "../ipc/project/man
 import { writeProjectFileAtomically } from "../ipc/project/atomicSave";
 import { approveUserPath } from "../ipc/utils";
 import { ensurePackagedRendererServer } from "../rendererServer";
+import { VideoIndexLibrary } from "./videoIndex";
+import { planVideoTask } from "./editTask";
+import type { SmartCutCandidate } from "../../src/components/video-editor/smartCut/smartCutPlan";
 
 export async function startRecordlyAutomation(options: {
 	getEditor: () => BrowserWindow;
@@ -24,8 +34,14 @@ export async function startRecordlyAutomation(options: {
 }) {
 	const transport = createAutomationTransport();
 	const jobs = new AutomationJobs();
+	const library = new VideoIndexLibrary(path.join(app.getPath("userData"), "video-index"));
 	const workers = new Set<BrowserWindow>();
 	let editorQueue: Promise<unknown> = Promise.resolve();
+	const enqueue = <T>(run: () => Promise<T>) => {
+		const result = editorQueue.then(run);
+		editorQueue = result.catch(() => undefined);
+		return result;
+	};
 	const send = <T>(command: string, args: Record<string, unknown> = {}) =>
 		transport.send<T>(options.getEditor().webContents, command, args);
 	const source = async (requested?: unknown) => {
@@ -131,13 +147,137 @@ export async function startRecordlyAutomation(options: {
 
 	async function call(name: string, args: Record<string, unknown>): Promise<unknown> {
 		switch (name) {
+			case "index_video": {
+				const file = await source(args.path);
+				return jobs.start("index", (signal, progress) =>
+					library.build(file, args as ToolArguments["index_video"], signal, progress),
+				);
+			}
+			case "get_video_index":
+				return library.get(args as unknown as ToolArguments["get_video_index"]);
+			case "get_storyboard":
+				return library.storyboard(args as unknown as ToolArguments["get_storyboard"]);
+			case "search_video":
+				return library.search(args as unknown as ToolArguments["search_video"]);
+			case "inspect_segment":
+				return library.inspect(args as unknown as ToolArguments["inspect_segment"]);
+			case "annotate_video":
+				return library.annotate(args as unknown as ToolArguments["annotate_video"]);
+			case "run_edit_task": {
+				const task = args as unknown as EditTaskOptions;
+				return jobs.start(
+					"edit_task",
+					async (signal, progress): Promise<EditTaskResult> => {
+						const index = await library.load(task.indexId);
+						const active = await enqueue(() => send<ProjectSnapshot>("get_project"));
+						if (active.sourcePath !== index.path)
+							throw new Error(
+								"Open the indexed source project before running this edit task",
+							);
+						const plan = await planVideoTask(index, active, task, signal, {
+							projectEdits: (edits) =>
+								enqueue(() => send<ProjectSnapshot>("plan_edits", { edits })),
+							pauseEdits: async () => {
+								const result = await enqueue(() =>
+									send<{ candidates: SmartCutCandidate[] }>(
+										"analyze_candidates",
+										{
+											sourcePath: index.path,
+											analysis: {
+												intervals: index.silences,
+												hasAudio: index.hasAudio,
+												durationMs: index.durationMs,
+											},
+										},
+									),
+								);
+								return result.candidates
+									.filter((candidate) => candidate.action === "delete")
+									.sort((a, b) => b.startMs - a.startMs)
+									.map(
+										(candidate): Edit => ({
+											type: "delete",
+											timeBase: "timeline",
+											startMs: candidate.startMs,
+											endMs: candidate.endMs,
+										}),
+									);
+							},
+						});
+						progress(25);
+						signal.throwIfAborted();
+						const captured = await enqueue(async () => {
+							const project = plan.edits.length
+								? await send<ProjectSnapshot>("apply_edits", {
+										expectedRevision: active.revision,
+										edits: plan.edits,
+									})
+								: active;
+							const context = await send<RenderSnapshot>("render_snapshot");
+							return { project, snapshot: { ...context, ...project } };
+						});
+						const snapshot = captured.snapshot;
+						const result: EditTaskResult = {
+							goal: task.goal,
+							...plan,
+							project: captured.project,
+						};
+						if (task.projectPath) {
+							const target = requirePath(task.projectPath);
+							if (path.extname(target).toLowerCase() !== ".recordly")
+								throw new Error("Project filename must end in .recordly");
+							await fs.mkdir(path.dirname(target), { recursive: true });
+							const data = {
+								version: 2,
+								projectId: snapshot.projectId ?? randomUUID(),
+								videoPath: snapshot.sourcePath,
+								editor: snapshot.editor,
+							};
+							await fs.writeFile(target, JSON.stringify(data, null, 2), {
+								flag: target === snapshot.projectPath ? "w" : "wx",
+							});
+							await enqueue(() =>
+								send("mark_saved", { path: target, project: data }),
+							);
+							result.savedPath = target;
+						}
+						progress(35);
+						if (task.previewPath && snapshot.durationMs > 0)
+							result.preview = await render(
+								snapshot,
+								{
+									outputPath: task.previewPath,
+									startMs: 0,
+									endMs: Math.min(8000, snapshot.durationMs),
+									width: 960,
+									height: 540,
+									fps: 30,
+								},
+								signal,
+								(value) => progress(35 + value * 0.25),
+							);
+						if (task.outputPath)
+							result.export = await render(
+								snapshot,
+								{ outputPath: task.outputPath },
+								signal,
+								(value) => progress(60 + value * 0.39),
+							);
+						return result;
+					},
+				);
+			}
 			case "get_project":
 			case "apply_edits":
 			case "undo":
 			case "redo":
+			case "list_recordings":
+			case "list_projects":
+			case "playback":
 				return send(name, args);
 			case "open_project": {
 				const file = requirePath(args.path);
+				let knownSourceDurationMs = 0;
 				let project: unknown;
 				let projectPath: string | null = null;
 				if (hasProjectFileExtension(file)) {
@@ -148,7 +288,8 @@ export async function startRecordlyAutomation(options: {
 					projectPath = file;
 				} else {
 					const metadata = await probeAutomationMedia(file);
-					approveUserPath(file);
+					approveUserPath(await fs.realpath(file).catch(() => file));
+					knownSourceDurationMs = metadata.durationMs;
 					project = {
 						version: 2,
 						videoPath: file,
@@ -170,7 +311,14 @@ export async function startRecordlyAutomation(options: {
 				while (Date.now() < deadline) {
 					const snapshot = await send<ProjectSnapshot>("get_project");
 					if (snapshot.error) throw new Error(snapshot.error);
-					if (snapshot.ready) return snapshot;
+					if (
+						snapshot.ready &&
+						(snapshot.sourceDurationMs > 0 || knownSourceDurationMs <= 0)
+					)
+						return {
+							...snapshot,
+							sourceDurationMs: snapshot.sourceDurationMs || knownSourceDurationMs,
+						};
 					await new Promise((resolve) => setTimeout(resolve, 100));
 				}
 				throw new Error("Video did not become ready within 60 seconds");
@@ -279,10 +427,10 @@ export async function startRecordlyAutomation(options: {
 	const bridge = await startAutomationBridge(connectionFile, async (name, args) => {
 		if (name === "get_job") return jobs.get(String(args.jobId));
 		if (name === "cancel_job") return jobs.cancel(String(args.jobId));
+		if (["get_video_index", "get_storyboard", "search_video", "inspect_segment"].includes(name))
+			return call(name, args);
 		// Order mutations and snapshots so two agents cannot interleave half an edit batch.
-		const result = editorQueue.then(() => call(name, args));
-		editorQueue = result.catch(() => undefined);
-		return result;
+		return enqueue(() => call(name, args));
 	});
 	return {
 		connectionFile,

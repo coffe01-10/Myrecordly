@@ -12,6 +12,9 @@ export function createPlaybackCommands(
 		get isPlaying() {
 			return transportRef.current?.isPlaying ?? pendingPlay ?? false;
 		},
+		get timeMs() {
+			return Math.round(timelineTimeRef.current * 1000);
+		},
 		seekTimeline(time: number) {
 			if (transportRef.current) transportRef.current.seek(time);
 			else timelineTimeRef.current = time;

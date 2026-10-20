@@ -40,7 +40,22 @@ export function createClipPlayback({
 	let lastTick = 0;
 	let activeClip: ClipRegion | null = null;
 	let playRequest = 0;
-	const duration = () => getTimelineDurationMs(getClips(), 0);
+	let cachedClips: ClipRegion[] | undefined;
+	let sortedClips: ClipRegion[] = [];
+	let durationMs = 0;
+	const readTimeline = () => {
+		const clips = getClips();
+		if (clips !== cachedClips) {
+			cachedClips = clips;
+			sortedClips = sortClipRegions(clips);
+			durationMs = getTimelineDurationMs(clips, 0);
+		}
+		return sortedClips;
+	};
+	const duration = () => {
+		readTimeline();
+		return durationMs;
+	};
 
 	const pause = () => {
 		playRequest++;
@@ -60,27 +75,32 @@ export function createClipPlayback({
 		});
 	};
 	const sync = (seek = false) => {
-		const clips = getClips();
+		const clips = readTimeline();
+		let clip = clips.find((clip) => timeMs >= clip.startMs && timeMs < clip.endMs) ?? null;
+		const last = clips[clips.length - 1];
+		if (!clip && last && Math.abs(timeMs - last.endMs) < 1e-7) clip = last;
 		// Empty timeline space is skipped during playback. Clip positions and
 		// paused seeks stay intact so editing a gap never moves source footage.
-		if (playing && !findPreviewClipAtTimelineTime(timeMs, clips)) {
-			const next = sortClipRegions(clips).find((clip) => clip.startMs > timeMs);
-			if (next) timeMs = next.startMs;
+		if (playing && !clip) {
+			const next = clips.find((clip) => clip.startMs > timeMs);
+			if (next) {
+				timeMs = next.startMs;
+				clip = next;
+			}
 		}
-		const clip = findPreviewClipAtTimelineTime(timeMs, clips);
 		const sourceMs = clip
 			? getClipSourceStartMs(clip) + (timeMs - clip.startMs) * clip.speed
 			: null;
 		if (clip && sourceMs !== null) {
-			enablePitchPreservingPlayback(video);
 			try {
-				video.playbackRate = clip.speed;
+				if (video.playbackRate !== clip.speed) video.playbackRate = clip.speed;
 			} catch (error) {
 				pause();
 				onError(error);
 				return;
 			}
 			if (seek || clip !== activeClip) {
+				enablePitchPreservingPlayback(video);
 				// Clip out-points are exclusive. At the final timeline endpoint,
 				// request a frame inside the clip, not EOF or the following footage.
 				const atEnd = timeMs >= clip.endMs - 1e-7;

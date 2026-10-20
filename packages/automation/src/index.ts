@@ -50,6 +50,36 @@ export class RecordlyClient {
 		return body.result as ToolResults[N];
 	}
 
+	listRecordings() {
+		return this.call("list_recordings", {});
+	}
+	indexVideo(options: ToolArguments["index_video"] = {}) {
+		return this.call("index_video", options);
+	}
+	getVideoIndex(options: ToolArguments["get_video_index"]) {
+		return this.call("get_video_index", options);
+	}
+	getStoryboard(options: ToolArguments["get_storyboard"]) {
+		return this.call("get_storyboard", options);
+	}
+	searchVideo(options: ToolArguments["search_video"]) {
+		return this.call("search_video", options);
+	}
+	inspectSegment(options: ToolArguments["inspect_segment"]) {
+		return this.call("inspect_segment", options);
+	}
+	annotateVideo(options: ToolArguments["annotate_video"]) {
+		return this.call("annotate_video", options);
+	}
+	runEditTask(options: ToolArguments["run_edit_task"]) {
+		return this.call("run_edit_task", options);
+	}
+	listProjects() {
+		return this.call("list_projects", {});
+	}
+	playback(action: ToolArguments["playback"]["action"], timeMs?: number) {
+		return this.call("playback", { action, ...(timeMs === undefined ? {} : { timeMs }) });
+	}
 	getProject() {
 		return this.call("get_project", {});
 	}
@@ -123,6 +153,7 @@ export class RecordlyClient {
 		connectionFile: string;
 		timeoutMs?: number;
 		onLog?: (text: string) => void;
+		detached?: boolean;
 	}): Promise<{ client: RecordlyClient; process: ChildProcess }> {
 		const child = spawn(
 			options.executable,
@@ -134,6 +165,8 @@ export class RecordlyClient {
 			{
 				windowsHide: true,
 				stdio: options.onLog ? ["ignore", "pipe", "pipe"] : "ignore",
+				// Windows closes an attached child when `recordly start` exits.
+				detached: options.detached,
 				env: {
 					...process.env,
 					ELECTRON_RUN_AS_NODE: undefined,
