@@ -9,6 +9,7 @@ import { isOwnedExportPath } from "../export/exportStream";
 import { isAllowedLocalReadPath } from "../project/manager";
 import type { DriveTicket } from "../../googleDrive/api";
 import { t } from "../../i18n";
+import { importCloudVideo } from "../../cloudStorage/importVideo";
 
 const transfers = new Map<string, AbortController>();
 const mimeTypes: Record<string, string> = {
@@ -138,35 +139,40 @@ export function registerGoogleDriveHandlers(tickets: {
 				const file = ticket.file;
 				if (!file || !/^[\w-]+$/.test(file.id))
 					throw new Error("Invalid Google Drive file.");
+				const download = async (partialPath: string) => {
+					tickets.assertTicket(ticket);
+					const response = await fetch(
+						`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
+						{
+							headers: { authorization: `Bearer ${ticket.token}` },
+							signal: controller.signal,
+						},
+					);
+					if (!response.ok || !response.body)
+						throw new Error(`Google Drive download failed (${response.status}).`);
+					const total = Number(response.headers.get("content-length") || file.size) || 0;
+					const handle = await fs.open(partialPath, "wx");
+					source = Readable.fromWeb(
+						response.body as import("node:stream/web").ReadableStream,
+					);
+					await pipeline(
+						source,
+						createProgressStream(total, reportProgress),
+						handle.createWriteStream(),
+						{
+							signal: controller.signal,
+						},
+					);
+					controller.signal.throwIfAborted();
+				};
+				if (input.destination === "library") {
+					const entry = await importCloudVideo(file.name, download);
+					return { success: true, filePath: entry.path, entry };
+				}
 				const save = await dialog.showSaveDialog({ defaultPath: path.basename(file.name) });
 				if (save.canceled || !save.filePath) return { success: false, canceled: true };
-				tickets.assertTicket(ticket);
-				// Download beside the destination and rename only after success, so a failed
-				// download cannot truncate an existing user file.
 				incompletePath = `${save.filePath}.${crypto.randomUUID()}.partial`;
-				const response = await fetch(
-					`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
-					{
-						headers: { authorization: `Bearer ${ticket.token}` },
-						signal: controller.signal,
-					},
-				);
-				if (!response.ok || !response.body)
-					throw new Error(`Google Drive download failed (${response.status}).`);
-				const total = Number(response.headers.get("content-length") || file.size) || 0;
-				const handle = await fs.open(incompletePath, "wx");
-				source = Readable.fromWeb(
-					response.body as import("node:stream/web").ReadableStream,
-				);
-				await pipeline(
-					source,
-					createProgressStream(total, reportProgress),
-					handle.createWriteStream(),
-					{
-						signal: controller.signal,
-					},
-				);
-				controller.signal.throwIfAborted();
+				await download(incompletePath);
 				await fs.rename(incompletePath, save.filePath);
 				incompletePath = undefined;
 				return { success: true, filePath: save.filePath };

@@ -4,6 +4,7 @@ export const MEDIA_CONTENT_TYPES: Record<string, string> = {
 	".mp4": "video/mp4",
 	".webm": "video/webm",
 	".mov": "video/quicktime",
+	".m4v": "video/mp4",
 	".mkv": "video/x-matroska",
 	".avi": "video/x-msvideo",
 	".wav": "audio/wav",

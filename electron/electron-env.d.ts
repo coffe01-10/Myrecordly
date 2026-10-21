@@ -795,6 +795,7 @@ interface Window {
 			paths: string[],
 			removed: boolean,
 		) => Promise<import("../src/types/recordingLibrary").LibraryResult<null>>;
+		onRecordingLibraryChanged: (callback: () => void) => () => void;
 		importRecording: (
 			currentPath: string,
 			recordingPath: string,

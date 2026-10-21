@@ -6,11 +6,11 @@ import { buildMediaUrl, getMediaServerBaseUrl } from "../../mediaServer";
 import { rememberApprovedLocalReadPath } from "../project/manager";
 import { getRecordingsDir } from "../utils";
 import type { RecordingLibraryEntry } from "../../../src/types/recordingLibrary";
+import { isLibraryVideo } from "../../../src/types/recordingLibrary";
 
 let mutation = Promise.resolve();
 const undoBatches = new Map<string, { bundle: string; files: string[] }>();
-const isRecording = (name: string) =>
-	/\.(mp4|mov|webm|mkv|m4v)$/i.test(name) && !/[.-]webcam[.-]/i.test(name);
+const isRecording = (name: string) => isLibraryVideo(name) && !/[.-]webcam[.-]/i.test(name);
 const batchKey = (paths: string[]) => JSON.stringify([...new Set(paths)].sort());
 
 export function listRecordings(includeSources = false): Promise<RecordingLibraryEntry[]> {
@@ -31,7 +31,13 @@ export function listRecordings(includeSources = false): Promise<RecordingLibrary
 		}
 		const result: RecordingLibraryEntry[] = [];
 		for (const entry of entries) {
-			if (!entry.isFile() || !(includeSources ? /\.(mp4|mov|webm|mkv|m4v|wav|m4a|mp3|ogg|flac)$/i.test(entry.name) : isRecording(entry.name))) continue;
+			if (
+				!entry.isFile() ||
+				!(includeSources
+					? /\.(mp4|mov|webm|mkv|m4v|wav|m4a|mp3|ogg|flac)$/i.test(entry.name)
+					: isRecording(entry.name))
+			)
+				continue;
 			const filePath = path.join(root, entry.name);
 			const stat = await fs.stat(filePath);
 			if (!stat.size) continue;

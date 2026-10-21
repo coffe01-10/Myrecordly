@@ -60,6 +60,13 @@ export function useRawLibrary(enabled: boolean) {
 	useEffect(() => {
 		if (enabled) void refresh();
 	}, [enabled, refresh]);
+	useEffect(
+		() =>
+			window.electronAPI.onRecordingLibraryChanged?.(() => {
+				if (enabled) void refresh();
+			}),
+		[enabled, refresh],
+	);
 	const rename = async (path: string, name: string) => {
 		localStorage.setItem(NAMES_KEY, JSON.stringify({ ...loadNames(), [path]: name }));
 		setEntries((previous) =>

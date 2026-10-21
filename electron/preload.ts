@@ -825,6 +825,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.invoke("get-project-preview", projectPath),
 	listRecordings: (includeSources?: boolean) =>
 		ipcRenderer.invoke("list-recordings", includeSources),
+	onRecordingLibraryChanged: (callback: () => void) => {
+		const listener = () => callback();
+		ipcRenderer.on("recording-library-changed", listener);
+		return () => ipcRenderer.removeListener("recording-library-changed", listener);
+	},
 	setRecordingsRemoved: (paths: string[], removed: boolean) =>
 		ipcRenderer.invoke("set-recordings-removed", paths, removed),
 	importRecording: (

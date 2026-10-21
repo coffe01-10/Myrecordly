@@ -57,6 +57,13 @@ export function useRecordingLibrary(
 	useEffect(() => {
 		if (open) void refresh();
 	}, [open, refresh, project.videoSourcePath]);
+	useEffect(
+		() =>
+			window.electronAPI.onRecordingLibraryChanged?.(() => {
+				void refresh();
+			}),
+		[refresh],
+	);
 	const remove = async (paths: string[]) => {
 		if (lock.current || !paths.length) return;
 		lock.current = true;
@@ -118,7 +125,7 @@ export function useRecordingLibrary(
 	const addToTimeline = async (paths: string | string[], index?: number) => {
 		const source = current.current.project.videoSourcePath;
 		let retainedSource = source;
-		if (lock.current || !source) return;
+		if (lock.current || !source) return false;
 		lock.current = true;
 		cancelled.current = false;
 		setCancelling(false);
@@ -197,7 +204,7 @@ export function useRecordingLibrary(
 					);
 				}
 			}
-			if (!media) return;
+			if (!media) return false;
 			const { project, timeline, ui, appearance } = current.current;
 			if (project.videoSourcePath !== source)
 				throw new Error(
@@ -255,6 +262,7 @@ export function useRecordingLibrary(
 							count: completed,
 						}),
 			);
+			return true;
 		} catch (error) {
 			if (!cancelled.current)
 				toast.error(
@@ -262,6 +270,7 @@ export function useRecordingLibrary(
 						error: String(error),
 					}),
 				);
+			return false;
 		} finally {
 			try {
 				const cleanup = await window.electronAPI.finishRecordingImport(

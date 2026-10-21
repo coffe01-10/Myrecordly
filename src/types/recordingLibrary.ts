@@ -3,6 +3,9 @@ export interface RecordingWebcamSource {
 	timeOffsetMs: number;
 	visibleRanges?: { startMs: number; endMs: number }[];
 }
+export function isLibraryVideo(name: string) {
+	return /\.(mp4|mov|webm|mkv|m4v)$/i.test(name);
+}
 export interface RecordingLibraryEntry {
 	path: string;
 	name: string;

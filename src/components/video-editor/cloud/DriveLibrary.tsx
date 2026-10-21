@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ProgressBar } from "@heroui/react";
 import {
 	CloudArrowUp,
 	DownloadSimple,
@@ -14,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
 	Select,
 	SelectContent,
@@ -39,10 +39,14 @@ import {
 import type { DriveFile, DrivePermission } from "@/types/googleDrive";
 import { useGoogleDrive } from "./useGoogleDrive";
 import { AuthSetupNotice } from "@/components/auth/AuthSetupNotice";
+import { isLibraryVideo } from "@/types/recordingLibrary";
+import { CloudVideoActions } from "./CloudVideoActions";
+import { CloudTransferProgress } from "./CloudTransferProgress";
+import { useCloudVideoImport, type CloudTimelineTarget } from "./useCloudVideoImport";
 
 const folderMime = "application/vnd.google-apps.folder";
 
-export function DriveLibrary() {
+export function DriveLibrary({ timelineTarget }: { timelineTarget?: CloudTimelineTarget } = {}) {
 	const { t } = useI18n();
 	const drive = useGoogleDrive();
 	const [files, setFiles] = useState<DriveFile[]>([]);
@@ -56,6 +60,7 @@ export function DriveLibrary() {
 	const [edit, setEdit] = useState<{ action: "rename" | "mkdir"; file?: DriveFile }>();
 	const [name, setName] = useState("");
 	const [sharing, setSharing] = useState<DriveFile>();
+	const [trashing, setTrashing] = useState<DriveFile>();
 	const [permissions, setPermissions] = useState<DrivePermission[]>([]);
 	const [permissionsLoading, setPermissionsLoading] = useState(false);
 	const [permissionError, setPermissionError] = useState<string>();
@@ -68,6 +73,28 @@ export function DriveLibrary() {
 	const transfer = useRef<DriveOperation | undefined>(undefined);
 	const parentId = trail[trail.length - 1]?.id;
 	const accountId = drive.user?.id;
+	const importer = useCloudVideoImport({
+		accountId,
+		timelineTarget,
+		download: async (fileId, operation) => {
+			transfer.current = operation;
+			setTransferring(true);
+			setProgress(undefined);
+			try {
+				const result = await driveApi.download(fileId, operation, "library");
+				if (!result.success && !result.canceled) throw new Error(result.error);
+				return result.entry;
+			} finally {
+				if (transfer.current === operation) {
+					transfer.current = undefined;
+					setTransferring(false);
+					setProgress(undefined);
+				}
+			}
+		},
+		cancel: (id) => window.electronAPI.driveCancel(id),
+	});
+	const blocked = busy || importer.busy;
 	const load = useCallback(
 		async (pageToken?: string) => {
 			const generation = ++request.current;
@@ -92,6 +119,7 @@ export function DriveLibrary() {
 		setTrail([]);
 		setFiles([]);
 		setSharing(undefined);
+		setTrashing(undefined);
 		setEdit(undefined);
 		return () => {
 			request.current++;
@@ -222,14 +250,14 @@ export function DriveLibrary() {
 					<div className="flex gap-2">
 						<Button
 							variant="ghost"
-							disabled={busy}
+							disabled={blocked}
 							onClick={() => void run(() => driveApi.disconnect())}
 						>
 							{t("editor.drive.disconnect", "Disconnect")}
 						</Button>
 						<Button
 							variant="secondary"
-							disabled={busy}
+							disabled={blocked}
 							onClick={() =>
 								void run(async () => {
 									const result = await window.electronAPI.openExternalUrl(
@@ -245,9 +273,9 @@ export function DriveLibrary() {
 					</div>
 				)}
 			</div>
-			{(error || drive.driveError) && (
+			{(error || drive.driveError || importer.error) && (
 				<p role="alert" className="mb-4 text-sm text-danger">
-					{error || drive.driveError}
+					{error || drive.driveError || importer.error}
 				</p>
 			)}
 			{!drive.status.connected ? (
@@ -264,7 +292,7 @@ export function DriveLibrary() {
 							)}
 						</p>
 					</div>
-					<Button disabled={busy || drive.driveLoading} onClick={() => void connect()}>
+					<Button disabled={blocked || drive.driveLoading} onClick={() => void connect()}>
 						{drive.driveLoading
 							? t("editor.drive.loading", "Loading…")
 							: t("editor.drive.connect", "Sign in with Google and connect Drive")}
@@ -297,6 +325,7 @@ export function DriveLibrary() {
 								variant="ghost"
 								size="sm"
 								className="h-auto px-2 py-1"
+								disabled={blocked}
 								onClick={() => setTrail([])}
 							>
 								Recordly
@@ -310,6 +339,7 @@ export function DriveLibrary() {
 										variant="ghost"
 										size="sm"
 										className="h-auto px-2 py-1"
+										disabled={blocked}
 										onClick={() =>
 											setTrail((current) => current.slice(0, index + 1))
 										}
@@ -329,7 +359,8 @@ export function DriveLibrary() {
 							/>
 							<Button
 								variant="ghost"
-								disabled={busy}
+								disabled={blocked}
+								size="icon"
 								aria-label={t("editor.drive.refresh", "Refresh")}
 								onClick={() => void load()}
 							>
@@ -337,7 +368,7 @@ export function DriveLibrary() {
 							</Button>
 							<Button
 								variant="secondary"
-								disabled={busy}
+								disabled={blocked}
 								onClick={() => {
 									setName("");
 									setEdit({ action: "mkdir" });
@@ -346,44 +377,34 @@ export function DriveLibrary() {
 								<Folder />
 								{t("editor.drive.newFolder", "New folder")}
 							</Button>
-							<Button disabled={busy} onClick={() => void upload()}>
+							<Button disabled={blocked} onClick={() => void upload()}>
 								<CloudArrowUp />
 								{t("editor.drive.upload", "Upload file")}
 							</Button>
 						</div>
 					</div>
-					{transferring && (
-						<div role="status" className="mb-4 flex items-center gap-3 text-sm">
-							<ProgressBar
-								className="flex-1"
-								aria-label="Google Drive"
-								value={progress}
-								isIndeterminate={progress === undefined}
-							>
-								<ProgressBar.Track>
-									<ProgressBar.Fill />
-								</ProgressBar.Track>
-							</ProgressBar>
-							{progress === undefined
-								? t("editor.drive.loading", "Loading…")
-								: `${progress}%`}
-							<Button
-								size="sm"
-								variant="ghost"
-								onClick={() => {
-									if (transfer.current) {
+					{(transferring || importer.busy) && (
+						<div className="mb-4">
+							<CloudTransferProgress
+								progress={progress}
+								onCancel={() => {
+									if (importer.busy) void importer.cancel();
+									else if (transfer.current) {
 										transfer.current.canceled = true;
 										void window.electronAPI.driveCancel(transfer.current.id);
 									}
 								}}
-							>
-								{t("editor.drive.cancel", "Cancel")}
-							</Button>
+							/>
 						</div>
 					)}
-					<div className="overflow-x-auto rounded-2xl border border-foreground/10">
+					{importer.status && (
+						<p role="status" className="mb-3 text-xs text-muted-foreground">
+							{importer.status}
+						</p>
+					)}
+					<div className="overflow-x-auto rounded-2xl border border-separator">
 						<table className="w-full text-left text-sm">
-							<thead className="border-b border-foreground/10 bg-foreground/[.025] text-xs text-muted-foreground">
+							<thead className="border-b border-separator bg-foreground/[.025] text-xs text-muted-foreground">
 								<tr>
 									<th className="px-5 py-3 font-medium">
 										{t("editor.drive.name", "Name")}
@@ -403,13 +424,14 @@ export function DriveLibrary() {
 								{visible.map((file) => (
 									<tr
 										key={file.id}
-										className="border-b border-foreground/5 last:border-0 hover:bg-foreground/[.025]"
+										className="border-b border-separator last:border-0 hover:bg-foreground/[.025]"
 									>
 										<td className="max-w-xs px-5 py-4">
 											<Button
 												type="button"
 												variant="ghost"
 												className="h-auto min-w-0 max-w-full justify-start gap-3 px-0 text-left"
+												disabled={blocked}
 												onClick={() =>
 													file.mimeType === folderMime
 														? setTrail((current) => [
@@ -427,7 +449,9 @@ export function DriveLibrary() {
 												) : (
 													<GoogleDriveLogo className="size-5 shrink-0 text-muted-foreground" />
 												)}
-												<span className="truncate">{file.name}</span>
+												<span title={file.name} className="truncate">
+													{file.name}
+												</span>
 											</Button>
 										</td>
 										<td className="whitespace-nowrap px-4 py-4 text-muted-foreground">
@@ -442,48 +466,69 @@ export function DriveLibrary() {
 										</td>
 										<td className="px-3 py-3">
 											<div className="flex justify-end gap-1">
-												{file.mimeType !== folderMime && (
-													<Button
-														variant="ghost"
-														size="icon"
-														disabled={
-															busy ||
-															file.capabilities?.canDownload === false
-														}
-														title={t(
-															"editor.drive.download",
-															"Download",
-														)}
-														onClick={() =>
-															void run(async () => {
-																transfer.current = {
-																	id: crypto.randomUUID(),
-																	accountId,
-																	canceled: false,
-																};
-																setTransferring(true);
-																setProgress(undefined);
-																const result =
-																	await driveApi.download(
-																		file.id,
-																		transfer.current,
-																	);
-																if (
-																	!result.success &&
-																	!result.canceled
-																)
-																	throw new Error(result.error);
-															})
-														}
-													>
-														<DownloadSimple />
-													</Button>
-												)}
+												{file.mimeType !== folderMime &&
+													(isLibraryVideo(file.name) ? (
+														<CloudVideoActions
+															name={file.name}
+															imported={Boolean(
+																importer.entries[file.id],
+															)}
+															disabled={
+																blocked ||
+																file.capabilities?.canDownload ===
+																	false
+															}
+															canAdd={Boolean(timelineTarget)}
+															onImport={(add) =>
+																void importer.start(file.id, add)
+															}
+														/>
+													) : (
+														<Button
+															variant="ghost"
+															size="icon"
+															disabled={
+																blocked ||
+																file.capabilities?.canDownload ===
+																	false
+															}
+															title={t(
+																"editor.drive.download",
+																"Download",
+															)}
+															onClick={() =>
+																void run(async () => {
+																	transfer.current = {
+																		id: crypto.randomUUID(),
+																		accountId,
+																		canceled: false,
+																	};
+																	setTransferring(true);
+																	setProgress(undefined);
+																	const result =
+																		await driveApi.download(
+																			file.id,
+																			transfer.current,
+																		);
+																	if (
+																		!result.success &&
+																		!result.canceled
+																	)
+																		throw new Error(
+																			result.error,
+																		);
+																})
+															}
+														>
+															<DownloadSimple />
+														</Button>
+													))}
 												<Button
 													variant="ghost"
 													size="icon"
 													disabled={
-														busy || file.capabilities?.canEdit === false
+														blocked ||
+														file.capabilities?.canEdit === false
 													}
 													title={t("editor.drive.rename", "Rename")}
 													onClick={() => {
@@ -497,7 +542,7 @@ export function DriveLibrary() {
 													variant="ghost"
 													size="icon"
 													disabled={
-														busy ||
+														blocked ||
 														file.capabilities?.canShare === false
 													}
 													title={t(
@@ -516,28 +561,11 @@ export function DriveLibrary() {
 													variant="ghost"
 													size="icon"
 													disabled={
-														busy ||
+														blocked ||
 														file.capabilities?.canTrash === false
 													}
 													title={t("editor.drive.trash", "Move to trash")}
-													onClick={() => {
-														if (
-															window.confirm(
-																t(
-																	"editor.drive.trashConfirm",
-																	"Move this file to Google Drive trash?",
-																),
-															)
-														)
-															void run(async () => {
-																await driveRequest(
-																	"trash",
-																	{ fileId: file.id },
-																	accountId,
-																);
-																await load();
-															});
-													}}
+													onClick={() => setTrashing(file)}
 												>
 													<Trash />
 												</Button>
@@ -565,7 +593,7 @@ export function DriveLibrary() {
 						<Button
 							className="mt-4"
 							variant="ghost"
-							disabled={busy}
+							disabled={blocked}
 							onClick={() => void load(nextPage)}
 						>
 							{t("editor.drive.loadMore", "Load more")}
@@ -573,6 +601,21 @@ export function DriveLibrary() {
 					)}
 				</>
 			)}
+			<ConfirmationDialog
+				open={Boolean(trashing)}
+				onOpenChange={(open) => {
+					if (!open) setTrashing(undefined);
+				}}
+				title={t("editor.drive.trash", "Move to trash")}
+				description={`${trashing?.name ?? ""} — ${t("editor.drive.trashConfirm", "Move this file to Google Drive trash?")}`}
+				confirmLabel={t("editor.drive.trash", "Move to trash")}
+				onConfirm={() =>
+					void run(async () => {
+						await driveRequest("trash", { fileId: trashing!.id }, accountId);
+						await load();
+					})
+				}
+			/>
 			<Dialog
 				open={Boolean(edit)}
 				onOpenChange={(open) => {
@@ -614,7 +657,7 @@ export function DriveLibrary() {
 							value={name}
 							onChange={(event) => setName(event.target.value)}
 						/>
-						<Button disabled={busy || !name.trim()} type="submit">
+						<Button disabled={blocked || !name.trim()} type="submit">
 							{t("editor.drive.save", "Save")}
 						</Button>
 					</form>

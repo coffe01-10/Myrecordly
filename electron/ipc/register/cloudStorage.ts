@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { CloudStorage } from "../../cloudStorage/runtime";
+import { importCloudVideo } from "../../cloudStorage/importVideo";
 import { cloudWebsiteSession } from "../../cloudStorage/webSessions";
 import {
 	cloudProviders,
@@ -18,6 +19,7 @@ export function registerCloudStorageHandlers() {
 			if (!window.isDestroyed()) window.webContents.send("cloud-storage-changed");
 	});
 	const windows = new Map<string, BrowserWindow>();
+	const imports = new Map<string, AbortController>();
 	const openWeb = async (account: CloudAccount) => {
 		const definition = cloudProviders.find((provider) => provider.id === account.provider)!;
 		const current = windows.get(account.id);
@@ -113,6 +115,7 @@ export function registerCloudStorageHandlers() {
 						break;
 					}
 					case "cancel":
+						imports.get(input.id)?.abort();
 						manager.cancel(input.id);
 						break;
 					case "list":
@@ -152,12 +155,43 @@ export function registerCloudStorageHandlers() {
 							return { success: true, data: { canceled: true } };
 						const partial = `${selected.filePath}.${randomUUID()}.partial`;
 						try {
-							await manager.copy(input.id, input.path, partial, false);
+							await manager.copy(
+								input.id,
+								input.path,
+								partial,
+								false,
+								input.operationId,
+							);
 							await fs.rename(partial, selected.filePath);
 						} finally {
 							await fs.rm(partial, { force: true });
 						}
 						break;
+					}
+					case "import": {
+						const operationId = input.operationId ?? randomUUID();
+						const controller = new AbortController();
+						imports.set(operationId, controller);
+						try {
+							const data = await importCloudVideo(
+								path.posix.basename(input.path),
+								async (partial) => {
+									// Cancel can arrive while the library directory/file is being prepared.
+									controller.signal.throwIfAborted();
+									await manager.copy(
+										input.id,
+										input.path,
+										partial,
+										false,
+										operationId,
+									);
+									controller.signal.throwIfAborted();
+								},
+							);
+							return { success: true, data };
+						} finally {
+							imports.delete(operationId);
+						}
 					}
 					default:
 						throw new Error("不支持的网盘操作");

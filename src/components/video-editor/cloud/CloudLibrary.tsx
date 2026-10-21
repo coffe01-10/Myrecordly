@@ -18,11 +18,15 @@ import {
 } from "@/components/ui/select";
 import { DriveLibrary } from "./DriveLibrary";
 import { ConnectedCloudFiles } from "./ConnectedCloudFiles";
+import type { CloudTimelineTarget } from "./useCloudVideoImport";
 
-export function CloudLibrary(_props: {
+export function CloudLibrary({
+	timelineTarget,
+}: {
 	token?: string;
 	accountLabel?: string;
 	onSignIn: () => void;
+	timelineTarget?: CloudTimelineTarget;
 }) {
 	const { t } = useI18n();
 	const cloud = useCloudStorage();
@@ -80,9 +84,13 @@ export function CloudLibrary(_props: {
 				</Select>
 			)}
 			{value === "google" ? (
-				<DriveLibrary />
+				<DriveLibrary timelineTarget={timelineTarget} />
 			) : selected ? (
-				<ConnectedCloudFiles key={selected.id} account={selected} />
+				<ConnectedCloudFiles
+					key={selected.id}
+					account={selected}
+					timelineTarget={timelineTarget}
+				/>
 			) : (
 				<p className="py-6 text-center text-sm text-muted-foreground">
 					{t(

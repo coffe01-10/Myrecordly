@@ -568,5 +568,11 @@
 		"videoSaved": "成片已保存到网盘 Recordly 文件夹",
 		"destination": "网盘",
 		"newSession": "新建独立网页会话"
+	},
+	"cloudImport": {
+		"import": "导入素材库",
+		"imported": "已导入",
+		"importedFile": "已加入素材库：{{name}}",
+		"projectChanged": "视频已加入素材库。当前项目已切换，请重新点击加入时间轴。"
 	}
 }

@@ -538,5 +538,11 @@
 		"videoSaved": "Video saved in the cloud Recordly folder",
 		"destination": "Cloud storage",
 		"newSession": "Add separate website session"
+	},
+	"cloudImport": {
+		"import": "Import to library",
+		"imported": "Imported",
+		"importedFile": "Added to library: {{name}}",
+		"projectChanged": "The video is in the library. The project changed; choose Add to timeline again."
 	}
 }

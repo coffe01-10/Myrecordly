@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ProgressBar } from "@heroui/react";
 import {
 	Folder,
 	File,
@@ -12,14 +11,36 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/contexts/I18nContext";
 import { cloudRequest } from "@/lib/drive/cloudStorage";
 import type { CloudAccount, CloudEntry } from "@/types/cloudStorage";
+import { isLibraryVideo, type RecordingLibraryEntry } from "@/types/recordingLibrary";
+import { CloudVideoActions } from "./CloudVideoActions";
+import { CloudTransferProgress } from "./CloudTransferProgress";
+import { useCloudVideoImport, type CloudTimelineTarget } from "./useCloudVideoImport";
 
-export function ConnectedCloudFiles({ account }: { account: CloudAccount }) {
+export function ConnectedCloudFiles({
+	account,
+	timelineTarget,
+}: {
+	account: CloudAccount;
+	timelineTarget?: CloudTimelineTarget;
+}) {
 	const { t } = useI18n();
 	const [directory, setDirectory] = useState("");
 	const [entries, setEntries] = useState<CloudEntry[]>([]);
 	const [busy, setBusy] = useState<string>();
 	const [error, setError] = useState<string>();
 	const [refresh, setRefresh] = useState(0);
+	const importer = useCloudVideoImport({
+		accountId: account.id,
+		timelineTarget,
+		download: (remotePath, operation) =>
+			cloudRequest<RecordingLibraryEntry>("import", {
+				id: account.id,
+				path: remotePath,
+				operationId: operation.id,
+			}),
+		cancel: (id) => cloudRequest("cancel", { id }),
+	});
+	const blocked = Boolean(busy) || importer.busy;
 	useEffect(() => {
 		let active = true;
 		setBusy("list");
@@ -70,7 +91,7 @@ export function ConnectedCloudFiles({ account }: { account: CloudAccount }) {
 				<Button
 					size="icon"
 					variant="ghost"
-					disabled={!directory || Boolean(busy)}
+					disabled={!directory || blocked}
 					title={t("editor.cloudAccounts.parent", "上一级")}
 					onClick={() => setDirectory(directory.split("/").slice(0, -1).join("/"))}
 				>
@@ -82,40 +103,34 @@ export function ConnectedCloudFiles({ account }: { account: CloudAccount }) {
 				<Button
 					size="icon"
 					variant="ghost"
-					disabled={Boolean(busy)}
+					disabled={blocked}
 					title={t("editor.drive.refresh", "刷新")}
 					onClick={() => setRefresh((value) => value + 1)}
 				>
 					<ArrowClockwise />
 				</Button>
-				<Button size="sm" disabled={Boolean(busy)} onClick={() => void transfer("upload")}>
+				<Button disabled={blocked} onClick={() => void transfer("upload")}>
 					<CloudArrowUp />
 					{t("editor.drive.upload", "上传文件")}
 				</Button>
 			</div>
-			{busy && (
-				<div className="flex items-center gap-3">
-					<ProgressBar
-						className="flex-1"
-						aria-label={t("editor.drive.loading", "加载中…")}
-						isIndeterminate
-					>
-						<ProgressBar.Track>
-							<ProgressBar.Fill />
-						</ProgressBar.Track>
-					</ProgressBar>
-					<Button
-						size="sm"
-						variant="ghost"
-						onClick={() => void cloudRequest("cancel", { id: account.id })}
-					>
-						{t("common.actions.cancel", "取消")}
-					</Button>
-				</div>
+			{blocked && (
+				<CloudTransferProgress
+					onCancel={() =>
+						void (importer.busy
+							? importer.cancel()
+							: cloudRequest("cancel", { id: account.id }))
+					}
+				/>
 			)}
-			{error && (
+			{(error || importer.error) && (
 				<p role="alert" className="break-words text-xs text-danger">
-					{error}
+					{error || importer.error}
+				</p>
+			)}
+			{importer.status && (
+				<p role="status" className="text-xs text-muted-foreground">
+					{importer.status}
 				</p>
 			)}
 			<div className="divide-y divide-separator rounded-2xl border border-separator">
@@ -130,7 +145,7 @@ export function ConnectedCloudFiles({ account }: { account: CloudAccount }) {
 							<Button
 								variant="ghost"
 								className="min-w-0 flex-1 justify-start truncate text-left text-sm"
-								disabled={Boolean(busy)}
+								disabled={blocked}
 								onClick={() =>
 									setDirectory([directory, entry.Name].filter(Boolean).join("/"))
 								}
@@ -138,27 +153,48 @@ export function ConnectedCloudFiles({ account }: { account: CloudAccount }) {
 								{entry.Name}
 							</Button>
 						) : (
-							<p className="min-w-0 flex-1 truncate text-sm">{entry.Name}</p>
+							<p title={entry.Name} className="min-w-0 flex-1 truncate text-sm">
+								{entry.Name}
+							</p>
 						)}
 						{!entry.IsDir && (
 							<>
-								<span className="text-xs text-muted-foreground">
+								<span className="shrink-0 whitespace-nowrap text-xs text-muted-foreground">
 									{(entry.Size / 1048576).toFixed(1)} MB
 								</span>
-								<Button
-									size="icon"
-									variant="ghost"
-									disabled={Boolean(busy)}
-									title={t("editor.drive.download", "下载")}
-									onClick={() => void transfer("download", entry)}
-								>
-									<DownloadSimple />
-								</Button>
+								{isLibraryVideo(entry.Name) ? (
+									<CloudVideoActions
+										name={entry.Name}
+										imported={Boolean(
+											importer.entries[
+												[directory, entry.Name].filter(Boolean).join("/")
+											],
+										)}
+										disabled={blocked}
+										canAdd={Boolean(timelineTarget)}
+										onImport={(add) =>
+											void importer.start(
+												[directory, entry.Name].filter(Boolean).join("/"),
+												add,
+											)
+										}
+									/>
+								) : (
+									<Button
+										size="icon"
+										variant="ghost"
+										disabled={blocked}
+										title={t("editor.drive.download", "下载")}
+										onClick={() => void transfer("download", entry)}
+									>
+										<DownloadSimple />
+									</Button>
+								)}
 							</>
 						)}
 					</div>
 				))}
-				{!busy && !entries.length && !error && (
+				{!blocked && !entries.length && !error && (
 					<p className="p-8 text-center text-sm text-muted-foreground">
 						{t("editor.cloudAccounts.empty", "此文件夹暂无文件")}
 					</p>

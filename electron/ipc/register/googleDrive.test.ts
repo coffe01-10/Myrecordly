@@ -9,20 +9,43 @@ const state = vi.hoisted(() => ({
 	handlers: new Map<string, Handler>(),
 	save: vi.fn(),
 	allowed: true,
+	library: "",
+	broadcast: vi.fn(),
 }));
 vi.mock("electron", () => ({
 	ipcMain: {
 		handle: (name: string, callback: Handler) => state.handlers.set(name, callback),
 	},
 	dialog: { showSaveDialog: state.save },
+	BrowserWindow: {
+		getAllWindows: () => [{ isDestroyed: () => false, webContents: { send: state.broadcast } }],
+	},
+	shell: { trashItem: vi.fn() },
 }));
-vi.mock("../project/manager", () => ({ isAllowedLocalReadPath: () => state.allowed }));
+vi.mock("../project/manager", () => ({
+	isAllowedLocalReadPath: () => state.allowed,
+	rememberApprovedLocalReadPath: async () => {},
+}));
+vi.mock("../utils", () => ({
+	getRecordingsDir: async () => {
+		await fs.mkdir(state.library, { recursive: true });
+		return state.library;
+	},
+}));
+vi.mock("../../mediaServer", () => ({
+	getMediaServerBaseUrl: () => "http://127.0.0.1:9999",
+	buildMediaUrl: (server: string, file: string) =>
+		`${server}/video?path=${encodeURIComponent(file)}`,
+}));
 vi.mock("../export/exportStream", () => ({ isOwnedExportPath: () => false }));
 import { registerGoogleDriveHandlers, validateDriveUploadUrl } from "./googleDrive";
+import { listRecordings } from "../recording/library";
 let directory: string;
 const event = { sender: { isDestroyed: () => false, send: vi.fn() } };
 beforeEach(async () => {
 	directory = await fs.mkdtemp(path.join(os.tmpdir(), "recordly-drive-test-"));
+	state.library = path.join(directory, "library");
+	state.broadcast.mockClear();
 	state.handlers.clear();
 	state.allowed = true;
 	state.save.mockReset();
@@ -127,4 +150,49 @@ it("downloads the remote file to the destination chosen by the user", async () =
 	});
 	expect(result).toMatchObject({ success: true, filePath: destination });
 	expect(await fs.readFile(destination, "utf8")).toBe("downloaded-video");
+});
+it("imports a Google video without a save dialog and exposes it in the existing library", async () => {
+	vi.stubGlobal("fetch", async () => new Response("downloaded-video"));
+	const result = await state.handlers.get("google-drive-transfer")!(event, {
+		id: "library",
+		direction: "download",
+		ticketId: "ticket",
+		destination: "library",
+	});
+	expect(result.success).toBe(true);
+	expect(state.save).not.toHaveBeenCalled();
+	expect((await listRecordings()).map((entry) => entry.path)).toContain(result.entry!.path);
+	expect(await fs.readFile(result.entry!.path, "utf8")).toBe("downloaded-video");
+	expect(state.broadcast).toHaveBeenCalledWith("recording-library-changed");
+});
+it("cancels a Google library import without leaving files or publishing a library update", async () => {
+	vi.stubGlobal(
+		"fetch",
+		async (_url: unknown, init: RequestInit) =>
+			new Response(
+				new ReadableStream({
+					start(controller) {
+						controller.enqueue(new Uint8Array([1, 2, 3]));
+						init.signal!.addEventListener("abort", () =>
+							controller.error(new Error("canceled")),
+						);
+						setTimeout(() => {
+							void state.handlers.get("google-drive-cancel")!(
+								event,
+								"cancel-library",
+							);
+						}, 10);
+					},
+				}),
+			),
+	);
+	const result = await state.handlers.get("google-drive-transfer")!(event, {
+		id: "cancel-library",
+		direction: "download",
+		ticketId: "ticket",
+		destination: "library",
+	});
+	expect(result.canceled).toBe(true);
+	expect(await fs.readdir(state.library)).toEqual([]);
+	expect(state.broadcast).not.toHaveBeenCalled();
 });

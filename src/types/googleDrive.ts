@@ -37,6 +37,7 @@ export type DriveTransfer = {
 	ticketId: string;
 	filePath?: string;
 	file?: DriveFile;
+	destination?: "library";
 };
 
 export type GoogleProfile = {
@@ -65,4 +66,5 @@ export type DriveTransferResult = {
 	error?: string;
 	file?: DriveFile;
 	filePath?: string;
+	entry?: import("./recordingLibrary").RecordingLibraryEntry;
 };

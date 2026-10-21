@@ -46,16 +46,22 @@ test("shared cards open ready links and delete incomplete uploads", async ({ pag
 	await page
 		.getByRole("button", { name: "Options for An interrupted upload", exact: true })
 		.click();
-	page.once("dialog", (dialog) => dialog.dismiss());
 	await page.getByRole("menuitem", { name: "Delete recording", exact: true }).click();
+	await page
+		.getByRole("dialog", { name: "Delete", exact: true })
+		.getByRole("button", { name: "Cancel", exact: true })
+		.click();
 	await expect(
 		page.getByRole("button", { name: "An interrupted upload", exact: true }),
 	).toHaveCount(1);
 	await page
 		.getByRole("button", { name: "Options for An interrupted upload", exact: true })
 		.click();
-	page.once("dialog", (dialog) => dialog.accept());
 	await page.getByRole("menuitem", { name: "Delete recording", exact: true }).click();
+	await page
+		.getByRole("dialog", { name: "Delete", exact: true })
+		.getByRole("button", { name: "Delete", exact: true })
+		.click();
 	await expect(
 		page.getByRole("button", { name: "An interrupted upload", exact: true }),
 	).toHaveCount(0);
@@ -113,14 +119,20 @@ test("deleting from another shared library refreshes a mounted Share quota", asy
 	await page
 		.getByRole("button", { name: "Options for An interrupted upload", exact: true })
 		.click();
-	page.once("dialog", (dialog) => dialog.dismiss());
 	await page.getByRole("menuitem", { name: "Delete recording", exact: true }).click();
+	await page
+		.getByRole("dialog", { name: "Delete", exact: true })
+		.getByRole("button", { name: "Cancel", exact: true })
+		.click();
 	await expect(page.getByRole("button", { name: "Share", exact: true })).toBeDisabled();
 	await page
 		.getByRole("button", { name: "Options for An interrupted upload", exact: true })
 		.click();
-	page.once("dialog", (dialog) => dialog.accept());
 	await page.getByRole("menuitem", { name: "Delete recording", exact: true }).click();
+	await page
+		.getByRole("dialog", { name: "Delete", exact: true })
+		.getByRole("button", { name: "Delete", exact: true })
+		.click();
 	await expect(
 		page.getByRole("button", { name: "An interrupted upload", exact: true }),
 	).toHaveCount(0);

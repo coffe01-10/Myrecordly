@@ -112,6 +112,79 @@ export function useProjectOpenActions({
 		],
 	);
 
+	const loadMediaPath = useCallback(
+		async (selectedPath: string) => {
+			const sourcePath = fromFileUrl(selectedPath);
+			const setPathResult = await window.electronAPI.setCurrentVideoPath(sourcePath, {
+				preserveProjectPath: false,
+			});
+			if (!setPathResult.success)
+				throw new Error(t("editor.project.mediaLoadFailed", "Could not load media"));
+			const sourceVideoUrl = await resolveVideoUrl(sourcePath);
+			try {
+				videoPlaybackRef.current?.pause();
+			} catch {
+				// The preview may already be tearing down.
+			}
+			setIsPlaying(false);
+			setCurrentTime(0);
+			setDuration(0);
+			project.setVideoSourcePath(sourcePath);
+			project.setVideoPath(sourceVideoUrl);
+			project.setCurrentProjectPath(null);
+			project.setLastSavedSnapshot(null);
+			resetSourceScopedEditorState();
+			pendingFreshRecordingAutoZoomPathRef.current =
+				appearance.autoApplyFreshRecordingAutoZooms ? sourceVideoUrl : null;
+			appearance.setWebcam((previous) => ({
+				...previous,
+				visibleRanges: undefined,
+				enabled: false,
+				sourcePath: null,
+				timeOffsetMs: DEFAULT_WEBCAM_TIME_OFFSET_MS,
+			}));
+			applySessionPresentation(null);
+			project.setProjectBrowserOpen(false);
+			await refreshProjectLibrary();
+			toast.success(t("editor.project.mediaImported", "Media imported"));
+		},
+		[
+			project,
+			appearance,
+			videoPlaybackRef,
+			pendingFreshRecordingAutoZoomPathRef,
+			setIsPlaying,
+			setCurrentTime,
+			setDuration,
+			resetSourceScopedEditorState,
+			applySessionPresentation,
+			refreshProjectLibrary,
+			t,
+		],
+	);
+	const handleOpenMediaAtPath = useCallback(
+		async (path: string) => {
+			if (
+				!(await confirmReplaceSourceWithUnsavedChanges(
+					t("editor.project.actionImportFile", "import a file"),
+				))
+			)
+				return false;
+			try {
+				await loadMediaPath(path);
+				return true;
+			} catch (error) {
+				toast.error(
+					t("editor.project.fileLoadError", "Could not load file: {{error}}", {
+						error: String(error),
+					}),
+				);
+				return false;
+			}
+		},
+		[confirmReplaceSourceWithUnsavedChanges, loadMediaPath, t],
+	);
+
 	const handleImportMediaOrProject = useCallback(async () => {
 		if (
 			!(await confirmReplaceSourceWithUnsavedChanges(
@@ -154,39 +227,7 @@ export function useProjectOpenActions({
 				return;
 			}
 
-			const sourcePath = fromFileUrl(result.path);
-			const setPathResult = await window.electronAPI.setCurrentVideoPath(sourcePath, {
-				preserveProjectPath: false,
-			});
-			if (!setPathResult.success)
-				throw new Error(t("editor.project.mediaLoadFailed", "Could not load media"));
-			const sourceVideoUrl = await resolveVideoUrl(sourcePath);
-			try {
-				videoPlaybackRef.current?.pause();
-			} catch {
-				// The preview may already be tearing down.
-			}
-			setIsPlaying(false);
-			setCurrentTime(0);
-			setDuration(0);
-			project.setVideoSourcePath(sourcePath);
-			project.setVideoPath(sourceVideoUrl);
-			project.setCurrentProjectPath(null);
-			project.setLastSavedSnapshot(null);
-			resetSourceScopedEditorState();
-			pendingFreshRecordingAutoZoomPathRef.current =
-				appearance.autoApplyFreshRecordingAutoZooms ? sourceVideoUrl : null;
-			appearance.setWebcam((previous) => ({
-				...previous,
-				visibleRanges: undefined,
-				enabled: false,
-				sourcePath: null,
-				timeOffsetMs: DEFAULT_WEBCAM_TIME_OFFSET_MS,
-			}));
-			applySessionPresentation(null);
-			project.setProjectBrowserOpen(false);
-			await refreshProjectLibrary();
-			toast.success(t("editor.project.mediaImported", "Media imported"));
+			await loadMediaPath(result.path);
 		} catch (error) {
 			project.setError(
 				t("editor.project.fileLoadError", "Could not load file: {{error}}", {
@@ -195,17 +236,10 @@ export function useProjectOpenActions({
 			);
 		}
 	}, [
+		loadMediaPath,
 		confirmReplaceSourceWithUnsavedChanges,
 		applyLoadedProject,
 		project,
-		appearance,
-		videoPlaybackRef,
-		setIsPlaying,
-		setCurrentTime,
-		setDuration,
-		resetSourceScopedEditorState,
-		pendingFreshRecordingAutoZoomPathRef,
-		applySessionPresentation,
 		refreshProjectLibrary,
 		t,
 	]);
@@ -319,6 +353,7 @@ export function useProjectOpenActions({
 	);
 
 	return {
+		handleOpenMediaAtPath,
 		handleRenameLibraryProject,
 		handleOpenProjectFromLibrary,
 		handleImportMediaOrProject,

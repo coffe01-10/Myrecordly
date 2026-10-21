@@ -29,6 +29,7 @@ export function DashboardGrid({
 	authToken,
 	onSignIn,
 	onShareProject,
+	cloudTimelineTarget,
 	visible,
 	busy,
 	selecting,
@@ -60,6 +61,7 @@ export function DashboardGrid({
 	| "authToken"
 	| "onSignIn"
 	| "onShareProject"
+	| "cloudTimelineTarget"
 	| "visible"
 	| "busy"
 	| "selecting"
@@ -92,6 +94,7 @@ export function DashboardGrid({
 						token={authToken}
 						accountLabel={accountLabel}
 						onSignIn={onSignIn}
+						timelineTarget={cloudTimelineTarget}
 					/>
 				) : (isRaw ? rawLoading : loading) ? (
 					<LibrarySkeleton />

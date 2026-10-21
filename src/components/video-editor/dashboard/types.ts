@@ -1,3 +1,4 @@
+import type { CloudTimelineTarget } from "../cloud/useCloudVideoImport";
 import type { ProjectLibraryEntry } from "../ProjectBrowserDialog";
 export type DashboardProps = {
 	open: boolean;
@@ -13,4 +14,5 @@ export type DashboardProps = {
 	onShareProject: (path: string) => Promise<void>;
 	accountLabel?: string;
 	authToken?: string;
+	cloudTimelineTarget?: CloudTimelineTarget;
 };

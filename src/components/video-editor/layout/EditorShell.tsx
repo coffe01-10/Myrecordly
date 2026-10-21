@@ -234,6 +234,21 @@ export function EditorShell(props: Props) {
 					}}
 					accountLabel={auth.user?.email || auth.user?.user_metadata.full_name}
 					authToken={auth.accessToken}
+					cloudTimelineTarget={{
+						projectKey: project.currentProjectPath ?? project.videoSourcePath,
+						add: async (path) => {
+							const added = project.videoSourcePath
+								? await library.addToTimeline(path)
+								: await openActions.handleOpenMediaAtPath(path);
+							if (added) {
+								project.setProjectBrowserOpen(false);
+								library.setOpen(true);
+								void library.refresh();
+							}
+							return added;
+						},
+						cancel: library.cancelImport,
+					}}
 					handleImportMediaOrProject={openActions.handleImportMediaOrProject}
 					handleOpenProjectFromLibrary={openActions.handleOpenProjectFromLibrary}
 					nativeCaptureUnavailableModalOpen={ui.nativeCaptureUnavailableModalOpen}

@@ -8,7 +8,11 @@ Recording and editing work locally without an account or database. The account d
 
 Provider buttons reopen an existing website session. Use Add separate website session for another independent login; a new session is saved only after its page loads. Connections can be renamed. Removing a local connection clears only this app’s session, not cloud files or the system browser’s session. Revoke server-side grants from the provider’s account settings.
 
-Direct exports save to a `Recordly` folder. Uploading updates a same-name file; downloads write a partial file before replacing the destination selected in the native save dialog.
+Direct exports save to a `Recordly` folder. Uploading updates a same-name file.
+
+Videos in Google Drive, OneDrive, and Dropbox offer **Import to library** and **+ Add to timeline**. Import saves directly to the configured recordings directory and refreshes the library, without a save dialog. Same-name videos receive numbered filenames. Failed or canceled downloads leave no partial assets.
+
+The plus button downloads and appends the video to the current timeline, or opens it as the first clip in an empty project. A video already imported on the current cloud page can be added without downloading again. Appending uses the existing local clip undo/redo behavior. Non-video downloads retain the native Save As flow.
 
 ## Local storage
 

@@ -65,7 +65,7 @@ export const driveApi = {
 			...session,
 		});
 	},
-	async download(fileId: string, operation: DriveOperation) {
+	async download(fileId: string, operation: DriveOperation, destination?: "library") {
 		const session = await driveRequest<{ ticketId: string; file: DriveFile }>(
 			"download",
 			{ fileId, transferId: operation.id },
@@ -78,6 +78,7 @@ export const driveApi = {
 		return window.electronAPI.driveTransfer({
 			id: operation.id,
 			direction: "download",
+			...(destination ? { destination } : {}),
 			...session,
 		});
 	},

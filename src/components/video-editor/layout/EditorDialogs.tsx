@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { ProjectLibraryEntry } from "../ProjectBrowserDialog";
+import type { CloudTimelineTarget } from "../cloud/useCloudVideoImport";
 import { Dashboard } from "../dashboard/Dashboard";
 
 export type UnsavedChangesDecision = "cancel" | "discard" | "save";
@@ -46,6 +47,7 @@ interface EditorDialogsProps {
 	onShareProject: (path: string) => Promise<void>;
 	accountLabel?: string;
 	authToken?: string;
+	cloudTimelineTarget?: CloudTimelineTarget;
 	handleImportMediaOrProject: () => Promise<void>;
 	handleOpenProjectFromLibrary: (projectPath: string) => Promise<unknown>;
 	nativeCaptureUnavailableModalOpen: boolean;
@@ -77,6 +79,7 @@ export function EditorDialogs({
 	onShareProject,
 	accountLabel,
 	authToken,
+	cloudTimelineTarget,
 	handleImportMediaOrProject,
 	handleOpenProjectFromLibrary,
 	nativeCaptureUnavailableModalOpen,
@@ -197,6 +200,7 @@ export function EditorDialogs({
 				onShareProject={onShareProject}
 				accountLabel={accountLabel}
 				authToken={authToken}
+				cloudTimelineTarget={cloudTimelineTarget}
 				onImportFile={handleImportMediaOrProject}
 				onOpenProject={handleOpenProjectFromLibrary}
 			/>

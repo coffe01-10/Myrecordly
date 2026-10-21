@@ -7,7 +7,8 @@ import { DashboardFilters } from "../dashboard/DashboardFilters";
 import { DashboardAnnouncements } from "../dashboard/DashboardAnnouncements";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Button } from "@heroui/react";
-import { useScopedT } from "@/contexts/I18nContext";
+import { useI18n, useScopedT } from "@/contexts/I18nContext";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { ArrowClockwise, ArrowSquareOut, Trash } from "@/components/ui/icons";
 
 type Recording = {
@@ -33,6 +34,7 @@ export function SharedRecordings({
 	accountLabel?: string;
 }) {
 	const t = useScopedT("editor");
+	const { t: globalT } = useI18n();
 	const [query, setQuery] = useState("");
 	const [period, setPeriod] = useState("all");
 	const [sort, setSort] = useState("recent");
@@ -42,6 +44,7 @@ export function SharedRecordings({
 	const [recordings, setRecordings] = useState<Recording[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [deleting, setDeleting] = useState<string>();
+	const [pendingDelete, setPendingDelete] = useState<string>();
 	const [error, setError] = useState<string>();
 	const loadGeneration = useRef(0);
 	const load = useCallback(async () => {
@@ -73,7 +76,6 @@ export function SharedRecordings({
 		};
 	}, [expanded, load, refreshKey]);
 	const remove = async (code: string) => {
-		if (!window.confirm(t("cloud.deleteSharedConfirm"))) return;
 		setDeleting(code);
 		setError(undefined);
 		try {
@@ -92,6 +94,18 @@ export function SharedRecordings({
 			setDeleting(undefined);
 		}
 	};
+	const confirmation = (
+		<ConfirmationDialog
+			open={Boolean(pendingDelete)}
+			onOpenChange={(open) => {
+				if (!open) setPendingDelete(undefined);
+			}}
+			title={globalT("common.actions.delete", "Delete")}
+			description={`${recordings.find((recording) => recording.code === pendingDelete)?.title ?? ""} — ${t("cloud.deleteSharedConfirm")}`}
+			confirmLabel={globalT("common.actions.delete", "Delete")}
+			onConfirm={() => void remove(pendingDelete!)}
+		/>
+	);
 	if (standalone) {
 		const entries = recordings
 			.map((recording) => ({
@@ -122,204 +136,215 @@ export function SharedRecordings({
 			}
 		};
 		return (
-			<div className="-mx-7 lg:-mx-10">
-				<DashboardAnnouncements />
-				<DashboardToolbar
-					query={query}
-					setQuery={setQuery}
-					isRaw={false}
-					onImportFile={load}
-					run={run}
-					busy={loading || Boolean(deleting)}
-					actionLabel={t("cloud.refresh")}
-					action="refresh"
-				/>
-				<DashboardFilters
-					hideSelection
-					isRaw={false}
-					period={period}
-					setPeriod={setPeriod}
-					sort={sort}
-					setSort={setSort}
-					selecting={selecting}
-					setSelecting={setSelecting}
-					selected={selected}
-					setSelected={setSelected}
-					visible={entries}
-					busy={loading || Boolean(deleting)}
-					deleteEntries={async () => undefined}
-				/>
-				<div className="px-7 lg:px-10">
-					{error && (
-						<p role="alert" className="mb-4 text-sm text-danger">
-							{error}
-						</p>
-					)}
-					{loading ? (
-						<LibrarySkeleton />
-					) : entries.length ? (
-						<ul
-							aria-label={t("cloud.sharedProjects")}
-							className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-x-7 gap-y-10 lg:gap-x-9"
-						>
-							{entries.map((entry) => (
-								<Fragment key={entry.path}>
-									<ProjectCard
-										entry={entry}
-										webUrl={entry.recording.url}
-										webReady={entry.recording.ready}
-										accountLabel={accountLabel}
-										busy={Boolean(deleting)}
-										selecting={false}
-										selected={[]}
-										toggleSelected={() => undefined}
-										openEntry={() =>
-											void run(async () => {
-												const result =
-													await window.electronAPI.openExternalUrl(
-														entry.recording.url,
-													);
-												if (!result.success)
-													throw new Error(
-														result.error || t("cloud.openLinkFailed"),
-													);
-											})
-										}
-										run={run}
-										onShareProject={async () => undefined}
-										onRenameProject={async (path) => path}
-										folders={[]}
-										save={() => undefined}
-										assignFolder={() => undefined}
-										onDelete={() => void remove(entry.path)}
-									/>
-								</Fragment>
-							))}
-						</ul>
-					) : (
-						<div className="flex h-64 flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
-							<span aria-hidden="true" className="text-4xl">
-								🦗
-							</span>
-							<p>
-								{query || period !== "all"
-									? t("cloud.noMatchingProjects")
-									: t("cloud.emptyProjects")}
+			<>
+				<div className="-mx-7 lg:-mx-10">
+					<DashboardAnnouncements />
+					<DashboardToolbar
+						query={query}
+						setQuery={setQuery}
+						isRaw={false}
+						onImportFile={load}
+						run={run}
+						busy={loading || Boolean(deleting)}
+						actionLabel={t("cloud.refresh")}
+						action="refresh"
+					/>
+					<DashboardFilters
+						hideSelection
+						isRaw={false}
+						period={period}
+						setPeriod={setPeriod}
+						sort={sort}
+						setSort={setSort}
+						selecting={selecting}
+						setSelecting={setSelecting}
+						selected={selected}
+						setSelected={setSelected}
+						visible={entries}
+						busy={loading || Boolean(deleting)}
+						deleteEntries={async () => undefined}
+					/>
+					<div className="px-7 lg:px-10">
+						{error && (
+							<p role="alert" className="mb-4 text-sm text-danger">
+								{error}
 							</p>
-						</div>
-					)}
+						)}
+						{loading ? (
+							<LibrarySkeleton />
+						) : entries.length ? (
+							<ul
+								aria-label={t("cloud.sharedProjects")}
+								className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-x-7 gap-y-10 lg:gap-x-9"
+							>
+								{entries.map((entry) => (
+									<Fragment key={entry.path}>
+										<ProjectCard
+											entry={entry}
+											webUrl={entry.recording.url}
+											webReady={entry.recording.ready}
+											accountLabel={accountLabel}
+											busy={Boolean(deleting)}
+											selecting={false}
+											selected={[]}
+											toggleSelected={() => undefined}
+											openEntry={() =>
+												void run(async () => {
+													const result =
+														await window.electronAPI.openExternalUrl(
+															entry.recording.url,
+														);
+													if (!result.success)
+														throw new Error(
+															result.error ||
+																t("cloud.openLinkFailed"),
+														);
+												})
+											}
+											run={run}
+											onShareProject={async () => undefined}
+											onRenameProject={async (path) => path}
+											folders={[]}
+											save={() => undefined}
+											assignFolder={() => undefined}
+											onDelete={() => setPendingDelete(entry.path)}
+										/>
+									</Fragment>
+								))}
+							</ul>
+						) : (
+							<div className="flex h-64 flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
+								<span aria-hidden="true" className="text-4xl">
+									🦗
+								</span>
+								<p>
+									{query || period !== "all"
+										? t("cloud.noMatchingProjects")
+										: t("cloud.emptyProjects")}
+								</p>
+							</div>
+						)}
+					</div>
 				</div>
-			</div>
+				{confirmation}
+			</>
 		);
 	}
 
 	return (
-		<section className="space-y-3 border-b border-foreground/10 pb-4">
-			<div className="flex items-center justify-between gap-2">
-				<Button
-					variant="ghost"
-					size="sm"
-					onPress={() => setExpanded((value) => !value)}
-					aria-expanded={expanded}
-				>
-					{expanded ? t("cloud.hideShared") : t("cloud.manageShared")}
-				</Button>
-				{expanded && (
+		<>
+			<section className="space-y-3 border-b border-foreground/10 pb-4">
+				<div className="flex items-center justify-between gap-2">
 					<Button
 						variant="ghost"
 						size="sm"
-						isIconOnly
-						aria-label={t("cloud.refreshRecordings")}
-						isDisabled={loading || Boolean(deleting)}
-						onPress={() => void load()}
+						onPress={() => setExpanded((value) => !value)}
+						aria-expanded={expanded}
 					>
-						<ArrowClockwise className="size-4" />
+						{expanded ? t("cloud.hideShared") : t("cloud.manageShared")}
 					</Button>
-				)}
-			</div>
-			{expanded && (
-				<>
-					<p className="text-xs text-muted">
-						{loading
-							? t("cloud.loadingRecordings")
-							: t("cloud.sharedCountSummary", undefined, {
-									count: recordings.length,
-									limit: FREE_RECORDING_LIMIT,
-								})}
-					</p>
-					{loading ? (
-						<LibrarySkeleton />
-					) : (
-						<ul className="max-h-64 space-y-2 overflow-y-auto">
-							{recordings.map((recording) => (
-								<li
-									key={recording.code}
-									className="rounded-lg border border-foreground/10 p-3"
-								>
-									<div className="flex items-center gap-3">
-										<div className="min-w-0 flex-1">
-											<p className="truncate text-sm font-medium">
-												{recording.title}
-											</p>
-											<p className="text-xs text-muted">
-												{(recording.size / 1024 / 1024).toFixed(1)} MB
-												{!recording.ready &&
-													` · ${t("cloud.incompleteUpload")}`}
-											</p>
-										</div>
-										{recording.ready && (
+					{expanded && (
+						<Button
+							variant="ghost"
+							size="sm"
+							isIconOnly
+							aria-label={t("cloud.refreshRecordings")}
+							isDisabled={loading || Boolean(deleting)}
+							onPress={() => void load()}
+						>
+							<ArrowClockwise className="size-4" />
+						</Button>
+					)}
+				</div>
+				{expanded && (
+					<>
+						<p className="text-xs text-muted">
+							{loading
+								? t("cloud.loadingRecordings")
+								: t("cloud.sharedCountSummary", undefined, {
+										count: recordings.length,
+										limit: FREE_RECORDING_LIMIT,
+									})}
+						</p>
+						{loading ? (
+							<LibrarySkeleton />
+						) : (
+							<ul className="max-h-64 space-y-2 overflow-y-auto">
+								{recordings.map((recording) => (
+									<li
+										key={recording.code}
+										className="rounded-lg border border-foreground/10 p-3"
+									>
+										<div className="flex items-center gap-3">
+											<div className="min-w-0 flex-1">
+												<p className="truncate text-sm font-medium">
+													{recording.title}
+												</p>
+												<p className="text-xs text-muted">
+													{(recording.size / 1024 / 1024).toFixed(1)} MB
+													{!recording.ready &&
+														` · ${t("cloud.incompleteUpload")}`}
+												</p>
+											</div>
+											{recording.ready && (
+												<Button
+													variant="ghost"
+													size="sm"
+													isIconOnly
+													aria-label={t(
+														"cloud.openRecordingAria",
+														undefined,
+														{
+															title: recording.title,
+														},
+													)}
+													onPress={() =>
+														void window.electronAPI.openExternalUrl(
+															recording.url,
+														)
+													}
+												>
+													<ArrowSquareOut className="size-4" />
+												</Button>
+											)}
 											<Button
 												variant="ghost"
 												size="sm"
 												isIconOnly
 												aria-label={t(
-													"cloud.openRecordingAria",
+													"cloud.deleteRecordingAria",
 													undefined,
 													{
 														title: recording.title,
 													},
 												)}
-												onPress={() =>
-													void window.electronAPI.openExternalUrl(
-														recording.url,
-													)
-												}
+												isDisabled={Boolean(deleting)}
+												className="text-danger"
+												onPress={() => setPendingDelete(recording.code)}
 											>
-												<ArrowSquareOut className="size-4" />
+												<Trash className="size-4" />
 											</Button>
-										)}
-										<Button
-											variant="ghost"
-											size="sm"
-											isIconOnly
-											aria-label={t("cloud.deleteRecordingAria", undefined, {
-												title: recording.title,
-											})}
-											isDisabled={Boolean(deleting)}
-											className="text-danger"
-											onPress={() => void remove(recording.code)}
-										>
-											<Trash className="size-4" />
-										</Button>
-									</div>
-								</li>
-							))}
-							{!recordings.length && !error && (
-								<li className="text-sm text-muted">
-									{t("cloud.noSharedRecordings")}
-								</li>
-							)}
-						</ul>
-					)}
-					{error && (
-						<Alert status="danger">
-							<Alert.Content>
-								<Alert.Description>{error}</Alert.Description>
-							</Alert.Content>
-						</Alert>
-					)}
-				</>
-			)}
-		</section>
+										</div>
+									</li>
+								))}
+								{!recordings.length && !error && (
+									<li className="text-sm text-muted">
+										{t("cloud.noSharedRecordings")}
+									</li>
+								)}
+							</ul>
+						)}
+						{error && (
+							<Alert status="danger">
+								<Alert.Content>
+									<Alert.Description>{error}</Alert.Description>
+								</Alert.Content>
+							</Alert>
+						)}
+					</>
+				)}
+			</section>
+			{confirmation}
+		</>
 	);
 }

@@ -93,8 +93,12 @@ export class CloudStorage {
 		this.queue = next.catch(() => undefined);
 		return next;
 	}
-	private command(args: string[], operationId?: string, input?: string): Promise<string> {
-		const controller = new AbortController();
+	private command(
+		args: string[],
+		operationId?: string,
+		input?: string,
+		controller = new AbortController(),
+	): Promise<string> {
 		if (operationId) this.processes.set(operationId, controller);
 		return new Promise((resolve, reject) => {
 			const child = spawn(cloudRuntimePath(), [...args, "--config", this.config], {
@@ -290,16 +294,32 @@ export class CloudStorage {
 			);
 		});
 	}
-	async copy(id: string, remotePath: string, localPath: string, upload: boolean) {
-		return this.ordered(async () => {
-			await this.getAccount(id);
-			await this.unlock();
-			const remote = this.remote(id, remotePath);
-			await this.command(
-				["copyto", ...(upload ? [localPath, remote] : [remote, localPath])],
-				id,
-			);
-		});
+	async copy(
+		id: string,
+		remotePath: string,
+		localPath: string,
+		upload: boolean,
+		operationId = id,
+	) {
+		// Register before queueing so Cancel also stops a transfer waiting for another command.
+		const controller = new AbortController();
+		this.processes.set(operationId, controller);
+		try {
+			return await this.ordered(async () => {
+				controller.signal.throwIfAborted();
+				await this.getAccount(id);
+				await this.unlock();
+				const remote = this.remote(id, remotePath);
+				await this.command(
+					["copyto", ...(upload ? [localPath, remote] : [remote, localPath])],
+					operationId,
+					undefined,
+					controller,
+				);
+			});
+		} finally {
+			this.processes.delete(operationId);
+		}
 	}
 	cancel(id = "login") {
 		if (id === "login") this.loginCanceled = true;
