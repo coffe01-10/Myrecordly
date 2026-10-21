@@ -1,3 +1,4 @@
+import { PreviewVolumeControl } from "./PreviewVolumeControl";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,13 +19,8 @@ import {
 	Scissors,
 	SkipBack,
 	SkipForward,
-	SpeakerHigh,
-	SpeakerLow,
-	SpeakerX,
 } from "@/components/ui/icons";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
 import type { useI18n } from "@/contexts/I18nContext";
 import { ASPECT_RATIOS, type AspectRatio, getAspectRatioLabel } from "@/utils/aspectRatioUtils";
 import type { useVideoEditorAudio } from "../audio/useVideoEditorAudio";
@@ -349,46 +345,7 @@ export function EditorPreviewPanel(props: Props) {
 					</div>
 				</div>
 
-				<div className="editor-playback-volume z-10 ml-auto flex items-center">
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								aria-label={t("editor.playback.volume", "Preview volume")}
-								title={t("editor.playback.volume", "Preview volume")}
-							>
-								{previewVolume <= 0.001 ? (
-									<SpeakerX className="size-3.5" />
-								) : previewVolume < 0.5 ? (
-									<SpeakerLow className="size-3.5" />
-								) : (
-									<SpeakerHigh className="size-3.5" />
-								)}
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent
-							side="top"
-							sideOffset={10}
-							aria-label={t("editor.playback.volume", "Preview volume")}
-							className="flex w-14 flex-col items-center gap-3 p-3"
-						>
-							<span className="text-[10px] tabular-nums text-muted-foreground">
-								{Math.round(previewVolume * 100)}%
-							</span>
-							<Slider
-								aria-label={t("editor.playback.volume", "Preview volume")}
-								orientation="vertical"
-								min={0}
-								max={1}
-								step={0.01}
-								value={[previewVolume]}
-								onValueChange={([value]) => setPreviewVolume(value)}
-								className="h-28"
-							/>
-						</PopoverContent>
-					</Popover>
-				</div>
+				<PreviewVolumeControl volume={previewVolume} onChange={setPreviewVolume} />
 			</div>
 		</div>
 	);

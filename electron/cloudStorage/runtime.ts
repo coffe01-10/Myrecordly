@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { app, safeStorage } from "electron";
 import { USER_DATA_PATH } from "../appPaths";
+import { configureRemote } from "./configureRemote";
 import {
 	cloudProviders,
 	type CloudAccount,
@@ -31,6 +32,7 @@ export class CloudStorage {
 	private keyUnavailable = false;
 	private processes = new Map<string, AbortController>();
 	private authorizing?: CloudProvider;
+	private authorizingStage?: "browser" | "drive";
 	private sessionOnly = false;
 	private loginCanceled = false;
 	private openingWeb = new Map<CloudProvider, Promise<CloudAccount>>();
@@ -151,6 +153,7 @@ export class CloudStorage {
 		return {
 			accounts: this.accounts,
 			authorizing: this.authorizing,
+			authorizingStage: this.authorizingStage,
 			runtimeAvailable,
 			sessionOnly: this.sessionOnly,
 		};
@@ -201,6 +204,7 @@ export class CloudStorage {
 			throw new Error("请使用网盘的网页登录入口");
 		if (this.authorizing) throw new Error("请先完成或取消当前浏览器授权");
 		this.authorizing = provider;
+		this.authorizingStage = "browser";
 		this.loginCanceled = false;
 		this.changed();
 		return this.ordered(async () => {
@@ -214,24 +218,19 @@ export class CloudStorage {
 			try {
 				await this.unlock();
 				if (this.loginCanceled) throw new Error("操作已取消");
-				await this.command(
-					[
-						"config",
-						"create",
-						account.id,
-						provider,
-						"config_is_local",
-						"true",
-						...(provider === "onedrive" ? ["config_type", "onedrive"] : []),
-						"--no-output",
-					],
-					"login",
-				);
-				if (this.loginCanceled) throw new Error("操作已取消");
-				// The backend config command can finish without a usable drive (e.g. denied consent).
-				await this.command(
-					["lsjson", `${account.id}:`, "--max-depth", "1", "--dirs-only"],
-					"login",
+				await configureRemote(
+					(args) => {
+						if (this.loginCanceled) throw new Error("操作已取消");
+						return this.command(args, "login");
+					},
+					account.id,
+					provider,
+					() => {
+						if (this.authorizingStage === "browser") {
+							this.authorizingStage = "drive";
+							this.changed();
+						}
+					},
 				);
 				if (this.loginCanceled) throw new Error("操作已取消");
 				this.accounts.push(account);
@@ -242,6 +241,7 @@ export class CloudStorage {
 				throw error;
 			} finally {
 				this.authorizing = undefined;
+				this.authorizingStage = undefined;
 				this.changed();
 			}
 		});

@@ -17,6 +17,7 @@ export type CloudAccount = {
 export type CloudStorageState = {
 	accounts: CloudAccount[];
 	authorizing?: CloudProvider;
+	authorizingStage?: "browser" | "drive";
 	runtimeAvailable: boolean;
 	sessionOnly: boolean;
 };

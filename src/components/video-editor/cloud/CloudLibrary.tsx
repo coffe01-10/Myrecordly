@@ -22,16 +22,18 @@ import type { CloudTimelineTarget } from "./useCloudVideoImport";
 
 export function CloudLibrary({
 	timelineTarget,
+	initialAccountId,
 }: {
 	token?: string;
 	accountLabel?: string;
 	onSignIn: () => void;
 	timelineTarget?: CloudTimelineTarget;
+	initialAccountId?: string;
 }) {
 	const { t } = useI18n();
 	const cloud = useCloudStorage();
 	const google = useGoogleDesktopAuth();
-	const [selection, setSelection] = useState("");
+	const [selection, setSelection] = useState(initialAccountId ?? "");
 	const [accountsExpanded, setAccountsExpanded] = useState<boolean>();
 	const direct = cloud.accounts.filter((account) => account.mode === "oauth");
 	const selected = direct.find((account) => account.id === selection) ?? direct[0];
@@ -56,7 +58,14 @@ export function CloudLibrary({
 					<AccordionContent>
 						<CloudAccountsPanel
 							onSelect={(account) => {
-								if (account.mode === "oauth") setSelection(account.id);
+								if (account.mode === "oauth") {
+									setSelection(account.id);
+									setAccountsExpanded(false);
+								}
+							}}
+							onSelectGoogle={() => {
+								setSelection("google");
+								setAccountsExpanded(false);
 							}}
 						/>
 					</AccordionContent>

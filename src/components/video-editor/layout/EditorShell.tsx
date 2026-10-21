@@ -6,7 +6,7 @@ import { useRecordlyAuth } from "@/components/auth/useRecordlyAuth";
 import { useVideoSourceRecovery } from "../hooks/useVideoSourceRecovery";
 import { useRecordingLibrary } from "../library/useRecordingLibrary";
 import { RecordingLibraryPanel } from "../library/RecordingLibraryPanel";
-import { RECORDING_DRAG_TYPE } from "@/types/recordingLibrary";
+import type { CloudTimelineTarget } from "../cloud/useCloudVideoImport";
 import { Button } from "@/components/ui/button";
 import {
 	lazy,
@@ -197,6 +197,21 @@ export function EditorShell(props: Props) {
 			callbackError={auth.callbackError}
 		/>
 	);
+	const cloudTimelineTarget: CloudTimelineTarget = {
+		projectKey: project.currentProjectPath ?? project.videoSourcePath,
+		add: async (path) => {
+			const added = project.videoSourcePath
+				? await library.addToTimeline(path)
+				: await openActions.handleOpenMediaAtPath(path);
+			if (added) {
+				project.setProjectBrowserOpen(false);
+				library.setOpen(true);
+				void library.refresh();
+			}
+			return added;
+		},
+		cancel: library.cancelImport,
+	};
 	const editorDialogs = (
 		<AccountProfileContext.Provider value={auth.user}>
 			<DashboardSettingsContext.Provider value={dashboardSettingsContent}>
@@ -234,21 +249,7 @@ export function EditorShell(props: Props) {
 					}}
 					accountLabel={auth.user?.email || auth.user?.user_metadata.full_name}
 					authToken={auth.accessToken}
-					cloudTimelineTarget={{
-						projectKey: project.currentProjectPath ?? project.videoSourcePath,
-						add: async (path) => {
-							const added = project.videoSourcePath
-								? await library.addToTimeline(path)
-								: await openActions.handleOpenMediaAtPath(path);
-							if (added) {
-								project.setProjectBrowserOpen(false);
-								library.setOpen(true);
-								void library.refresh();
-							}
-							return added;
-						},
-						cancel: library.cancelImport,
-					}}
+					cloudTimelineTarget={cloudTimelineTarget}
 					handleImportMediaOrProject={openActions.handleImportMediaOrProject}
 					handleOpenProjectFromLibrary={openActions.handleOpenProjectFromLibrary}
 					nativeCaptureUnavailableModalOpen={ui.nativeCaptureUnavailableModalOpen}
@@ -262,6 +263,7 @@ export function EditorShell(props: Props) {
 			<>
 				<EditorLoadingSkeleton />
 				<RecordlySignInDialog
+					timelineTarget={cloudTimelineTarget}
 					open={signInOpen}
 					onOpenChange={setSignInOpen}
 					reason={signInReason}
@@ -293,6 +295,7 @@ export function EditorShell(props: Props) {
 					</Button>
 				</div>
 				<RecordlySignInDialog
+					timelineTarget={cloudTimelineTarget}
 					open={signInOpen}
 					onOpenChange={setSignInOpen}
 					reason={signInReason}
@@ -368,45 +371,6 @@ export function EditorShell(props: Props) {
 				onPointerDownCapture={(event) => {
 					if ((event.target as HTMLElement).closest("[data-timeline-item]"))
 						library.setOpen(false);
-				}}
-				onDragOver={(event) => {
-					if (event.dataTransfer.types.includes(RECORDING_DRAG_TYPE)) {
-						event.preventDefault();
-						event.dataTransfer.dropEffect = "copy";
-					}
-				}}
-				onDrop={(event) => {
-					const path = event.dataTransfer.getData(RECORDING_DRAG_TYPE);
-					if (!path) return;
-					event.preventDefault();
-					event.stopPropagation();
-					const timelinePanel = (event.target as HTMLElement).closest(
-						"[data-timeline-panel]",
-					);
-					let index: number | undefined;
-					if (timelinePanel) {
-						const clips = [
-							...timelinePanel.querySelectorAll<HTMLElement>(
-								'[data-timeline-item][data-variant="clip"]',
-							),
-						].sort((a, b) => Number(a.dataset.startMs) - Number(b.dataset.startMs));
-						index = clips.findIndex((clip) => {
-							const rect = clip.getBoundingClientRect();
-							return event.clientX < rect.left + rect.width / 2;
-						});
-						if (index < 0) index = clips.length;
-					}
-					let paths: unknown;
-					try {
-						paths = JSON.parse(path);
-					} catch {
-						paths = [path];
-					}
-					if (
-						Array.isArray(paths) &&
-						paths.every((value) => typeof value === "string" && value.length > 0)
-					)
-						void library.addToTimeline(paths, index);
 				}}
 			>
 				<div className="editor-workspace relative z-10 min-h-0 flex-1">
@@ -529,6 +493,7 @@ export function EditorShell(props: Props) {
 				</div>
 			)}
 			<RecordlySignInDialog
+				timelineTarget={cloudTimelineTarget}
 				open={signInOpen}
 				onOpenChange={setSignInOpen}
 				reason={signInReason}

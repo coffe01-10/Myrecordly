@@ -507,6 +507,8 @@
 	},
 	"openRecordingsFolder": "Aufnahmeordner öffnen",
 	"cloudAccounts": {
+		"backToAccounts": "Back to accounts",
+		"browse": "Browse files",
 		"title": "Cloud accounts",
 		"description": "Connect your cloud storage to manage footage and finished videos.",
 		"browserAuth": "Browser authorization",
@@ -516,6 +518,7 @@
 		"disconnect": "Disconnect",
 		"signIn": "Sign in",
 		"signingIn": "Continue sign-in in the opened window…",
+		"connectingDrive": "Signed in. Connecting to your drive…",
 		"runtimeMissing": "This build does not include the direct connection component. Website sessions remain available.",
 		"sessionOnly": "The system keyring is unavailable. Direct authorization lasts until this app exits.",
 		"saved": "Saved accounts and website sessions",

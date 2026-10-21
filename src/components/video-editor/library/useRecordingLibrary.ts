@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "@/components/ui/toast";
+import { useRecordingDrag } from "./useRecordingDrag";
 import { useScopedT } from "@/contexts/I18nContext";
 import type { RecordingLibraryEntry } from "@/types/recordingLibrary";
 import { packClipSequence, rippleRegionAnchors, rippleRegions } from "../clipSequence";
@@ -287,7 +288,9 @@ export function useRecordingLibrary(
 			setCancelling(false);
 		}
 	};
+	const drag = useRecordingDrag(addToTimeline);
 	return {
+		drag,
 		open,
 		setOpen,
 		entries,

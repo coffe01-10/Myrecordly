@@ -8,6 +8,16 @@ const entries: RecordingLibraryEntry[] = [];
 const changed = new Set<() => void>();
 const canceled = new Set<string>();
 const mediaUrl = `${location.origin}/tests/ui/fixtures/filmstrip.mp4`;
+if (query.has("library")) {
+	for (const name of ["intro.mp4", "interview.mp4"])
+		entries.push({
+			name,
+			path: `/recordings/${name}`,
+			bytes: 81920,
+			createdAt: Date.now(),
+			url: mediaUrl,
+		});
+}
 const accounts = [
 	{ id: "one", provider: "onedrive", name: "OneDrive · Work", mode: "oauth", connectedAt: "" },
 	{ id: "two", provider: "dropbox", name: "Dropbox · Personal", mode: "oauth", connectedAt: "" },

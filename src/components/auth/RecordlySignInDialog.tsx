@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/contexts/I18nContext";
 import { CloudAccountsPanel } from "./CloudAccountsPanel";
 import { OnboardingFeature } from "./OnboardingFeature";
+import { CloudLibrary } from "@/components/video-editor/cloud/CloudLibrary";
+import type { CloudTimelineTarget } from "@/components/video-editor/cloud/useCloudVideoImport";
 
 export type SignInReason = "account" | "share";
 type Props = {
@@ -16,6 +18,7 @@ type Props = {
 	configured: boolean;
 	callbackError?: string;
 	onAuthenticated: () => void;
+	timelineTarget?: CloudTimelineTarget;
 };
 
 export function RecordlySignInDialog({
@@ -24,14 +27,58 @@ export function RecordlySignInDialog({
 	open,
 	onOpenChange,
 	onAuthenticated,
+	timelineTarget,
 }: Props) {
 	const { t } = useI18n();
 	const [featureStep, setFeatureStep] = useState(-1);
+	const [browsing, setBrowsing] = useState<string>();
 	const feature = onboarding && featureStep >= 0;
 	const wide = onboarding || variant === "wide";
 	useEffect(() => {
-		if (!open) setFeatureStep(-1);
+		if (!open) {
+			setFeatureStep(-1);
+			setBrowsing(undefined);
+		}
 	}, [open]);
+	if (browsing)
+		return (
+			<Modal isOpen={open} onOpenChange={onOpenChange}>
+				<Modal.Backdrop>
+					<Modal.Container size="cover" placement="center" className="p-4 sm:p-8">
+						<Modal.Dialog
+							aria-label={t("editor.cloudAccounts.browse", "浏览文件")}
+							className="custom-scrollbar w-full max-w-5xl max-h-[calc(100dvh-64px)] overflow-y-auto p-6"
+						>
+							<Modal.CloseTrigger aria-label={t("common.actions.close", "关闭")} />
+							<Modal.Header>
+								<Modal.Heading>
+									{t("editor.cloudAccounts.browse", "浏览文件")}
+								</Modal.Heading>
+							</Modal.Header>
+							<Button variant="ghost" onPress={() => setBrowsing(undefined)}>
+								{t("editor.cloudAccounts.backToAccounts", "返回账号")}
+							</Button>
+							<CloudLibrary
+								onSignIn={() => setBrowsing(undefined)}
+								initialAccountId={browsing}
+								timelineTarget={
+									timelineTarget
+										? {
+												...timelineTarget,
+												add: async (path) => {
+													const added = await timelineTarget.add(path);
+													if (added) onOpenChange(false);
+													return added;
+												},
+											}
+										: undefined
+								}
+							/>
+						</Modal.Dialog>
+					</Modal.Container>
+				</Modal.Backdrop>
+			</Modal>
+		);
 	return (
 		<Modal isOpen={open} onOpenChange={onOpenChange}>
 			<Modal.Backdrop>
@@ -87,7 +134,19 @@ export function RecordlySignInDialog({
 										)}
 									</Description>
 								</Modal.Header>
-								<CloudAccountsPanel />
+								<CloudAccountsPanel
+									onSelect={
+										!onboarding
+											? (account) => {
+													if (account.mode === "oauth")
+														setBrowsing(account.id);
+												}
+											: undefined
+									}
+									onSelectGoogle={
+										!onboarding ? () => setBrowsing("google") : undefined
+									}
+								/>
 								<Button
 									className="mt-5 w-full"
 									variant="secondary"

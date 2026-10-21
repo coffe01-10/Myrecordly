@@ -537,6 +537,8 @@
 	},
 	"openRecordingsFolder": "打开录制文件夹",
 	"cloudAccounts": {
+		"backToAccounts": "返回账号",
+		"browse": "浏览文件",
 		"title": "网盘账号",
 		"description": "连接自己的网盘，集中管理素材与成片。",
 		"browserAuth": "浏览器授权",
@@ -546,6 +548,7 @@
 		"disconnect": "断开",
 		"signIn": "登录",
 		"signingIn": "请在打开的窗口中完成登录…",
+		"connectingDrive": "登录已完成，正在连接网盘…",
 		"runtimeMissing": "此构建未附带直连组件，网页登录仍可使用。",
 		"sessionOnly": "系统密钥环不可用，直连授权仅保留至本次退出。",
 		"saved": "已保存的账号与网页会话",

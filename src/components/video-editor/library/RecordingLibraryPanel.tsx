@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/icons";
 import { useScopedT } from "@/contexts/I18nContext";
 import { cn } from "@/lib/utils";
-import { RECORDING_DRAG_TYPE } from "@/types/recordingLibrary";
 import { RecordingThumbnail } from "./RecordingThumbnail";
 import type { useRecordingLibrary } from "./useRecordingLibrary";
 
@@ -225,22 +224,23 @@ export function RecordingLibraryPanel({
 					<div
 						key={entry.path}
 						data-recording-path={entry.path}
-						draggable={!library.busy && !library.importing}
-						onDragStart={(event) => {
+						onPointerDownCapture={(event) => {
+							if (library.busy || library.importing) return;
 							const paths = library.selected.has(entry.path)
 								? library.entries
 										.filter((item) => library.selected.has(item.path))
 										.map((item) => item.path)
 								: [entry.path];
-							event.dataTransfer.setData(RECORDING_DRAG_TYPE, JSON.stringify(paths));
-							event.dataTransfer.effectAllowed = "copy";
+							library.drag.start(event, paths, entry.name);
 						}}
+						onClickCapture={library.drag.suppressClick}
 						className={cn(
-							"group flex items-center gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-default",
+							"group flex touch-none items-center gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-default",
 							library.selected.has(entry.path) && "bg-default",
 						)}
 					>
 						<Checkbox
+							data-recording-select
 							aria-label={t("clips.select", "Select {{name}}", { name: entry.name })}
 							isDisabled={library.busy || library.importing}
 							isSelected={library.selected.has(entry.path)}
@@ -255,7 +255,8 @@ export function RecordingLibraryPanel({
 						<Button
 							type="button"
 							variant="ghost"
-							className="h-auto min-w-0 flex-1 justify-start gap-3 rounded-md px-0 text-left"
+							data-recording-drag-handle
+							className="h-auto min-w-0 flex-1 cursor-grab justify-start gap-3 rounded-md px-0 text-left"
 							disabled={library.busy || library.importing}
 							onClick={() => toggle(entry.path, !library.selected.has(entry.path))}
 							onDoubleClick={() => void library.addToTimeline(entry.path)}
@@ -282,6 +283,7 @@ export function RecordingLibraryPanel({
 							variant="ghost"
 							size="icon"
 							className="size-7 shrink-0"
+							data-recording-add
 							aria-label={t("clips.addToTimeline", "Add {{name}} to timeline", {
 								name: entry.name,
 							})}
@@ -313,6 +315,7 @@ export function RecordingLibraryPanel({
 					</Button>
 				)}
 			</footer>
+			{library.drag.overlay}
 		</section>
 	);
 }

@@ -2,6 +2,8 @@
 
 Recording and editing work locally without an account or database. The account dialog manages provider connections rather than a Recordly/Supabase identity.
 
+Choose **Browse files** beside an authorized OneDrive, Dropbox, or Google Drive account to access its files, import footage, or add videos to the current timeline directly from the account dialog. Newly connected OneDrive and Dropbox accounts open their file browser automatically.
+
 - **OneDrive and Dropbox:** browser OAuth through the bundled rclone runtime. Browse, upload, download, and export finished videos from Recordly.
 - **Aliyun, Baidu, Quark, and 123:** official website windows with separate persistent sessions. Complete the provider’s own login and manage files there. A saved website session is not presented as verified API authorization. Website restrictions and verification prompts remain under the provider’s control.
 - **Google Drive:** the publisher bundles the desktop OAuth configuration. Users do not register an API application or import JSON. Builds without publisher configuration explain the limitation while other providers remain available.

@@ -8,7 +8,13 @@ import { cloudRequest, useCloudStorage } from "@/lib/drive/cloudStorage";
 import { useGoogleDesktopAuth } from "./useGoogleDesktopAuth";
 import { signInGoogleDesktop, signOutGoogleDesktop } from "@/lib/auth/googleDesktop";
 
-export function CloudAccountsPanel({ onSelect }: { onSelect?: (account: CloudAccount) => void }) {
+export function CloudAccountsPanel({
+	onSelect,
+	onSelectGoogle,
+}: {
+	onSelect?: (account: CloudAccount) => void;
+	onSelectGoogle?: () => void;
+}) {
 	const { t } = useI18n();
 	const cloud = useCloudStorage();
 	const google = useGoogleDesktopAuth();
@@ -79,6 +85,12 @@ export function CloudAccountsPanel({ onSelect }: { onSelect?: (account: CloudAcc
 									))}
 					</span>
 				</div>
+				{google.user && onSelectGoogle && (
+					<Button size="sm" variant="secondary" onClick={onSelectGoogle}>
+						<ArrowSquareOut />
+						{t("editor.cloudAccounts.browse", "浏览文件")}
+					</Button>
+				)}
 				{(google.configured || google.user) && (
 					<Button
 						size="sm"
@@ -98,7 +110,11 @@ export function CloudAccountsPanel({ onSelect }: { onSelect?: (account: CloudAcc
 			</div>
 			{(cloud.authorizing || google.authorizing) && (
 				<div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-					<span>{t("editor.cloudAccounts.signingIn", "请在打开的窗口中完成登录…")}</span>
+					<span>
+						{cloud.authorizingStage === "drive"
+							? t("editor.cloudAccounts.connectingDrive", "登录已完成，正在连接网盘…")
+							: t("editor.cloudAccounts.signingIn", "请在打开的窗口中完成登录…")}
+					</span>
 					<Button
 						size="sm"
 						variant="ghost"
@@ -204,9 +220,13 @@ export function CloudAccountsPanel({ onSelect }: { onSelect?: (account: CloudAcc
 							)}
 							{(account.mode === "web" || onSelect) && (
 								<Button
-									size="icon"
-									variant="ghost"
-									title={t("editor.cloudAccounts.open", "打开网盘")}
+									size={account.mode === "web" ? "icon" : "sm"}
+									variant={account.mode === "web" ? "ghost" : "secondary"}
+									title={
+										account.mode === "web"
+											? t("editor.cloudAccounts.open", "打开网盘")
+											: t("editor.cloudAccounts.browse", "浏览文件")
+									}
 									onClick={() =>
 										account.mode === "web"
 											? void run(account.id, () =>
@@ -216,6 +236,8 @@ export function CloudAccountsPanel({ onSelect }: { onSelect?: (account: CloudAcc
 									}
 								>
 									<ArrowSquareOut />
+									{account.mode === "oauth" &&
+										t("editor.cloudAccounts.browse", "浏览文件")}
 								</Button>
 							)}
 							<Button

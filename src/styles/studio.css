@@ -1,6 +1,10 @@
 /* DogSC's neutral surfaces, mint navigation and warm effect tracks.
    These are application chrome tokens; video composition colors stay independent. */
 
+/* Desktop controls keep the native arrow instead of swapping cursor handles at every control. */
+:root { --cursor-interactive: default; }
+html[data-library-dragging] * { cursor: grabbing !important; }
+
 /* Windows caption buttons retain their native behavior over a transparent surface.
    Keeping the title strip in the page lets every modal backdrop dim it naturally. */
 html[data-window-titlebar="overlay"] #root {
@@ -268,6 +272,25 @@ html[data-window-fullscreen] .native-window-titlebar { display: none; }
 	border-radius: 50%;
 }
 .slider__thumb::after { display: none; }
+.slider.preview-volume-slider[data-orientation="vertical"] {
+	height: 104px;
+	width: 28px;
+}
+.slider.preview-volume-slider .slider__track {
+	width: 4px;
+	border-block-width: 7px;
+}
+.slider.preview-volume-slider .slider__track[data-fill-start="true"] {
+	border-bottom-color: var(--slider-fill);
+}
+.slider.preview-volume-slider .slider__track[data-fill-end="true"] {
+	border-top-color: var(--slider-fill);
+}
+.slider.preview-volume-slider .slider__thumb {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+}
 .slider__output {
 	min-width: 48px;
 	padding: 3px 9px;
