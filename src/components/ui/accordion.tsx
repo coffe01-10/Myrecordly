@@ -19,11 +19,12 @@ export function AccordionTrigger({
 }
 export function AccordionContent({
 	children,
+	bodyClassName,
 	...props
-}: ComponentProps<typeof HeroAccordion.Panel>) {
+}: ComponentProps<typeof HeroAccordion.Panel> & { bodyClassName?: string }) {
 	return (
 		<HeroAccordion.Panel {...props}>
-			<HeroAccordion.Body>{children}</HeroAccordion.Body>
+			<HeroAccordion.Body className={bodyClassName}>{children}</HeroAccordion.Body>
 		</HeroAccordion.Panel>
 	);
 }

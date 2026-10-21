@@ -1,51 +1,42 @@
-语言: [EN](authentication.md) | 简中
+# 网盘登录与账号管理
 
-# Recordly 身份验证设置
+Recordly 的录制、剪辑、保存不需要账号。网盘登录直接与各家服务交互，不创建 Recordly 用户数据库，也不要求部署 Supabase。
 
-Google 登录与 Drive 使用桌面 OAuth 直连，无需 Supabase，首次在应用里导入 Desktop app 客户端 JSON 即可。参见 [Google 桌面登录配置](google-drive.zh-CN.md)。以下 Supabase 设置仅用于可选的邮箱、Microsoft、GitHub 和旧云端服务，其会话与 Google 桌面会话分开。
+## 使用方式
 
-## 1. 创建项目
+打开账号按钮或素材库的云端页面，进入「网盘账号」。
 
-1. 创建一个 Supabase 项目。
-2. 在 **Project settings → API** 中，复制项目 URL 和可发布密钥（publishable key）。
-3. 将 `.env.example` 复制为 `.env.local` 并填入这两个值。切勿在桌面应用中使用 service-role 密钥。
-4. 在 **Authentication → URL configuration** 中，将 `recordly://auth/callback` 和 `http://127.0.0.1:43821/auth/callback` 添加到重定向允许列表。
+| 服务 | 接入方式 | 文件管理 |
+| --- | --- | --- |
+| OneDrive、Dropbox | 系统浏览器授权，使用随应用内置的 rclone 客户端 | 应用内浏览文件、上传、下载、导出成片 |
+| 阿里云盘、百度网盘、夸克网盘、123 云盘 | 独立的官方网页窗口，按官网要求扫码或登录 | 在官网窗口中操作，不需要开发者 API 密钥 |
+| Google Drive | 应用发布方预先配置桌面 OAuth 客户端，用户只登录授权 | 原有 Google Drive 文件管理 |
 
-一旦启用邮箱认证并创建了用户，邮箱/密码即可使用。密码重置邮件使用同一个桌面回调。
+点击网盘入口默认打开已有网页会话，不会反复新增条目。需要另一个独立登录时，点击会话行的「新建独立网页会话」加号；也可以修改备注名。网页未能加载时不会保存新条目。网页登录会话不会仅凭打开页面被标成「已授权」；是否登录成功由官网界面显示。网站限制嵌入浏览器时，以网站要求为准，应用不绕过验证码、设备验证或登录限制。
 
-## 2. Google
+「移除本机会话」只删除这台电脑中此应用保存的授权或网页会话，不删除云端文件，也不影响系统浏览器的登录。撤销服务端授权仍在网盘自己的账户页面完成。
 
-创建 **Desktop app** OAuth 客户端，启用 Drive API，并把测试邮箱加入测试用户，然后在 Recordly 中导入下载的 JSON。完整步骤见 [Google 桌面登录与 Drive](google-drive.zh-CN.md)，不再使用 Supabase 回调、服务端 Secrets、数据库或 Edge Function。
+## 保存与导出
 
-## 3. X
+直连网盘可在云端素材库内选择账号、进入文件夹、上传与下载。上传同名文件会更新该文件。下载先写入临时文件，完成后才替换用户选定的目标。
 
-1. 在 X Developer Dashboard 中创建一个 OAuth 2.0 应用，并启用请求用户邮箱。
-2. 将其回调 URL 设置为 `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`。
-3. 在 Supabase 中启用 X/Twitter OAuth 2.0，并粘贴客户端 ID 和密钥。
+导出窗口选择「网盘」，再选择直连账号，即可把成片保存到网盘中的 `Recordly` 文件夹。网页会话的文件操作使用网盘官方窗口，可以先导出到本地，再从官网上传。
 
-## 4. SAML SSO（当前隐藏）
+## 本机存储
 
-SAML 按客户工作区配置。Supabase 的 SAML 支持需要 Pro 或更高版本。
+- 账号备注与类型：用户数据目录下的 `cloud-storage/accounts.json`，不包含访问令牌。
+- OneDrive / Dropbox 授权：`cloud-storage/accounts.conf`，由 rclone 加密；随机解密口令通过操作系统 `safeStorage` 保存。
+- 系统密钥环不可用时，只保留本次运行的直连授权，退出即删除临时授权配置。
+- 官方网页使用各自独立的持久化浏览器会话，不注入 Recordly preload，不把密码或 Cookie 复制到应用数据库。
 
-1. 在 Supabase Auth 提供方设置中启用 SAML。
-2. 获取客户的 IdP 元数据 URL 或元数据 XML 文件。
-3. 使用 Supabase CLI 注册连接及其邮箱域名，例如：
+## 发布方配置
 
-   ```sh
-   supabase sso add --type saml --project-ref YOUR_PROJECT_REF \
-     --metadata-url 'https://customer.example/idp/metadata' \
-     --domains customer.example
-   ```
+运行 `npm run build:cloud-runtime` 获取官方 rclone 运行组件。平台构建流程会自动执行；组件随安装包分发。授权页面可能显示 rclone 的应用名称，这是内置授权引擎，不要求最终用户注册开发者账号。
 
-Recordly 模态框会从输入的邮箱地址中提取域名，并启动匹配的 SAML 连接。
+网络不可用或当前平台没有对应组件时，构建会说明直连组件未附带，网页登录仍可使用；恢复网络后可重新运行上述命令。
 
-## 5. 本地验证
+Google 的公共共享客户端正在退出使用。发布者应注册自己的 Desktop OAuth 应用、启用 Drive API，并按 Google 要求发布与验证授权应用。把下载的客户端配置放到 `public/google-oauth-desktop.json` 后构建，最终用户只需点击登录。当前构建没有该配置时，会如实显示 Google 授权未内置，其他网盘照常使用，不再弹出导入 JSON 的文件对话框。
 
-创建 `.env.local` 后重启 `npm run dev`。打开一个编辑器并验证：
+没有接入数据库账号体系的邮箱、GitHub 和 Microsoft/Supabase 登录已从主入口撤下；旧服务源码保留为兼容代码，不参与网盘登录。
 
-1. 账户按钮会打开 **Sign into Recordly**。
-2. 邮箱/密码会创建一个持久化的 Supabase 会话。
-3. Google 会打开系统浏览器并返回 Recordly。
-4. 在未登录状态下点击 **Create link** 会打开此模态框；身份验证成功后它会继续进入分享对话框。
-
-将相同的 `SUPABASE_URL` 和 `SUPABASE_PUBLISHABLE_KEY` 值添加到分享 Worker 的 secrets 或变量中。将 `OWNER_USER_ID` 设置为所有者的 Supabase 用户 ID。Worker 会用 Supabase 验证访问令牌，并在接受 API 请求前要求该所有者身份。`API_SECRET` 仅在服务端使用，仍可用于库管理和显式启用的本地集成测试；它绝不会被输入到桌面应用中，也不会由桌面应用暴露。
+参考：[OneDrive](https://rclone.org/onedrive/)、[Dropbox](https://rclone.org/dropbox/)、[Google 客户端政策](https://rclone.org/drive/#making-your-own-client-id)。

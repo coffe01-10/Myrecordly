@@ -5,6 +5,7 @@ import { registerCaptionHandlers } from "./register/captions";
 import { registerCloudShareHandlers } from "./register/cloudShare";
 import { registerGoogleDriveHandlers } from "./register/googleDrive";
 import { registerGoogleDesktopHandlers } from "./register/googleDesktop";
+import { registerCloudStorageHandlers } from "./register/cloudStorage";
 import { registerExportHandlers } from "./register/export";
 import { registerPermissionHandlers } from "./register/permissions";
 import { registerProjectHandlers } from "./register/project";
@@ -74,6 +75,7 @@ export function registerIpcHandlers(
 	registerCaptionHandlers();
 	registerCloudShareHandlers();
 	registerGoogleDriveHandlers(registerGoogleDesktopHandlers());
+	registerCloudStorageHandlers();
 	registerProjectHandlers();
 	registerSettingsHandlers();
 }

@@ -134,7 +134,7 @@
 		"replaceClient": "Change Google client configuration",
 		"sessionOnly": "This device cannot encrypt saved credentials. Sign-in lasts for this app session only.",
 		"googleErrors": {
-			"NOT_CONFIGURED": "Import a Google Desktop app OAuth client JSON first.",
+			"NOT_CONFIGURED": "Google authorization is not included in this build. Please use another cloud provider.",
 			"INVALID_CLIENT": "Choose the JSON for a Desktop app OAuth client, not a Web client or API key.",
 			"AUTH_CANCELED": "Google sign-in was canceled.",
 			"AUTH_TIMEOUT": "Browser sign-in timed out. Click Google to try again.",
@@ -505,5 +505,38 @@
 		"collapse": "Comprimi timeline",
 		"unsupportedSpeed": "This speed is not supported for preview on this device."
 	},
-	"openRecordingsFolder": "Apri cartella registrazioni"
+	"openRecordingsFolder": "Apri cartella registrazioni",
+	"cloudAccounts": {
+		"title": "Cloud accounts",
+		"description": "Connect your cloud storage to manage footage and finished videos.",
+		"browserAuth": "Browser authorization",
+		"websiteSession": "Official website session",
+		"googleReady": "Sign in with your browser to connect Drive",
+		"googleUnavailable": "Google authorization is not included in this build. Other providers remain available.",
+		"disconnect": "Disconnect",
+		"signIn": "Sign in",
+		"signingIn": "Continue sign-in in the opened window…",
+		"runtimeMissing": "This build does not include the direct connection component. Website sessions remain available.",
+		"sessionOnly": "The system keyring is unavailable. Direct authorization lasts until this app exits.",
+		"saved": "Saved accounts and website sessions",
+		"accountName": "Account label",
+		"webSaved": "Independent website session · check sign-in on the official site",
+		"connected": "Authorized · browse and transfer files in the app",
+		"open": "Open storage",
+		"rename": "Edit account label",
+		"remove": "Remove local session",
+		"webNotice": "The official website handles login. Recordly does not read your password or treat opening a page as successful authorization. Removing a session clears this app’s local login only; it does not delete cloud files.",
+		"optional": "Recording and editing work locally. Sign-in is only for your own cloud storage.",
+		"continueLocal": "Continue to Recordly",
+		"manage": "Manage cloud accounts",
+		"choose": "Choose cloud account",
+		"start": "Add a direct account to browse files here. For website sessions, choose Open storage.",
+		"parent": "Parent folder",
+		"empty": "This folder is empty",
+		"exportFolder": "The finished video is saved in the selected cloud’s Recordly folder. Uploading updates a file with the same name.",
+		"saveVideo": "Save video to cloud storage",
+		"videoSaved": "Video saved in the cloud Recordly folder",
+		"destination": "Cloud storage",
+		"newSession": "Add separate website session"
+	}
 }

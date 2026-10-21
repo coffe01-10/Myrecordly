@@ -1,204 +1,182 @@
-import { useEffect, useRef, useState } from "react";
-import { GoogleDriveLogo } from "@phosphor-icons/react";
+import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { ProgressBar } from "@heroui/react";
 import { Button } from "@/components/ui/button";
+import {
+	Accordion,
+	AccordionItem,
+	AccordionTrigger,
+	AccordionContent,
+} from "@/components/ui/accordion";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { CloudAccountsPanel } from "@/components/auth/CloudAccountsPanel";
+import { useGoogleDesktopAuth } from "@/components/auth/useGoogleDesktopAuth";
 import { useI18n } from "@/contexts/I18nContext";
-import { signInWithSocial } from "@/lib/auth/recordlyAuth";
-import { driveApi, notifyDriveChanged } from "@/lib/drive/googleDrive";
-import type { DriveFile } from "@/types/googleDrive";
-import { useGoogleDrive } from "./useGoogleDrive";
-import { AuthSetupNotice } from "@/components/auth/AuthSetupNotice";
+import { cloudRequest, useCloudStorage } from "@/lib/drive/cloudStorage";
+import { GoogleDriveExportButton } from "./GoogleDriveExportButton";
 
-export function DriveExportButton({
-	prepareFile,
-	projectTitle,
-	preparationProgress,
-	onCancelPrepare,
-	onBusyChange,
-}: {
-	prepareFile: () => Promise<string | undefined>;
-	projectTitle: string;
-	preparationProgress: number;
-	onCancelPrepare: () => void;
-	onBusyChange: (busy: boolean) => void;
-}) {
+export function DriveExportButton(props: ComponentProps<typeof GoogleDriveExportButton>) {
 	const { t } = useI18n();
-	const drive = useGoogleDrive();
+	const cloud = useCloudStorage();
+	const google = useGoogleDesktopAuth();
+	const direct = cloud.accounts.filter((account) => account.mode === "oauth");
+	const [selection, setSelection] = useState("");
+	const [accountsExpanded, setAccountsExpanded] = useState<boolean>();
+	const selected = direct.find((account) => account.id === selection) ?? direct[0];
+	const value =
+		selection === "google" && google.user
+			? "google"
+			: (selected?.id ?? (google.user ? "google" : ""));
 	const [busy, setBusy] = useState(false);
-	const [phase, setPhase] = useState<"prepare" | "upload">("prepare");
-	const [progress, setProgress] = useState(0);
+	const [phase, setPhase] = useState("prepare");
 	const [error, setError] = useState<string>();
-	const [result, setResult] = useState<DriveFile>();
-	const active = useRef<{ id: string; canceled: boolean; accountId?: string } | undefined>(
-		undefined,
-	);
-	const currentAccount = useRef(drive.user?.id);
-	currentAccount.current = drive.user?.id;
-	const cancelPrepare = useRef(onCancelPrepare);
-	cancelPrepare.current = onCancelPrepare;
+	const [saved, setSaved] = useState(false);
+	const canceled = useRef(false);
+	const activeId = useRef<string | undefined>(undefined);
 	useEffect(() => {
-		onBusyChange(busy);
-		return () => onBusyChange(false);
-	}, [busy, onBusyChange]);
+		props.onBusyChange(busy);
+		return () => props.onBusyChange(false);
+	}, [busy, props.onBusyChange]);
+	const cancel = () => {
+		canceled.current = true;
+		props.onCancelPrepare();
+		if (activeId.current) void cloudRequest("cancel", { id: activeId.current });
+	};
 	useEffect(
-		() =>
-			window.electronAPI.onDriveProgress?.((event) => {
-				if (event.id === active.current?.id)
-					setProgress(Math.min(99, Math.round((event.transferred / event.total) * 100)));
-			}),
+		() => () => {
+			if (activeId.current) void cloudRequest("cancel", { id: activeId.current });
+		},
 		[],
 	);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: Account switches clear success links and cancel the previous account's transfer.
-	useEffect(() => {
-		setResult(undefined);
-		setError(undefined);
-		return () => {
-			if (active.current) {
-				active.current.canceled = true;
-				void window.electronAPI.driveCancel(active.current.id);
-				cancelPrepare.current();
-			}
-		};
-	}, [drive.user?.id]);
 	const save = async () => {
-		const operation = {
-			id: crypto.randomUUID(),
-			canceled: false,
-			accountId: currentAccount.current,
-		};
-		active.current = operation;
-		let filePath: string | undefined;
+		if (!selected) return;
+		canceled.current = false;
+		activeId.current = selected.id;
 		setBusy(true);
-		setPhase("prepare");
-		setProgress(0);
+		setSaved(false);
 		setError(undefined);
-		setResult(undefined);
+		setPhase("prepare");
+		let file: string | undefined;
 		try {
-			filePath = await prepareFile();
-			if (operation.canceled || currentAccount.current !== operation.accountId) return;
-			if (!filePath)
-				throw new Error(t("editor.cloud.prepareFailed", "Could not prepare the export."));
+			file = await props.prepareFile();
+			if (canceled.current || !file) return;
 			setPhase("upload");
-			const response = await driveApi.upload(
-				filePath,
-				operation,
-				undefined,
-				`${projectTitle || "Recordly"}.mp4`,
-			);
-			if (operation.canceled || currentAccount.current !== operation.accountId) return;
-			if (!response.success && !response.canceled) throw new Error(response.error);
-			if (response.file) {
-				setResult(response.file);
-				notifyDriveChanged();
-			}
+			await cloudRequest("upload", {
+				id: selected.id,
+				filePath: file,
+				directory: "Recordly",
+				name: `${props.projectTitle || "Recordly"}.mp4`,
+			});
+			if (!canceled.current) setSaved(true);
 		} catch (cause) {
-			if (!operation.canceled)
-				setError(cause instanceof Error ? cause.message : String(cause));
+			if (!canceled.current) setError(cause instanceof Error ? cause.message : String(cause));
 		} finally {
-			try {
-				if (filePath) await window.electronAPI.discardExportedTemp(filePath);
-			} catch (cause) {
-				console.warn("Could not remove temporary Drive export", cause);
-			} finally {
-				active.current = undefined;
-				setBusy(false);
-			}
+			if (file)
+				await window.electronAPI
+					.discardExportedTemp(file)
+					.catch((cause) =>
+						console.warn("Could not remove temporary cloud export", cause),
+					);
+			activeId.current = undefined;
+			setBusy(false);
 		}
 	};
 	return (
 		<div className="space-y-4">
-			{drive.status.reconnect && (
-				<p role="status" className="text-sm text-muted">
-					{t(
-						"editor.signIn.googleErrors.RECONNECT_REQUIRED",
-						"Google authorization expired or was revoked. Sign in again.",
-					)}
-				</p>
+			{value && (
+				<Select
+					aria-label={t("editor.cloudAccounts.choose", "选择网盘账号")}
+					value={value}
+					disabled={busy}
+					onValueChange={(next) => {
+						setSelection(next);
+						setSaved(false);
+					}}
+				>
+					<SelectTrigger className="w-full">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						{direct.map((account) => (
+							<SelectItem key={account.id} value={account.id}>
+								{account.name}
+							</SelectItem>
+						))}
+						{google.user && (
+							<SelectItem value="google">{`Google Drive · ${google.user.email}`}</SelectItem>
+						)}
+					</SelectContent>
+				</Select>
 			)}
-			{!drive.configured && <AuthSetupNotice />}
-			{drive.authorizing && (
-				<Button variant="ghost" onClick={() => void window.electronAPI.googleAuthCancel()}>
-					{t("editor.signIn.cancelGoogle", "Cancel browser sign-in")}
-				</Button>
-			)}
-			<div className="flex items-center gap-3 rounded-xl bg-foreground/5 p-4">
-				<GoogleDriveLogo className="size-7" />
-				<div>
-					<p className="text-sm font-medium">
-						{drive.status.connected ? drive.status.email : "Google Drive"}
-					</p>
-					<p className="mt-1 text-xs text-muted-foreground">
+			{value === "google" ? (
+				<GoogleDriveExportButton {...props} />
+			) : selected ? (
+				<>
+					<p className="text-xs text-muted-foreground">
 						{t(
-							"editor.drive.exportDescription",
-							"Save the finished video in your Recordly folder. Folder access permissions also apply.",
+							"editor.cloudAccounts.exportFolder",
+							"成片会保存到所选网盘的 Recordly 文件夹。",
 						)}
 					</p>
-				</div>
-			</div>
-			{(error || drive.driveError) && (
-				<p role="alert" className="text-sm text-danger">
-					{error || drive.driveError}
-				</p>
-			)}
-			{busy ? (
-				<div role="status" className="space-y-3">
-					<p className="text-sm">
-						{phase === "prepare"
-							? t("editor.drive.preparing", "Preparing your video…")
-							: t("editor.drive.uploading", "Uploading to Google Drive…")}
-					</p>
-					<progress
-						className="w-full"
-						max={100}
-						value={phase === "prepare" ? preparationProgress : progress}
-					/>
-					<Button
-						className="w-full"
-						variant="secondary"
-						onClick={() => {
-							if (active.current) {
-								active.current.canceled = true;
-								void window.electronAPI.driveCancel(active.current.id);
-							}
-							if (phase === "prepare") onCancelPrepare();
-						}}
-					>
-						{t("editor.drive.cancel", "Cancel")}
-					</Button>
-				</div>
-			) : result ? (
-				<div className="space-y-3">
-					<p role="status" className="text-sm">
-						{t("editor.drive.saved", "Saved to Google Drive")}
-					</p>
-					<Button
-						className="w-full"
-						onClick={() =>
-							void window.electronAPI.openExternalUrl(
-								result.webViewLink ||
-									`https://drive.google.com/file/d/${result.id}/view`,
-							)
-						}
-					>
-						{t("editor.drive.openDrive", "Open in Drive")}
-					</Button>
-				</div>
-			) : drive.status.connected ? (
-				<Button className="w-full" onClick={() => void save()}>
-					{t("editor.drive.saveToDrive", "Save to Google Drive")}
-				</Button>
-			) : (
-				<Button
-					className="w-full"
-					disabled={drive.driveLoading}
-					onClick={() =>
-						void signInWithSocial("google").catch((cause) => setError(String(cause)))
-					}
-				>
-					{drive.driveLoading
-						? t("editor.drive.loading", "Loading…")
-						: t("editor.drive.connect", "Sign in with Google and connect Drive")}
-				</Button>
-			)}
+					{error && (
+						<p role="alert" className="break-words text-xs text-danger">
+							{error}
+						</p>
+					)}
+					{busy ? (
+						<>
+							<ProgressBar
+								aria-label={t("editor.drive.loading", "加载中…")}
+								value={props.preparationProgress}
+								isIndeterminate={phase === "upload"}
+							>
+								<ProgressBar.Track>
+									<ProgressBar.Fill />
+								</ProgressBar.Track>
+							</ProgressBar>
+							<Button className="w-full" variant="secondary" onClick={cancel}>
+								{t("common.actions.cancel", "取消")}
+							</Button>
+						</>
+					) : (
+						<>
+							<Button className="w-full" onClick={() => void save()}>
+								{t("editor.cloudAccounts.saveVideo", "保存成片到网盘")}
+							</Button>
+							{saved && (
+								<p role="status" className="text-sm">
+									{t(
+										"editor.cloudAccounts.videoSaved",
+										"成片已保存到网盘 Recordly 文件夹",
+									)}
+								</p>
+							)}
+						</>
+					)}
+				</>
+			) : null}
+			<Accordion
+				expandedKeys={(accountsExpanded ?? !value) ? ["accounts"] : []}
+				onExpandedChange={(keys) => setAccountsExpanded(keys.has("accounts"))}
+			>
+				<AccordionItem id="accounts">
+					<AccordionTrigger className="px-0 py-2 text-xs text-muted-foreground">
+						{t("editor.cloudAccounts.manage", "管理网盘账号")}
+					</AccordionTrigger>
+					<AccordionContent bodyClassName="px-0 pb-0">
+						<CloudAccountsPanel
+							onSelect={(account) => {
+								if (account.mode === "oauth") setSelection(account.id);
+							}}
+						/>
+					</AccordionContent>
+				</AccordionItem>
+			</Accordion>
 		</div>
 	);
 }

@@ -134,7 +134,7 @@
 		"replaceClient": "更換 Google 用戶端設定",
 		"sessionOnly": "本機暫時無法加密儲存憑證，本次登入僅在應用程式執行期間有效，重新啟動後需再次登入。",
 		"googleErrors": {
-			"NOT_CONFIGURED": "請先匯入 Google 桌面 OAuth 用戶端 JSON。",
+			"NOT_CONFIGURED": "Google authorization is not included in this build. Please use another cloud provider.",
 			"INVALID_CLIENT": "請選擇桌面應用程式的 OAuth 用戶端 JSON，不能使用 Web 用戶端或 API 金鑰。",
 			"AUTH_CANCELED": "已取消 Google 登入。",
 			"AUTH_TIMEOUT": "瀏覽器登入等候逾時，請重新點選 Google。",
@@ -505,5 +505,38 @@
 		"collapse": "摺疊時間軸",
 		"unsupportedSpeed": "This speed is not supported for preview on this device."
 	},
-	"openRecordingsFolder": "打開錄製資料夾"
+	"openRecordingsFolder": "打開錄製資料夾",
+	"cloudAccounts": {
+		"title": "Cloud accounts",
+		"description": "Connect your cloud storage to manage footage and finished videos.",
+		"browserAuth": "Browser authorization",
+		"websiteSession": "Official website session",
+		"googleReady": "Sign in with your browser to connect Drive",
+		"googleUnavailable": "Google authorization is not included in this build. Other providers remain available.",
+		"disconnect": "Disconnect",
+		"signIn": "Sign in",
+		"signingIn": "Continue sign-in in the opened window…",
+		"runtimeMissing": "This build does not include the direct connection component. Website sessions remain available.",
+		"sessionOnly": "The system keyring is unavailable. Direct authorization lasts until this app exits.",
+		"saved": "Saved accounts and website sessions",
+		"accountName": "Account label",
+		"webSaved": "Independent website session · check sign-in on the official site",
+		"connected": "Authorized · browse and transfer files in the app",
+		"open": "Open storage",
+		"rename": "Edit account label",
+		"remove": "Remove local session",
+		"webNotice": "The official website handles login. Recordly does not read your password or treat opening a page as successful authorization. Removing a session clears this app’s local login only; it does not delete cloud files.",
+		"optional": "Recording and editing work locally. Sign-in is only for your own cloud storage.",
+		"continueLocal": "Continue to Recordly",
+		"manage": "Manage cloud accounts",
+		"choose": "Choose cloud account",
+		"start": "Add a direct account to browse files here. For website sessions, choose Open storage.",
+		"parent": "Parent folder",
+		"empty": "This folder is empty",
+		"exportFolder": "The finished video is saved in the selected cloud’s Recordly folder. Uploading updates a file with the same name.",
+		"saveVideo": "Save video to cloud storage",
+		"videoSaved": "Video saved in the cloud Recordly folder",
+		"destination": "Cloud storage",
+		"newSession": "Add separate website session"
+	}
 }

@@ -1,106 +1,41 @@
 import { expect, test } from "@playwright/test";
-import { installDesktopBridge } from "./bridge";
 
-test("banner login animates email expansion, rejects incorrect credentials, and persists the local account until sign-out", async ({
-	page,
-}) => {
-	await installDesktopBridge(page);
-	await page.goto("/?windowType=editor");
-	await page.getByRole("button", { name: "Home", exact: true }).click();
-	await page.getByRole("button", { name: "Sign in", exact: true }).click();
-	const login = page.getByRole("dialog", {
-		name: "Beautiful, shareable screen recordings",
-		exact: true,
-	});
+test("cloud accounts separates browser authorization from website sessions", async ({ page }) => {
+	await page.goto("/tests/ui/cloud-accounts.html");
+	const dialog = page.getByRole("dialog", { name: "Cloud accounts", exact: true });
 	await expect(
-		login.getByRole("button", { name: "Continue with Google", exact: true }),
+		dialog.getByRole("button", { name: "OneDrive Browser authorization" }),
 	).toBeVisible();
 	await expect(
-		login.getByRole("button", { name: "Continue with Microsoft", exact: true }),
+		dialog.getByRole("button", { name: "百度网盘 Official website session" }),
 	).toBeVisible();
-	await expect(login.getByLabel("Password", { exact: true })).toHaveCount(0);
-	await expect(login.getByText("Recordly", { exact: true })).toBeVisible();
-	await expect(login.getByText("worth sharing.", { exact: false })).toHaveCount(0);
-	for (const provider of ["Google", "Microsoft"]) {
-		await expect
-			.poll(() =>
-				login
-					.getByRole("button", { name: `Continue with ${provider}`, exact: true })
-					.locator("img")
-					.evaluate((image: HTMLImageElement) => image.naturalWidth),
-			)
-			.toBeGreaterThan(0);
-	}
-	const heading = await login.getByRole("heading").boundingBox();
-	const textSize = await login.getByRole("heading").evaluate((element) => ({
-		height: element.clientHeight,
-		width: element.clientWidth,
-		scrollWidth: element.scrollWidth,
-		lineHeight: parseFloat(getComputedStyle(element).lineHeight),
-	}));
-	expect(textSize.height).toBeLessThanOrEqual(textSize.lineHeight + 1);
-	expect(textSize.scrollWidth).toBeLessThanOrEqual(textSize.width);
-	const artwork = await login.locator('img[src$="login-banner.png"]').boundingBox();
-	expect(artwork!.y + artwork!.height).toBeLessThan(heading!.y);
-	await page.keyboard.press("Tab");
-	await login.evaluate((element: HTMLElement) => element.focus());
-	await expect(login).toHaveCSS("outline-style", "none");
-
-	await page.screenshot({ path: "test-results/login.png", animations: "disabled" });
-	const collapsed = (await login.boundingBox())!.height;
-	await login.getByLabel("Email", { exact: true }).fill("test@email.com");
-	await expect
-		.poll(async () => (await login.boundingBox())!.height)
-		.toBeGreaterThan(collapsed + 80);
-	await login.getByLabel("Email", { exact: true }).fill("");
-	await expect(login.getByLabel("Password", { exact: true })).toHaveCount(0);
-	await expect
-		.poll(async () => Math.abs((await login.boundingBox())!.height - collapsed))
-		.toBeLessThan(2);
-	await login.getByLabel("Email", { exact: true }).fill("test@email.com");
-	await login.getByLabel("Password", { exact: true }).fill("incorrect");
-	await login.getByRole("button", { name: "Sign in", exact: true }).click();
-	await expect(login.getByText("Incorrect email or password.")).toBeVisible();
-	await login.getByLabel("Password", { exact: true }).fill("1234");
-	await page.screenshot({ path: "test-results/login-expanded.png", animations: "disabled" });
-	await page.setViewportSize({ width: 800, height: 600 });
-	await login
-		.getByRole("heading", { name: "Beautiful, shareable screen recordings", exact: true })
-		.scrollIntoViewIfNeeded();
 	await expect(
-		login.getByRole("heading", { name: "Beautiful, shareable screen recordings", exact: true }),
-	).toBeInViewport();
-	await login.getByRole("button", { name: "Sign in", exact: true }).scrollIntoViewIfNeeded();
-	await expect(login.getByRole("button", { name: "Sign in", exact: true })).toBeInViewport();
-	await login.getByRole("button", { name: "Sign in", exact: true }).click();
-	await expect(login).not.toBeVisible();
-	await expect(page.getByRole("dialog", { name: "Projects dashboard" })).toBeVisible();
-	await page.reload();
-	await page.getByRole("button", { name: "Home", exact: true }).click();
-	await page.getByRole("button", { name: "test@email.com", exact: true }).click();
-	const account = page.getByRole("dialog", { name: "Your account", exact: true });
-	await expect(account.getByText("test@email.com")).toBeVisible();
-	await account.getByRole("button", { name: "Sign out", exact: true }).click();
+		dialog.locator('input[type="email"], input[type="password"], input[type="file"]'),
+	).toHaveCount(0);
+	await dialog.getByRole("button", { name: "百度网盘 Official website session" }).click();
 	await expect(
-		page.getByRole("dialog", { name: "Beautiful, shareable screen recordings" }),
-	).toBeVisible();
+		dialog.getByText("Independent website session · check sign-in on the official site"),
+	).toHaveCount(1);
+	await dialog.getByRole("button", { name: "Add separate website session" }).click();
+	await expect(
+		dialog.getByText("Independent website session · check sign-in on the official site"),
+	).toHaveCount(2);
+	await dialog.getByRole("button", { name: "Edit account label" }).last().click();
+	await dialog.getByRole("textbox", { name: "Account label" }).fill("Personal files");
+	await dialog.getByRole("button", { name: "Save", exact: true }).click();
+	await expect(dialog.getByText("Personal files", { exact: true })).toBeVisible();
+	await dialog.getByRole("button", { name: "Remove local session" }).last().click();
+	await expect(dialog.getByText("Personal files", { exact: true })).toHaveCount(0);
 });
 
-test("login banner and email expansion work with reduced motion", async ({ page }) => {
+test("cloud account dialog fits a compact window and reduced motion", async ({ page }) => {
+	await page.setViewportSize({ width: 620, height: 740 });
 	await page.emulateMedia({ reducedMotion: "reduce" });
-	await installDesktopBridge(page);
-	await page.goto("/?windowType=editor");
-	await page.getByRole("button", { name: "Recordly account", exact: true }).click();
-	const login = page.getByRole("dialog", {
-		name: "Beautiful, shareable screen recordings",
-		exact: true,
-	});
-	await login.getByLabel("Email", { exact: true }).fill("test@email.com");
-	await expect(login.getByLabel("Password", { exact: true })).toBeVisible();
-	await login.getByLabel("Email", { exact: true }).fill("");
-	await expect(login.getByLabel("Password", { exact: true })).toHaveCount(0);
-	await login.getByLabel("Email", { exact: true }).fill("test@email.com");
-	await login.getByLabel("Password", { exact: true }).fill("1234");
-	await login.getByRole("button", { name: "Sign in", exact: true }).click();
-	await expect(login).not.toBeVisible();
+	await page.goto("/tests/ui/cloud-accounts.html");
+	const dialog = page.getByRole("dialog", { name: "Cloud accounts", exact: true });
+	await dialog.getByRole("button", { name: "Done", exact: true }).scrollIntoViewIfNeeded();
+	await expect(dialog.getByRole("button", { name: "Done", exact: true })).toBeInViewport();
+	await dialog.getByRole("button", { name: "Done", exact: true }).click();
+	await expect(dialog).not.toBeVisible();
+	await expect(page.getByRole("button", { name: "Footage", exact: true })).toBeVisible();
 });

@@ -42,6 +42,7 @@ electron/native/nvidia-cuda-compositor/build/
 electron/native/bin/*/whisper-*
 electron/native/bin/*/whisper-runtime.json
 electron/native/bin/*/*.dll
+electron/native/bin/*/rclone*
 
 # Local debug helpers
 tmp-*.ps1

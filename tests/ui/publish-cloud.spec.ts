@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-test("publish preserves local destination and stays open throughout sharing", async ({ page }) => {
-	await page.goto("/tests/ui/publish.html?switch");
+test("publish preserves the local destination and saves to a connected cloud account", async ({
+	page,
+}) => {
+	await page.goto("/tests/ui/publish.html");
 	await page.getByRole("button", { name: "Publish", exact: true }).click();
 	await page.getByRole("row", { name: "Local", exact: true }).click();
 	await expect(page.getByRole("button", { name: "Export Video", exact: true })).toBeVisible();
@@ -11,30 +13,20 @@ test("publish preserves local destination and stays open throughout sharing", as
 		"aria-selected",
 		"true",
 	);
-	await page.getByRole("row", { name: "Link", exact: true }).click();
-	await page.getByRole("button", { name: "Share", exact: true }).click();
-	await expect(page.getByText(/Uploading ·/)).toBeVisible();
-	await page.keyboard.press("Escape");
-	await expect(page.getByText(/Uploading ·/)).toBeVisible();
+	await page.getByRole("row", { name: "Cloud storage", exact: true }).click();
+	await page.getByRole("button", { name: "Save video to cloud storage", exact: true }).click();
 	await expect(page.getByRole("row", { name: "Local", exact: true })).toHaveAttribute(
 		"aria-disabled",
 		"true",
 	);
-	await expect(page.getByRole("button", { name: "Copy link", exact: true })).toBeVisible({
-		timeout: 20000,
-	});
-	await page
-		.getByRole("button", { name: "Fixture refresh token", exact: true })
-		.evaluate((button: HTMLButtonElement) => button.click());
-	await expect(page.getByRole("button", { name: "Copy link", exact: true })).toBeVisible();
-	await page
-		.getByRole("button", { name: "Fixture switch account", exact: true })
-		.evaluate((button: HTMLButtonElement) => button.click());
-	await expect(page.getByRole("button", { name: "Copy link", exact: true })).toHaveCount(0);
+	await expect(page.getByRole("status")).toHaveText("Video saved in the cloud Recordly folder");
+	await expect
+		.poll(() => page.evaluate(() => document.documentElement.dataset.uploadedFile))
+		.toBe("Preview.mp4");
 });
 
 test("a full cloud quota prevents starting preparation", async ({ page }) => {
-	await page.goto("/tests/ui/publish.html?full");
+	await page.goto("/tests/ui/publish.html?legacy&full");
 	await page.getByRole("button", { name: "Publish", exact: true }).click();
 	await expect(
 		page.getByText(
@@ -72,7 +64,7 @@ test("shared cards open ready links and delete incomplete uploads", async ({ pag
 });
 
 test("switching accounts clears the previous account's cloud quota", async ({ page }) => {
-	await page.goto("/tests/ui/publish.html?full&switch");
+	await page.goto("/tests/ui/publish.html?legacy&full&switch");
 	await page.getByRole("button", { name: "Publish", exact: true }).click();
 	await expect(
 		page.getByText(
@@ -97,7 +89,7 @@ for (const fails of [false, true]) {
 	test(`ignores an old account's late upload ${fails ? "error" : "success"}`, async ({
 		page,
 	}) => {
-		await page.goto(`/tests/ui/publish.html?switch&controlled${fails ? "&fail" : ""}`);
+		await page.goto(`/tests/ui/publish.html?legacy&switch&controlled${fails ? "&fail" : ""}`);
 		await page.getByRole("button", { name: "Publish", exact: true }).click();
 		await page.getByRole("button", { name: "Share", exact: true }).click();
 		await expect(page.getByText("Uploading · 85%", { exact: true })).toBeVisible();
@@ -140,7 +132,7 @@ test("deleting from another shared library refreshes a mounted Share quota", asy
 	).toHaveCount(0);
 });
 
-for (const destination of ["Local", "Link"]) {
+for (const destination of ["Local", "Cloud storage"]) {
 	test(`Publish preserves manual export reporting for ${destination}`, async ({ page }) => {
 		await page.goto("/tests/ui/publish.html?export-error");
 		await page.getByRole("button", { name: "Publish", exact: true }).click();

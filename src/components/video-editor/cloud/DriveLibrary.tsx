@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ProgressBar } from "@heroui/react";
 import {
 	CloudArrowUp,
 	DownloadSimple,
@@ -12,6 +13,14 @@ import {
 	X,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import {
 	Dialog,
 	DialogContent,
@@ -20,7 +29,7 @@ import {
 	DialogDescription,
 } from "@/components/ui/dialog";
 import { useI18n } from "@/contexts/I18nContext";
-import { signInWithSocial } from "@/lib/auth/recordlyAuth";
+import { signInGoogleDesktop } from "@/lib/auth/googleDesktop";
 import {
 	driveApi,
 	driveRequest,
@@ -32,7 +41,6 @@ import { useGoogleDrive } from "./useGoogleDrive";
 import { AuthSetupNotice } from "@/components/auth/AuthSetupNotice";
 
 const folderMime = "application/vnd.google-apps.folder";
-const fieldClass = "h-10 min-w-0 rounded-xl border border-foreground/15 bg-background px-3 text-sm";
 
 export function DriveLibrary() {
 	const { t } = useI18n();
@@ -173,7 +181,10 @@ export function DriveLibrary() {
 			setPermissionsLoading(false);
 		}
 	};
-	const connect = () => run(() => signInWithSocial("google"));
+	const connect = () =>
+		run(async () => {
+			await signInGoogleDesktop();
+		});
 	const visible = files.filter((file) => file.name.toLowerCase().includes(query.toLowerCase()));
 	return (
 		<section className="py-6" aria-label="Google Drive">
@@ -281,32 +292,36 @@ export function DriveLibrary() {
 							className="flex flex-wrap items-center gap-1 text-sm"
 							aria-label={t("editor.drive.location", "Drive folder")}
 						>
-							<button
+							<Button
 								type="button"
-								className="rounded-lg px-2 py-1 hover:bg-foreground/5"
+								variant="ghost"
+								size="sm"
+								className="h-auto px-2 py-1"
 								onClick={() => setTrail([])}
 							>
 								Recordly
-							</button>
+							</Button>
 							{trail.map((folder, index) => (
 								<span key={folder.id}>
 									{" "}
 									/{" "}
-									<button
+									<Button
 										type="button"
-										className="rounded-lg px-2 py-1 hover:bg-foreground/5"
+										variant="ghost"
+										size="sm"
+										className="h-auto px-2 py-1"
 										onClick={() =>
 											setTrail((current) => current.slice(0, index + 1))
 										}
 									>
 										{folder.name}
-									</button>
+									</Button>
 								</span>
 							))}
 						</nav>
 						<div className="flex flex-wrap gap-2">
-							<input
-								className={`${fieldClass} w-44`}
+							<Input
+								className="h-10 w-44"
 								aria-label={t("editor.drive.search", "Search files")}
 								placeholder={t("editor.drive.search", "Search files")}
 								value={query}
@@ -339,7 +354,16 @@ export function DriveLibrary() {
 					</div>
 					{transferring && (
 						<div role="status" className="mb-4 flex items-center gap-3 text-sm">
-							<progress className="flex-1" max={100} value={progress} />
+							<ProgressBar
+								className="flex-1"
+								aria-label="Google Drive"
+								value={progress}
+								isIndeterminate={progress === undefined}
+							>
+								<ProgressBar.Track>
+									<ProgressBar.Fill />
+								</ProgressBar.Track>
+							</ProgressBar>
 							{progress === undefined
 								? t("editor.drive.loading", "Loading…")
 								: `${progress}%`}
@@ -382,9 +406,10 @@ export function DriveLibrary() {
 										className="border-b border-foreground/5 last:border-0 hover:bg-foreground/[.025]"
 									>
 										<td className="max-w-xs px-5 py-4">
-											<button
+											<Button
 												type="button"
-												className="flex max-w-full items-center gap-3 text-left"
+												variant="ghost"
+												className="h-auto min-w-0 max-w-full justify-start gap-3 px-0 text-left"
 												onClick={() =>
 													file.mimeType === folderMime
 														? setTrail((current) => [
@@ -403,7 +428,7 @@ export function DriveLibrary() {
 													<GoogleDriveLogo className="size-5 shrink-0 text-muted-foreground" />
 												)}
 												<span className="truncate">{file.name}</span>
-											</button>
+											</Button>
 										</td>
 										<td className="whitespace-nowrap px-4 py-4 text-muted-foreground">
 											{file.size
@@ -581,11 +606,11 @@ export function DriveLibrary() {
 							});
 						}}
 					>
-						<input
+						<Input
 							autoFocus
 							required
 							aria-label={t("editor.drive.name", "Name")}
-							className={`${fieldClass} flex-1`}
+							className="h-10 min-w-0 flex-1"
 							value={name}
 							onChange={(event) => setName(event.target.value)}
 						/>
@@ -622,24 +647,33 @@ export function DriveLibrary() {
 							void changePermission("grant", { type: "user", email, role });
 						}}
 					>
-						<input
+						<Input
 							required
 							type="email"
 							aria-label={t("editor.drive.recipient", "Recipient email")}
 							placeholder={t("editor.drive.recipient", "Recipient email")}
-							className={`${fieldClass} flex-1`}
+							className="h-10 min-w-0 flex-1"
 							value={email}
 							onChange={(event) => setEmail(event.target.value)}
 						/>
-						<select
-							className={fieldClass}
+						<Select
+							className="w-28"
 							aria-label={t("editor.drive.role", "Permission")}
 							value={role}
-							onChange={(event) => setRole(event.target.value)}
+							onValueChange={setRole}
 						>
-							<option value="reader">{t("editor.drive.viewer", "Viewer")}</option>
-							<option value="writer">{t("editor.drive.editor", "Editor")}</option>
-						</select>
+							<SelectTrigger className="h-10 w-full">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="reader">
+									{t("editor.drive.viewer", "Viewer")}
+								</SelectItem>
+								<SelectItem value="writer">
+									{t("editor.drive.editor", "Editor")}
+								</SelectItem>
+							</SelectContent>
+						</Select>
 						<Button type="submit" disabled={permissionsLoading}>
 							{t("editor.drive.invite", "Invite")}
 						</Button>

@@ -1,51 +1,27 @@
-Language: EN | [简中](authentication.zh-CN.md)
+# Cloud account sign-in
 
-# Recordly authentication setup
+Recording and editing work locally without an account or database. The account dialog manages provider connections rather than a Recordly/Supabase identity.
 
-Google sign-in and Drive use desktop OAuth directly, without Supabase. Import a Google Desktop app client JSON in Recordly; see [desktop Google setup (简中)](google-drive.zh-CN.md). The Supabase instructions below apply only to optional email, Microsoft, GitHub and legacy cloud services. Their session is separate from the native Google account.
+- **OneDrive and Dropbox:** browser OAuth through the bundled rclone runtime. Browse, upload, download, and export finished videos from Recordly.
+- **Aliyun, Baidu, Quark, and 123:** official website windows with separate persistent sessions. Complete the provider’s own login and manage files there. A saved website session is not presented as verified API authorization. Website restrictions and verification prompts remain under the provider’s control.
+- **Google Drive:** the publisher bundles the desktop OAuth configuration. Users do not register an API application or import JSON. Builds without publisher configuration explain the limitation while other providers remain available.
 
-## 1. Create the project
+Provider buttons reopen an existing website session. Use Add separate website session for another independent login; a new session is saved only after its page loads. Connections can be renamed. Removing a local connection clears only this app’s session, not cloud files or the system browser’s session. Revoke server-side grants from the provider’s account settings.
 
-1. Create a Supabase project.
-2. In **Project settings → API**, copy the project URL and publishable key.
-3. Copy `.env.example` to `.env.local` and fill in both values. Never use the service-role key in the desktop application.
-4. In **Authentication → URL configuration**, add `recordly://auth/callback` and `http://127.0.0.1:43821/auth/callback` to the redirect allow list.
+Direct exports save to a `Recordly` folder. Uploading updates a same-name file; downloads write a partial file before replacing the destination selected in the native save dialog.
 
-Email/password works once email authentication is enabled and a user has been created. Password-reset emails use the same desktop callback.
+## Local storage
 
-## 2. Google
+`cloud-storage/accounts.json` stores labels and provider identifiers. rclone credentials are in an encrypted `accounts.conf`; its random password is stored with the OS safeStorage keyring. Without a secure keyring, direct authorization lasts for the current app run only. Website sessions use distinct Chromium partitions with no Recordly preload.
 
-Create a **Desktop app** OAuth client, enable Drive API and add your test email to the test audience. Import the downloaded JSON in Recordly. Follow the [desktop setup guide (简中)](google-drive.zh-CN.md); no Supabase callback, Edge Function, server-side OAuth secret or connection migration is required.
+## Packaging
 
-## 3. X
+`npm run build:cloud-runtime` downloads the official rclone runtime. Platform builds run it automatically and include it in the app. OAuth consent can display the rclone application name. No developer keys are requested from end users.
 
-1. Create an OAuth 2.0 app in the X Developer Dashboard and enable requesting the user's email.
-2. Set its callback URL to `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`.
-3. Enable X/Twitter OAuth 2.0 in Supabase and paste the client ID and secret.
+When the runtime cannot be downloaded or the platform is unsupported, the build reports the unavailable component and continues with website sessions. Run the command again when the environment is ready.
 
-## 4. SAML SSO (currently hidden)
+For Google, the publisher enables Drive API, registers a Desktop OAuth client, completes the required Google publishing/verification steps, and bundles `public/google-oauth-desktop.json`. Google’s shared rclone client is being retired, so it is not used as a workaround. Existing imported Google configurations remain compatible.
 
-SAML is configured per customer workspace. Supabase's SAML support requires Pro or above.
+Legacy Supabase/email/GitHub identity code remains separate and is no longer exposed by the primary cloud-account sign-in UI.
 
-1. Enable SAML in the Supabase Auth provider settings.
-2. Obtain the customer's IdP metadata URL or metadata XML file.
-3. Register the connection and its email domain with the Supabase CLI, for example:
-
-   ```sh
-   supabase sso add --type saml --project-ref YOUR_PROJECT_REF \
-     --metadata-url 'https://customer.example/idp/metadata' \
-     --domains customer.example
-   ```
-
-The Recordly modal extracts the domain from the entered email address and starts the matching SAML connection.
-
-## 5. Verify locally
-
-Restart `npm run dev` after creating `.env.local`. Open an editor and verify:
-
-1. The account button opens **Sign into Recordly**.
-2. Email/password creates a persistent Supabase session.
-3. Google opens the system browser and returns to Recordly.
-4. Clicking **Create link** while signed out opens this modal; after successful authentication it continues to the share dialog.
-
-Add the same `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` values to the share Worker's secrets or variables. Set `OWNER_USER_ID` to the owner’s Supabase user ID. The Worker validates the access token with Supabase and requires that owner identity before accepting API requests. `API_SECRET` is server-side only and remains available for library administration and explicitly enabled local integration tests; it is never entered into or exposed by the desktop app.
+See [Chinese guide](authentication.zh-CN.md), [OneDrive](https://rclone.org/onedrive/), [Dropbox](https://rclone.org/dropbox/), and [Google client policy](https://rclone.org/drive/#making-your-own-client-id).

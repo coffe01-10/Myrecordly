@@ -952,6 +952,11 @@ interface Window {
 		revealInFolder: (
 			filePath: string,
 		) => Promise<{ success: boolean; error?: string; message?: string }>;
+		cloudStorageRequest: (
+			action: string,
+			input?: Record<string, string>,
+		) => Promise<import("../src/types/cloudStorage").CloudResult<unknown>>;
+		onCloudStorageChanged: (callback: () => void) => () => void;
 		googleAuthState: () => Promise<
 			import("../src/types/googleDrive").GoogleResult<
 				import("../src/types/googleDrive").GoogleAuthState

@@ -1,82 +1,29 @@
-import { demoUser, hasDemoSession, subscribeDemoSession } from "@/lib/auth/demoSession";
 import type { User } from "@supabase/supabase-js";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import {
-	completeAuthCallback,
-	recordlyAuth,
-	recordlyAuthConfigured,
-} from "@/lib/auth/recordlyAuth";
 import { useGoogleDesktopAuth } from "./useGoogleDesktopAuth";
 import { googleAccountUser } from "@/lib/auth/googleDesktop";
+import { useCloudStorage } from "@/lib/drive/cloudStorage";
 
+/** Local account presentation only; cloud authorization belongs to each provider. */
 export function useRecordlyAuth() {
 	const google = useGoogleDesktopAuth();
-	const demo = useSyncExternalStore(subscribeDemoSession, hasDemoSession, () => false);
-	const [user, setUser] = useState<User | null>(null);
-	const [accessToken, setAccessToken] = useState<string>();
-	const [loading, setLoading] = useState(recordlyAuthConfigured);
-	const [callbackError, setCallbackError] = useState<string>();
-	const callbackUrl = useRef<string | undefined>(undefined);
-
-	useEffect(() => {
-		if (!recordlyAuth) {
-			setLoading(false);
-			return;
-		}
-
-		let mounted = true;
-		void recordlyAuth.auth
-			.getSession()
-			.then(({ data }) => {
-				if (mounted) {
-					setUser(data.session?.user ?? null);
-					setAccessToken(data.session?.access_token);
-					setLoading(false);
+	const cloud = useCloudStorage();
+	const account = cloud.accounts.find((item) => item.mode === "oauth");
+	const user: User | null =
+		googleAccountUser(google) ??
+		(account
+			? {
+					id: account.id,
+					aud: "cloud-storage",
+					app_metadata: { provider: account.provider },
+					user_metadata: { full_name: account.name },
+					created_at: account.connectedAt,
 				}
-			})
-			.catch((error) => {
-				if (mounted) {
-					setCallbackError(error instanceof Error ? error.message : String(error));
-					setLoading(false);
-				}
-			});
-		const { data: listener } = recordlyAuth.auth.onAuthStateChange((_event, session) => {
-			if (mounted) {
-				setUser(session?.user ?? null);
-				setAccessToken(session?.access_token);
-			}
-		});
-
-		const handleCallback = async (url: string) => {
-			if (!mounted || callbackUrl.current === url) return;
-			callbackUrl.current = url;
-			try {
-				setCallbackError(undefined);
-				await completeAuthCallback(url);
-			} catch (error) {
-				if (mounted)
-					setCallbackError(error instanceof Error ? error.message : String(error));
-			} finally {
-				await window.electronAPI.ackAuthCallbackUrl(url).catch(() => undefined);
-			}
-		};
-		const unsubscribe = window.electronAPI.onAuthCallbackUrl((url) => void handleCallback(url));
-		void window.electronAPI.getPendingAuthCallbackUrl().then((url) => {
-			if (url) void handleCallback(url);
-		});
-
-		return () => {
-			mounted = false;
-			listener.subscription.unsubscribe();
-			unsubscribe();
-		};
-	}, []);
-
+			: null);
 	return {
-		user: googleAccountUser(google) ?? (demo ? demoUser : user),
-		accessToken: google.user || demo ? undefined : accessToken,
-		loading: loading || google.loading,
-		configured: recordlyAuthConfigured,
-		callbackError: callbackError || google.error,
+		user,
+		accessToken: undefined as string | undefined,
+		loading: google.loading,
+		configured: true,
+		callbackError: cloud.error,
 	};
 }

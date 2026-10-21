@@ -22,6 +22,7 @@ import {
 import { RECORDINGS_DIR } from "./appPaths";
 import { readAppSetting } from "./appSettingsStore";
 import { createAuthCallbackController } from "./authCallback";
+import { isCloudWebsiteSession } from "./cloudStorage/webSessions";
 import { showCursor } from "./cursorHider";
 import { getGpuSwitches } from "./gpuSwitches";
 import { initializeMainLocale, setMainLocale, t } from "./i18n";
@@ -88,7 +89,10 @@ app.commandLine.appendSwitch("enable-unsafe-webgpu");
 app.commandLine.appendSwitch("enable-gpu-rasterization");
 
 app.on("web-contents-created", (_event, contents) => {
-	if (!shouldHardenWebContentsType(contents.getType())) {
+	if (
+		!shouldHardenWebContentsType(contents.getType()) ||
+		isCloudWebsiteSession(contents.session)
+	) {
 		return;
 	}
 

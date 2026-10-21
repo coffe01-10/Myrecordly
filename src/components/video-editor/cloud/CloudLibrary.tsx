@@ -1,74 +1,95 @@
 import { useState } from "react";
+import {
+	Accordion,
+	AccordionItem,
+	AccordionTrigger,
+	AccordionContent,
+} from "@/components/ui/accordion";
 import { useI18n } from "@/contexts/I18nContext";
-import { Button } from "@/components/ui/button";
+import { CloudAccountsPanel } from "@/components/auth/CloudAccountsPanel";
+import { useCloudStorage } from "@/lib/drive/cloudStorage";
+import { useGoogleDesktopAuth } from "@/components/auth/useGoogleDesktopAuth";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { DriveLibrary } from "./DriveLibrary";
-import { SharedRecordings } from "./SharedRecordings";
-import { CLOUD_SHARE_ENDPOINT } from "./endpoint";
-import { recordlyAuthConfigured } from "@/lib/auth/client";
+import { ConnectedCloudFiles } from "./ConnectedCloudFiles";
 
-export function CloudLibrary({
-	token,
-	accountLabel,
-	onSignIn,
-}: {
+export function CloudLibrary(_props: {
 	token?: string;
 	accountLabel?: string;
 	onSignIn: () => void;
 }) {
 	const { t } = useI18n();
-	const [tab, setTab] = useState("drive");
+	const cloud = useCloudStorage();
+	const google = useGoogleDesktopAuth();
+	const [selection, setSelection] = useState("");
+	const [accountsExpanded, setAccountsExpanded] = useState<boolean>();
+	const direct = cloud.accounts.filter((account) => account.mode === "oauth");
+	const selected = direct.find((account) => account.id === selection) ?? direct[0];
+	const value =
+		selection === "google" && google.user
+			? "google"
+			: (selected?.id ?? (google.user ? "google" : ""));
 	return (
-		<div>
-			<div
-				className="flex gap-2 border-b border-foreground/10 py-4"
-				role="tablist"
-				aria-label={t("editor.drive.storage", "Cloud storage")}
+		<div className="space-y-5 py-5">
+			<Accordion
+				expandedKeys={
+					(accountsExpanded ?? (cloud.accounts.length === 0 && !google.user))
+						? ["accounts"]
+						: []
+				}
+				onExpandedChange={(keys) => setAccountsExpanded(keys.has("accounts"))}
 			>
-				<Button
-					role="tab"
-					aria-selected={tab === "drive"}
-					variant={tab === "drive" ? "secondary" : "ghost"}
-					onClick={() => setTab("drive")}
+				<AccordionItem id="accounts">
+					<AccordionTrigger>
+						{t("editor.cloudAccounts.manage", "管理网盘账号")}
+					</AccordionTrigger>
+					<AccordionContent>
+						<CloudAccountsPanel
+							onSelect={(account) => {
+								if (account.mode === "oauth") setSelection(account.id);
+							}}
+						/>
+					</AccordionContent>
+				</AccordionItem>
+			</Accordion>
+			{value && (
+				<Select
+					aria-label={t("editor.cloudAccounts.choose", "选择网盘账号")}
+					value={value}
+					onValueChange={setSelection}
 				>
-					Google Drive
-				</Button>
-				{recordlyAuthConfigured && (
-					<Button
-						role="tab"
-						aria-selected={tab === "share"}
-						variant={tab === "share" ? "secondary" : "ghost"}
-						onClick={() => setTab("share")}
-					>
-						Recordly Share
-					</Button>
-				)}
-			</div>
-			{tab === "drive" ? (
+					<SelectTrigger className="w-full">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						{direct.map((account) => (
+							<SelectItem key={account.id} value={account.id}>
+								{account.name}
+							</SelectItem>
+						))}
+						{google.user && (
+							<SelectItem value="google">{`Google Drive · ${google.user.email}`}</SelectItem>
+						)}
+					</SelectContent>
+				</Select>
+			)}
+			{value === "google" ? (
 				<DriveLibrary />
-			) : token && CLOUD_SHARE_ENDPOINT ? (
-				<SharedRecordings
-					token={token}
-					endpoint={CLOUD_SHARE_ENDPOINT}
-					accountLabel={accountLabel}
-					standalone
-				/>
+			) : selected ? (
+				<ConnectedCloudFiles key={selected.id} account={selected} />
 			) : (
-				<div className="flex h-64 flex-col items-center justify-center gap-4 text-sm text-muted-foreground">
-					<p>
-						{token
-							? t(
-									"editor.cloud.sharingUnavailable",
-									"Cloud sharing is not available in this build yet.",
-								)
-							: t(
-									"editor.cloud.signInRequired",
-									"Sign in to manage shared recordings.",
-								)}
-					</p>
-					{!token && (
-						<Button onClick={onSignIn}>{t("editor.cloud.signIn", "Sign in")}</Button>
+				<p className="py-6 text-center text-sm text-muted-foreground">
+					{t(
+						"editor.cloudAccounts.start",
+						"添加直连账号后可在这里浏览文件；网页登录会话请点击“打开网盘”。",
 					)}
-				</div>
+				</p>
 			)}
 		</div>
 	);

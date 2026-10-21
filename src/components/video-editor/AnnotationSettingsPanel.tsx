@@ -19,6 +19,12 @@ import { ColorControl, ColorPalette } from "@/components/ui/color-picker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
+import {
+	Accordion,
+	AccordionItem,
+	AccordionTrigger,
+	AccordionContent,
+} from "@/components/ui/accordion";
 
 import {
 	Select,
@@ -675,19 +681,23 @@ export function AnnotationSettingsPanel({
 						)}
 					</div>
 
-					<details className="mt-4 text-muted-foreground">
-						<summary className="flex cursor-pointer items-center gap-2 py-2">
-							<Info className="w-3.5 h-3.5" />
-							<span className="text-xs font-medium">
-								{t("annotations.shortcutsAndTips")}
-							</span>
-						</summary>
-						<ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-3 leading-relaxed">
-							<li>{t("annotations.tipSelectAnnotation")}</li>
-							<li>{t("annotations.tipCycleForward")}</li>
-							<li>{t("annotations.tipCycleBackward")}</li>
-						</ul>
-					</details>
+					<Accordion className="mt-4">
+						<AccordionItem id="tips">
+							<AccordionTrigger className="gap-2 px-0 py-2 text-muted-foreground">
+								<Info className="w-3.5 h-3.5" />
+								<span className="text-xs font-medium">
+									{t("annotations.shortcutsAndTips")}
+								</span>
+							</AccordionTrigger>
+							<AccordionContent bodyClassName="px-0 pb-0">
+								<ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-3 leading-relaxed">
+									<li>{t("annotations.tipSelectAnnotation")}</li>
+									<li>{t("annotations.tipCycleForward")}</li>
+									<li>{t("annotations.tipCycleBackward")}</li>
+								</ul>
+							</AccordionContent>
+						</AccordionItem>
+					</Accordion>
 				</div>
 			</div>
 			<div className="shrink-0 px-5 py-4">

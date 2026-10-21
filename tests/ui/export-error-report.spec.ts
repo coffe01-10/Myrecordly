@@ -26,7 +26,8 @@ test("export reports preview only technical data and submit explicitly without a
 	await dialog.getByText("View data to be sent", { exact: true }).click();
 	await expect(dialog.locator("pre")).toContainText("VIDEO_DECODE_ENCODING_ERROR");
 	await expect(dialog.locator("pre")).not.toContainText("Alice");
-	await dialog.getByLabel("Cloud plan", { exact: false }).selectOption("paid");
+	await dialog.getByRole("button", { name: /Cloud plan/ }).click();
+	await page.getByRole("option", { name: "Paid cloud plan", exact: true }).click();
 	await expect(dialog.locator("pre")).toContainText('"cloudPlan": "paid"');
 	await page.screenshot({ path: "test-results/export-error-report.png" });
 	await dialog.getByRole("button", { name: "Send report", exact: true }).click();

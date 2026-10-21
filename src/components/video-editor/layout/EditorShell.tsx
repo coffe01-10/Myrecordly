@@ -232,7 +232,7 @@ export function EditorShell(props: Props) {
 						if (!auth.user) requestSignIn("share");
 						else setShareRequestNonce((value) => value + 1);
 					}}
-					accountLabel={auth.user?.email}
+					accountLabel={auth.user?.email || auth.user?.user_metadata.full_name}
 					authToken={auth.accessToken}
 					handleImportMediaOrProject={openActions.handleImportMediaOrProject}
 					handleOpenProjectFromLibrary={openActions.handleOpenProjectFromLibrary}

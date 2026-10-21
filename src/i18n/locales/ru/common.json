@@ -149,7 +149,8 @@
 			"actionFailed": "Could not complete action",
 			"savePreferences": "Could not save library preferences",
 			"saveFolders": "Could not save folders"
-		}
+		},
+		"cloudAccounts": "Cloud accounts"
 	},
 	"colorPicker": {
 		"colors": "Colors",

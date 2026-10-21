@@ -149,7 +149,8 @@
 			"actionFailed": "無法完成操作",
 			"savePreferences": "無法儲存媒體庫偏好設定",
 			"saveFolders": "無法儲存資料夾"
-		}
+		},
+		"cloudAccounts": "Cloud accounts"
 	},
 	"colorPicker": {
 		"colors": "顏色",

@@ -1,6 +1,19 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+	Accordion,
+	AccordionItem,
+	AccordionTrigger,
+	AccordionContent,
+} from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { useScopedT } from "@/contexts/I18nContext";
 import {
 	buildExportErrorReport,
@@ -64,33 +77,56 @@ export function ExportErrorReportButton({
 									"Send technical details to Recordly support through Supabase. No account ID, email, recording, file path, attachments or console logs are included. Supabase may keep connection logs separately.",
 								)}
 							</p>
-							<label className="flex flex-col gap-2 text-sm">
-								{t("errorReport.cloudPlanLabel", "Cloud plan (optional, self-reported)")}
-								<select
+							<div className="flex flex-col gap-2 text-sm">
+								<span>
+									{t(
+										"errorReport.cloudPlanLabel",
+										"Cloud plan (optional, self-reported)",
+									)}
+								</span>
+								<Select
+									aria-label={t(
+										"errorReport.cloudPlanLabel",
+										"Cloud plan (optional, self-reported)",
+									)}
 									value={plan}
-									onChange={(event) => setPlan(event.target.value as CloudPlan)}
+									onValueChange={(value) => setPlan(value as CloudPlan)}
 									disabled={sending}
-									className="rounded-md border bg-background p-2"
 								>
-									<option value="unknown">
-										{t("errorReport.cloudPlanUnknown", "Unknown / prefer not to say")}
-									</option>
-									<option value="paid">
-										{t("errorReport.cloudPlanPaid", "Paid cloud plan")}
-									</option>
-									<option value="not_paid">
-										{t("errorReport.cloudPlanNotPaid", "No paid cloud plan")}
-									</option>
-								</select>
-							</label>
-							<details>
-								<summary className="cursor-pointer text-sm">
-									{t("errorReport.viewData", "View data to be sent")}
-								</summary>
-								<pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs mt-2">
-									{JSON.stringify(report, null, 2)}
-								</pre>
-							</details>
+									<SelectTrigger className="w-full">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="unknown">
+											{t(
+												"errorReport.cloudPlanUnknown",
+												"Unknown / prefer not to say",
+											)}
+										</SelectItem>
+										<SelectItem value="paid">
+											{t("errorReport.cloudPlanPaid", "Paid cloud plan")}
+										</SelectItem>
+										<SelectItem value="not_paid">
+											{t(
+												"errorReport.cloudPlanNotPaid",
+												"No paid cloud plan",
+											)}
+										</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+							<Accordion>
+								<AccordionItem id="report-data">
+									<AccordionTrigger className="px-0 py-2">
+										{t("errorReport.viewData", "View data to be sent")}
+									</AccordionTrigger>
+									<AccordionContent bodyClassName="px-0 pb-0">
+										<pre className="custom-scrollbar max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs">
+											{JSON.stringify(report, null, 2)}
+										</pre>
+									</AccordionContent>
+								</AccordionItem>
+							</Accordion>
 							<p className="text-xs text-muted-foreground">
 								{t(
 									"errorReport.retentionNotice",

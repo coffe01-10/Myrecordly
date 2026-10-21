@@ -252,9 +252,10 @@ export function RecordingLibraryPanel({
 								</Checkbox.Control>
 							</Checkbox.Content>
 						</Checkbox>
-						<button
+						<Button
 							type="button"
-							className="flex min-w-0 flex-1 items-center gap-3 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-focus"
+							variant="ghost"
+							className="h-auto min-w-0 flex-1 justify-start gap-3 rounded-md px-0 text-left"
 							disabled={library.busy || library.importing}
 							onClick={() => toggle(entry.path, !library.selected.has(entry.path))}
 							onDoubleClick={() => void library.addToTimeline(entry.path)}
@@ -276,7 +277,7 @@ export function RecordingLibraryPanel({
 									· {(entry.bytes / 1024 / 1024).toFixed(1)} MB
 								</span>
 							</span>
-						</button>
+						</Button>
 						<Button
 							variant="ghost"
 							size="icon"

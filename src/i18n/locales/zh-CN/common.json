@@ -149,7 +149,8 @@
 			"actionFailed": "无法完成操作",
 			"savePreferences": "无法保存媒体库偏好设置",
 			"saveFolders": "无法保存文件夹"
-		}
+		},
+		"cloudAccounts": "网盘账号"
 	},
 	"colorPicker": {
 		"colors": "颜色",

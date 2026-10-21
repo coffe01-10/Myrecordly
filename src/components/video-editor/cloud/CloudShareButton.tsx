@@ -1,4 +1,5 @@
 import { Export, LinkSimple } from "@phosphor-icons/react";
+import { ProgressBar } from "@heroui/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Check } from "@/components/ui/icons";
 import { Label } from "@/components/ui/label";
+import { TextArea } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import { useI18n } from "@/contexts/I18nContext";
 import { CLOUD_SHARE_ENDPOINT as DEFAULT_CLOUD_ENDPOINT } from "./endpoint";
@@ -280,13 +282,13 @@ export function CloudShareButton({
 					{!uploading && (
 						<div className="space-y-2">
 							<Label htmlFor="cloud-share-notes">{t("editor.cloud.notes")}</Label>
-							<textarea
+							<TextArea
 								id="cloud-share-notes"
 								placeholder={t("editor.cloud.notesPlaceholder")}
 								value={notes}
 								onChange={(event) => setNotes(event.target.value.slice(0, 2000))}
 								disabled={uploading}
-								className="block h-20 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+								className="h-20 w-full resize-none"
 							/>
 							{!inline && (
 								<p className="text-right text-[11px] text-muted-foreground">
@@ -297,12 +299,18 @@ export function CloudShareButton({
 					)}
 					{uploading ? (
 						<div className="space-y-2">
-							<div className="h-2 overflow-hidden rounded-full bg-foreground/10">
-								<div
-									className="h-full bg-[#2563EB] transition-all"
-									style={{ width: `${progress}%` }}
-								/>
-							</div>
+							<ProgressBar
+								value={progress}
+								aria-label={t(
+									"editor.cloud.uploadingProgress",
+									"Uploading · {{progress}}%",
+									{ progress },
+								)}
+							>
+								<ProgressBar.Track>
+									<ProgressBar.Fill />
+								</ProgressBar.Track>
+							</ProgressBar>
 							<p className="text-xs text-muted-foreground">
 								{t("editor.cloud.uploadingProgress", "Uploading · {{progress}}%", {
 									progress,

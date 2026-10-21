@@ -122,7 +122,7 @@ export class GoogleDesktopAuth {
 		if (this.pending) return this.pending.promise;
 		if (!this.client)
 			throw new GoogleError(
-				"Import a Google Desktop app OAuth client JSON first.",
+				"This build does not include Google authorization. The application publisher must configure it; you do not need to create an API key.",
 				"NOT_CONFIGURED",
 			);
 		const controller = new AbortController();

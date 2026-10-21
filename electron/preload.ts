@@ -1046,6 +1046,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	cloudShareCancel: (uploadId: string) => ipcRenderer.invoke("cloud-share-cancel", uploadId),
 	drivePickUpload: () => ipcRenderer.invoke("google-drive-pick-upload"),
 	googleAuthState: () => ipcRenderer.invoke("google-auth-state"),
+	cloudStorageRequest: (action: string, input: Record<string, string> = {}) =>
+		ipcRenderer.invoke("cloud-storage-request", action, input),
+	onCloudStorageChanged: (callback: () => void) => {
+		const listener = () => callback();
+		ipcRenderer.on("cloud-storage-changed", listener);
+		return () => ipcRenderer.removeListener("cloud-storage-changed", listener);
+	},
 	googleAuthSignIn: () => ipcRenderer.invoke("google-auth-sign-in"),
 	googleAuthSignOut: () => ipcRenderer.invoke("google-auth-sign-out"),
 	googleAuthImportClient: () => ipcRenderer.invoke("google-auth-import-client"),

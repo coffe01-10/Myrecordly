@@ -164,7 +164,7 @@ export function DashboardSidebar({
 					<Button variant="ghost" className={navClass(false)} onClick={onSignIn}>
 						<UserCircle weight="fill" className="size-[18px] shrink-0" />
 						<span className="truncate">
-							{accountLabel || t("dashboard.signIn", "Sign in")}
+							{accountLabel || t("dashboard.cloudAccounts", "网盘账号")}
 						</span>
 					</Button>
 				</div>

@@ -1,5 +1,5 @@
 import { Card, ProgressBar, Tag, TagGroup } from "@heroui/react";
-import { Export, HardDrive, LinkSimple, GoogleDriveLogo } from "@phosphor-icons/react";
+import { Export, HardDrive, Cloud } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ExportErrorReportButton } from "@/components/feedback/ExportErrorReportButton";
@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/components/ui/toast";
 import type { useI18n } from "@/contexts/I18nContext";
-import { recordlyAuthConfigured } from "@/lib/auth/client";
-import { CloudShareButton } from "../cloud/CloudShareButton";
 import { DriveExportButton } from "../cloud/DriveExportButton";
 import { ExportSettingsMenu } from "../ExportSettingsMenu";
 import type { useExportDimensions } from "../export/useExportDimensions";
@@ -45,8 +43,7 @@ type Props = {
 export function EditorExportMenu(props: Props) {
 	const { publishDestination: storedDestination, setPublishDestination: setDestination } =
 		props.exportSettings;
-	const destination =
-		storedDestination === "link" && !recordlyAuthConfigured ? "drive" : storedDestination;
+	const destination = storedDestination === "link" ? "drive" : storedDestination;
 	const [shareBusy, setShareBusy] = useState(false);
 	const reducedMotion = useReducedMotion();
 	const handledShareRequest = useRef(0);
@@ -67,7 +64,7 @@ export function EditorExportMenu(props: Props) {
 	useEffect(() => {
 		if (props.shareRequestNonce > handledShareRequest.current) {
 			handledShareRequest.current = props.shareRequestNonce;
-			setDestination("link");
+			setDestination("drive");
 			props.handleOpenExportDropdown();
 		}
 	}, [props.shareRequestNonce, props.handleOpenExportDropdown, setDestination]);
@@ -135,7 +132,7 @@ export function EditorExportMenu(props: Props) {
 
 	const settingsForm = (
 		<ExportSettingsMenu
-			exportFormat={destination === "link" ? "mp4" : exportFormat}
+			exportFormat={destination === "drive" ? "mp4" : exportFormat}
 			onExportFormatChange={setExportFormat}
 			exportEncodingMode={exportEncodingMode}
 			onExportEncodingModeChange={setExportEncodingMode}
@@ -160,8 +157,8 @@ export function EditorExportMenu(props: Props) {
 			gifOutputDimensions={gifOutputDimensions}
 			onExport={handleStartExportFromDropdown}
 			hideHeading
-			hideAction={destination === "link"}
-			linkMode={destination === "link"}
+			hideAction={destination === "drive"}
+			linkMode={destination === "drive"}
 			className="rounded-none bg-transparent px-5 pb-5 pt-0 shadow-none"
 		/>
 	);
@@ -223,13 +220,7 @@ export function EditorExportMenu(props: Props) {
 											!isExporting &&
 											!shareBusy
 										)
-											setDestination(
-												keys.has("drive")
-													? "drive"
-													: keys.has("link")
-														? "link"
-														: "local",
-											);
+											setDestination(keys.has("drive") ? "drive" : "local");
 									}}
 								>
 									<TagGroup.List className="flex gap-2">
@@ -238,19 +229,9 @@ export function EditorExportMenu(props: Props) {
 											isDisabled={isExporting || shareBusy}
 											className="h-24 flex-1 flex-col justify-center gap-2 rounded-xl border border-foreground/10"
 										>
-											<GoogleDriveLogo className="size-6" />
-											Google Drive
+											<Cloud className="size-6" />
+											{t("editor.cloudAccounts.destination", "网盘")}
 										</Tag>
-										{recordlyAuthConfigured && (
-											<Tag
-												id="link"
-												isDisabled={isExporting || shareBusy}
-												className="h-24 flex-1 flex-col justify-center gap-2 rounded-xl border border-foreground/10"
-											>
-												<LinkSimple className="size-6" />
-												{t("editor.cloud.link", "Link")}
-											</Tag>
-										)}
 										<Tag
 											id="local"
 											isDisabled={isExporting || shareBusy}
@@ -265,6 +246,18 @@ export function EditorExportMenu(props: Props) {
 							<div>
 								{destination === "drive" ? (
 									<div className="px-5 pb-5">
+										{exportError && (
+											<div className="mb-4 space-y-2">
+												<p className="select-text whitespace-pre-wrap break-words text-xs text-muted-foreground">
+													{exportError}
+												</p>
+												<ExportErrorReportButton
+													key={exportError}
+													error={exportError}
+													format="mp4"
+												/>
+											</div>
+										)}
 										<DriveExportButton
 											prepareFile={props.prepareExportForShare}
 											projectTitle={props.projectTitle}
@@ -272,31 +265,6 @@ export function EditorExportMenu(props: Props) {
 											onCancelPrepare={handleCancelExport}
 											onBusyChange={setShareBusy}
 										/>
-									</div>
-								) : destination === "link" ? (
-									<div className="px-5 pb-5">
-										<CloudShareButton
-											inline
-											projectPath={props.projectPath}
-											projectTitle={props.projectTitle}
-											prepareFile={props.prepareExportForShare}
-											onCancelPrepare={handleCancelExport}
-											preparationProgress={exportProgress?.percentage ?? 0}
-											authToken={props.authToken}
-											accountId={props.accountId}
-											onBusyChange={setShareBusy}
-											onRequestSignIn={() => {
-												setShowExportDropdown(false);
-												props.onRequestShareSignIn();
-											}}
-										/>
-										{exportError && !shareBusy && (
-											<ExportErrorReportButton
-												key={exportError}
-												error={exportError}
-												format="mp4"
-											/>
-										)}
 									</div>
 								) : isExporting ? (
 									<Card className="rounded-none bg-transparent p-5 text-foreground shadow-none">

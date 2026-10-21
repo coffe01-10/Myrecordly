@@ -117,13 +117,13 @@ export function EditorSidebar({
 							variant="ghost"
 							isIconOnly
 							className="editor-account-button mt-1"
-							aria-label={t("editor.sidebar.recordlyAccount", "Recordly account")}
+							aria-label={t("editor.cloudAccounts.title", "网盘账号")}
 							onPress={onAccountClick}
 						>
 							<AccountAvatar user={accountUser} className="!size-7" />
 						</Button>
 						<Tooltip.Content placement="right">
-							{t("editor.account.title", "Account")}
+							{t("editor.cloudAccounts.title", "网盘账号")}
 						</Tooltip.Content>
 					</Tooltip>
 				</nav>

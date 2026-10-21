@@ -1,4 +1,17 @@
 import { Button } from "@/components/ui/button";
+import {
+	Accordion,
+	AccordionItem,
+	AccordionTrigger,
+	AccordionContent,
+} from "@/components/ui/accordion";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { useI18n } from "@/contexts/I18nContext";
 import type { SmartCutAction } from "./smartCutPlan";
 import type { useSmartCut } from "./useSmartCut";
@@ -42,20 +55,26 @@ export default function SmartCutPanel({ cut }: { cut: ReturnType<typeof useSmart
 						)}
 					</p>
 				)}
-				<label className="flex items-center justify-between gap-2 text-sm">
-					{t("editor.smartCut.minimum", "Minimum pause")}
-					<select
-						className="rounded-md border border-separator bg-background p-1.5"
-						value={cut.minPauseMs}
-						onChange={(event) => cut.setMinPauseMs(Number(event.target.value))}
+				<div className="flex items-center justify-between gap-2 text-sm">
+					<span>{t("editor.smartCut.minimum", "Minimum pause")}</span>
+					<Select
+						aria-label={t("editor.smartCut.minimum", "Minimum pause")}
+						className="w-20"
+						value={String(cut.minPauseMs)}
+						onValueChange={(value) => cut.setMinPauseMs(Number(value))}
 					>
-						{[1000, 2000, 3000, 5000].map((value) => (
-							<option key={value} value={value}>
-								{value / 1000} s
-							</option>
-						))}
-					</select>
-				</label>
+						<SelectTrigger className="h-8 w-full text-xs">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{[1000, 2000, 3000, 5000].map((value) => (
+								<SelectItem key={value} value={String(value)}>
+									{`${value / 1000} s`}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
 				{!cut.analysis && (
 					<Button
 						className="w-full"
@@ -87,18 +106,22 @@ export default function SmartCutPanel({ cut }: { cut: ReturnType<typeof useSmart
 					</p>
 				)}
 			</div>
-			<div className="min-h-0 flex-1 overflow-y-auto p-3">
+			<div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-3">
 				{cut.analysis && (
 					<>
-						<details className="mb-2 text-xs leading-relaxed text-muted-foreground">
-							<summary className="cursor-pointer">
-								{t("editor.smartCut.criteria", "How pauses are selected")}
-							</summary>
-							{t(
-								"editor.smartCut.safety",
-								"Quiet sections with cursor activity, added audio, or no cursor data are kept by default. Each cut keeps 250 ms at both ends.",
-							)}
-						</details>
+						<Accordion className="mb-2">
+							<AccordionItem id="criteria">
+								<AccordionTrigger className="px-0 py-2 text-xs text-muted-foreground">
+									{t("editor.smartCut.criteria", "How pauses are selected")}
+								</AccordionTrigger>
+								<AccordionContent bodyClassName="px-0 pb-2 text-xs leading-relaxed">
+									{t(
+										"editor.smartCut.safety",
+										"Quiet sections with cursor activity, added audio, or no cursor data are kept by default. Each cut keeps 250 ms at both ends.",
+									)}
+								</AccordionContent>
+							</AccordionItem>
+						</Accordion>
 						{!cut.analysis.hasAudio && (
 							<p role="status" className="mb-3 text-xs text-muted-foreground">
 								{t(
@@ -125,29 +148,36 @@ export default function SmartCutPanel({ cut }: { cut: ReturnType<typeof useSmart
 											count: cut.candidates.length,
 										})}
 									</span>
-									<select
+									<Select
 										aria-label={t("editor.smartCut.bulk", "Set all sections")}
 										value=""
-										className="min-w-0 rounded-md border border-separator bg-background p-1 text-xs"
-										onChange={(event) =>
-											cut.setAll(event.target.value as SmartCutAction)
+										className="min-w-0 w-auto"
+										onValueChange={(value) =>
+											cut.setAll(value as SmartCutAction)
 										}
 									>
-										<option value="" disabled>
-											{t("editor.smartCut.bulk", "Set all sections")}
-										</option>
-										{choices.map(([value, label]) => (
-											<option key={value} value={value}>
-												{label}
-											</option>
-										))}
-									</select>
+										<SelectTrigger className="h-8 text-xs">
+											<SelectValue
+												placeholder={t(
+													"editor.smartCut.bulk",
+													"Set all sections",
+												)}
+											/>
+										</SelectTrigger>
+										<SelectContent>
+											{choices.map(([value, label]) => (
+												<SelectItem key={value} value={value}>
+													{label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
 								</div>
 								<ol className="space-y-3">
 									{cut.candidates.map((item, index) => (
 										<li
 											key={item.id}
-											className={`rounded-xl border p-3 ${cut.previewId === item.id ? "border-primary bg-primary/5" : "border-separator bg-content1/50"}`}
+											className={`rounded-xl border p-3 ${cut.previewId === item.id ? "border-primary bg-primary/5" : "border-separator bg-surface-secondary"}`}
 										>
 											<div className="mb-2 flex items-center justify-between gap-2">
 												<span className="font-mono text-xs">
@@ -192,27 +222,32 @@ export default function SmartCutPanel({ cut }: { cut: ReturnType<typeof useSmart
 														? t("editor.smartCut.stop", "Stop")
 														: t("editor.smartCut.preview", "Preview")}
 												</Button>
-												<select
+												<Select
 													aria-label={t(
 														"editor.smartCut.action",
 														"Action for section {{index}}",
 														{ index: index + 1 },
 													)}
-													className="min-w-0 flex-1 rounded-md border border-separator bg-background p-2 text-xs"
+													className="min-w-0 flex-1"
 													value={item.action}
-													onChange={(event) =>
+													onValueChange={(value) =>
 														cut.setAction(
 															item.id,
-															event.target.value as SmartCutAction,
+															value as SmartCutAction,
 														)
 													}
 												>
-													{choices.map(([value, label]) => (
-														<option key={value} value={value}>
-															{label}
-														</option>
-													))}
-												</select>
+													<SelectTrigger className="h-8 w-full text-xs">
+														<SelectValue />
+													</SelectTrigger>
+													<SelectContent>
+														{choices.map(([value, label]) => (
+															<SelectItem key={value} value={value}>
+																{label}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 											</div>
 										</li>
 									))}

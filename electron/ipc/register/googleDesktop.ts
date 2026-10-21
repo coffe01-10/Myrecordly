@@ -62,8 +62,6 @@ export function registerGoogleDesktopHandlers() {
 	ipcMain.handle(
 		"google-auth-sign-in",
 		wrap(async () => {
-			if (!(await auth.state()).configured && !(await importClient()).configured)
-				throw new GoogleError("Google authorization was canceled.", "AUTH_CANCELED");
 			const state = await auth.signIn();
 			const window =
 				BrowserWindow.getAllWindows().find((candidate) =>

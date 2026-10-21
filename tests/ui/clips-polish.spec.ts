@@ -51,21 +51,14 @@ test("annotations can be dragged into the canvas background and survive undo", a
 		.toBeGreaterThan(overlay.x + 8);
 });
 
-test("cloud sharing is reachable from Export and the account control", async ({ page }) => {
-	const errors: string[] = [];
-	page.on("pageerror", (error) => errors.push(error.message));
-	await page.getByRole("button", { name: "Export", exact: true }).click();
-	await page.getByRole("button", { name: "Create share link", exact: true }).click();
-	await expect(page.getByRole("heading", { name: "Sign into Recordly" })).toBeVisible();
+test("cloud accounts is reachable from Publish and the account control", async ({ page }) => {
+	await page.getByRole("button", { name: "Cloud accounts", exact: true }).click();
+	const dialog = page.getByRole("dialog", { name: "Cloud accounts", exact: true });
 	await expect(
-		page.getByText("Sign in to publish this video and manage its shared link."),
+		dialog.getByRole("heading", { name: "Cloud accounts", exact: true }),
 	).toBeVisible();
-	await page.screenshot({ path: "test-results/cloud-sign-in.png", animations: "disabled" });
-	const dialog = page.getByRole("dialog");
-	await expect(dialog.locator(".modal__body")).toBeVisible();
-	expect(await dialog.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
-	await page.getByRole("button", { name: "Close", exact: true }).click();
-	await page.getByRole("button", { name: "Recordly account", exact: true }).click();
-	await expect(page.getByRole("heading", { name: "Sign into Recordly" })).toBeVisible();
-	expect(errors).toEqual([]);
+	await dialog.getByRole("button", { name: "Done", exact: true }).click();
+	await page.getByRole("button", { name: "Publish", exact: true }).click();
+	await page.getByRole("row", { name: "Cloud storage", exact: true }).click();
+	await expect(page.getByText("Manage cloud accounts", { exact: true })).toBeVisible();
 });

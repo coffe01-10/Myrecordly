@@ -164,7 +164,7 @@
 		"replaceClient": "更换 Google 客户端配置",
 		"sessionOnly": "本机暂时无法加密保存凭据，本次登录仅在应用运行期间有效，重启后需重新登录。",
 		"googleErrors": {
-			"NOT_CONFIGURED": "请先导入 Google“桌面应用”OAuth 客户端 JSON。",
+			"NOT_CONFIGURED": "此版本尚未内置 Google 授权，请先使用其他网盘。",
 			"INVALID_CLIENT": "请选择“桌面应用”类型的 OAuth 客户端 JSON，不能使用 Web 客户端或 API 密钥。",
 			"AUTH_CANCELED": "已取消 Google 登录。",
 			"AUTH_TIMEOUT": "浏览器登录等待超时，请重新点击 Google。",
@@ -535,5 +535,38 @@
 		"collapse": "折叠时间轴",
 		"unsupportedSpeed": "此设备不支持以该速度预览。"
 	},
-	"openRecordingsFolder": "打开录制文件夹"
+	"openRecordingsFolder": "打开录制文件夹",
+	"cloudAccounts": {
+		"title": "网盘账号",
+		"description": "连接自己的网盘，集中管理素材与成片。",
+		"browserAuth": "浏览器授权",
+		"websiteSession": "官方网页会话",
+		"googleReady": "浏览器登录并连接网盘",
+		"googleUnavailable": "此版本尚未内置 Google 授权，请先使用其他网盘。",
+		"disconnect": "断开",
+		"signIn": "登录",
+		"signingIn": "请在打开的窗口中完成登录…",
+		"runtimeMissing": "此构建未附带直连组件，网页登录仍可使用。",
+		"sessionOnly": "系统密钥环不可用，直连授权仅保留至本次退出。",
+		"saved": "已保存的账号与网页会话",
+		"accountName": "账号备注名",
+		"webSaved": "独立网页会话 · 登录状态请在官网确认",
+		"connected": "已授权 · 可在应用内浏览与传输文件",
+		"open": "打开网盘",
+		"rename": "修改备注名",
+		"remove": "移除本机会话",
+		"webNotice": "网页登录由网盘官网处理，Recordly 不读取密码，也不会仅凭打开网页就标记为授权成功。移除会话只清除此应用的本机登录，不删除云端文件。",
+		"optional": "录制与剪辑可直接使用，登录仅用于自己的网盘。",
+		"continueLocal": "继续使用 Recordly",
+		"manage": "管理网盘账号",
+		"choose": "选择网盘账号",
+		"start": "添加直连账号后可在这里浏览文件；网页登录会话请点击“打开网盘”。",
+		"parent": "上一级",
+		"empty": "此文件夹暂无文件",
+		"exportFolder": "成片会保存到所选网盘的 Recordly 文件夹，同名文件会更新。",
+		"saveVideo": "保存成片到网盘",
+		"videoSaved": "成片已保存到网盘 Recordly 文件夹",
+		"destination": "网盘",
+		"newSession": "新建独立网页会话"
+	}
 }

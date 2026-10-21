@@ -2,6 +2,7 @@ import { useState, type ComponentProps } from "react";
 import { createRoot } from "react-dom/client";
 import { I18nProvider, useI18n } from "@/contexts/I18nContext";
 import { EditorExportMenu } from "@/components/video-editor/layout/EditorExportMenu";
+import { CloudShareButton } from "@/components/video-editor/cloud/CloudShareButton";
 import "@/index.css";
 import { loadEditorPreferences } from "@/components/video-editor/editorPreferences";
 import { useExportSettings } from "@/components/video-editor/export/useExportSettings";
@@ -11,6 +12,31 @@ let reportUpload:
 	| ((event: { uploadId: string; uploadedBytes: number; totalBytes: number }) => void)
 	| undefined;
 window.electronAPI = {
+	onCloudStorageChanged: () => () => undefined,
+	cloudStorageRequest: async (action: string, input: Record<string, string>) => {
+		if (action === "state")
+			return {
+				success: true,
+				data: {
+					accounts: [
+						{
+							id: "fixture",
+							provider: "onedrive",
+							name: "OneDrive",
+							mode: "oauth",
+							connectedAt: "",
+						},
+					],
+					runtimeAvailable: true,
+					sessionOnly: false,
+				},
+			};
+		if (action === "upload") {
+			await new Promise((resolve) => setTimeout(resolve, 600));
+			document.documentElement.dataset.uploadedFile = input.name;
+		}
+		return { success: true, data: null };
+	},
 	cloudShareManage: async ({ token }: { token: string }) => ({
 		success: true,
 		videos:
@@ -110,7 +136,25 @@ function Preview() {
 					</button>
 				</div>
 			)}
-			<EditorExportMenu {...props} />
+			{new URLSearchParams(location.search).has("legacy") ? (
+				<>
+					<button type="button" onClick={() => setOpen(true)}>
+						Publish
+					</button>
+					{open && (
+						<CloudShareButton
+							inline
+							authToken={authToken}
+							accountId={accountId}
+							projectTitle="Preview"
+							prepareFile={props.prepareExportForShare}
+							preparationProgress={percentage}
+						/>
+					)}
+				</>
+			) : (
+				<EditorExportMenu {...props} />
+			)}
 		</div>
 	);
 }
